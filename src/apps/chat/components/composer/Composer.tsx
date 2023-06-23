@@ -15,7 +15,7 @@ import PsychologyIcon from '@mui/icons-material/Psychology';
 import StopOutlinedIcon from '@mui/icons-material/StopOutlined';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
-
+import { SystemPurposeId, SystemPurposes } from '../../../../data';
 import { ContentReducer } from '~/modules/aifn/summarize/ContentReducer';
 import { useChatLLM } from '~/modules/llms/store-llms';
 
@@ -144,7 +144,7 @@ const SentMessagesMenu = (props: {
  */
 export function Composer(props: {
   conversationId: string | null; messageId: string | null;
-  isDeveloperMode: boolean;
+  systemPurpose: SystemPurposeId | null;
   onSendMessage: (sendModeId: SendModeId, conversationId: string, text: string) => void;
   sx?: SxProps;
 }) {
@@ -408,11 +408,9 @@ export function Composer(props: {
   };
 
   // const prodiaApiKey = isValidProdiaApiKey(useSettingsStore(state => state.prodiaApiKey));
-  // const isProdiaConfigured = !requireUserKeyProdia || prodiaApiKey;
-  const textPlaceholder: string = props.isDeveloperMode
-    ? 'Tell me what you need, and drop source files...'
-    : /*isProdiaConfigured ?*/ 'Type a question...' /*: 'Chat · /react · drop text files...'*/;
-
+  // const isProdiaConfigured = !requireUserKeyProdia || prodiaApiKey; 
+  const textPlaceholder: string = SystemPurposes[props.systemPurpose as SystemPurposeId].placeHolder;
+    
   const isReAct = sendModeId === 'react';
 
   return (
@@ -451,7 +449,7 @@ export function Composer(props: {
               title={pasteClipboardLegend}>
               <Button fullWidth variant='plain' color='neutral' startDecorator={<ContentPasteGoIcon />} onClick={handlePasteButtonClicked}
                       sx={{ ...hideOnMobile, justifyContent: 'flex-start' }}>
-                {props.isDeveloperMode ? 'Paste code' : 'Paste'}
+                
               </Button>
             </Tooltip>
 
@@ -465,7 +463,7 @@ export function Composer(props: {
             <Box sx={{ position: 'relative' }}>
 
               <Textarea
-                variant='outlined' color={isReAct ? 'info' : 'neutral'}
+                variant='outlined' color={isReAct ? 'primary' : 'info'}
                 autoFocus
                 minRows={4} maxRows={12}
                 placeholder={textPlaceholder}
@@ -498,7 +496,7 @@ export function Composer(props: {
             {/* {!!tokenLimit && <TokenBadge directTokens={directTokens} indirectTokens={historyTokens + responseTokens} tokenLimit={tokenLimit} absoluteBottomRight />} */}
 
             <Card
-              color='primary' invertedColors variant='soft'
+              color='info' invertedColors variant='soft'
               sx={{
                 display: isDragging ? 'flex' : 'none',
                 position: 'absolute', bottom: 0, left: 0, right: 0, top: 0,
@@ -536,7 +534,7 @@ export function Composer(props: {
               {assistantTyping
                 ? (
                   <Button
-                    fullWidth variant='soft' color={isReAct ? 'info' : 'primary'} disabled={!props.conversationId}
+                    fullWidth variant='soft' color={isReAct ? 'primary' : 'info'} disabled={!props.conversationId}
                     onClick={handleStopClicked}
                     endDecorator={<StopOutlinedIcon />}
                   >
@@ -544,7 +542,7 @@ export function Composer(props: {
                   </Button>
                 ) : (
                   <Button
-                    fullWidth variant='solid' color={isReAct ? 'info' : 'primary'} disabled={!props.conversationId || !chatLLM}
+                    fullWidth variant='solid' color={isReAct ? 'primary' : 'info'} disabled={!props.conversationId || !chatLLM}
                     onClick={handleSendClicked} onDoubleClick={handleShowSendMode}
                     endDecorator={isReAct ? <PsychologyIcon /> : <TelegramIcon />}
                   >

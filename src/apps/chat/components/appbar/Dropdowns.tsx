@@ -81,13 +81,14 @@ export function Dropdowns(props: {
 
       </>}
     />
-
+    {/*}
     {systemPurposeId && (
       <AppBarDropdown
         items={SystemPurposes} showSymbols={zenMode === 'clean'}
         value={systemPurposeId} onChange={handleSystemPurposeChange}
       />
     )}
+    */}
 
   </>;
 }

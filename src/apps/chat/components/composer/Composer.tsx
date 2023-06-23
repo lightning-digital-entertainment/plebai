@@ -411,7 +411,7 @@ export function Composer(props: {
   // const isProdiaConfigured = !requireUserKeyProdia || prodiaApiKey;
   const textPlaceholder: string = props.isDeveloperMode
     ? 'Tell me what you need, and drop source files...'
-    : /*isProdiaConfigured ?*/ 'Chat · /react · /imagine · drop text files...' /*: 'Chat · /react · drop text files...'*/;
+    : /*isProdiaConfigured ?*/ 'Type a question...' /*: 'Chat · /react · drop text files...'*/;
 
   const isReAct = sendModeId === 'react';
 
@@ -495,7 +495,7 @@ export function Composer(props: {
 
             {isSpeechEnabled && <MicButton variant={micVariant} color={micColor} onClick={handleMicClicked} sx={{ ...hideOnMobile, position: 'absolute', top: 0, right: 0, margin: 1 }} />}
 
-            {!!tokenLimit && <TokenBadge directTokens={directTokens} indirectTokens={historyTokens + responseTokens} tokenLimit={tokenLimit} absoluteBottomRight />}
+            {/* {!!tokenLimit && <TokenBadge directTokens={directTokens} indirectTokens={historyTokens + responseTokens} tokenLimit={tokenLimit} absoluteBottomRight />} */}
 
             <Card
               color='primary' invertedColors variant='soft'

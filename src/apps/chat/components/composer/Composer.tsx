@@ -486,9 +486,9 @@ export function Composer(props: {
                   fontSize: '16px',
                   lineHeight: 1.75,
                 }} />
-
+                {/*
               {tokenLimit > 0 && (directTokens > 0 || (historyTokens + responseTokens) > 0) && <TokenProgressbar history={historyTokens} response={responseTokens} direct={directTokens} limit={tokenLimit} />}
-
+              */}
             </Box>
 
             {isSpeechEnabled && <MicButton variant={micVariant} color={micColor} onClick={handleMicClicked} sx={{ ...hideOnMobile, position: 'absolute', top: 0, right: 0, margin: 1 }} />}

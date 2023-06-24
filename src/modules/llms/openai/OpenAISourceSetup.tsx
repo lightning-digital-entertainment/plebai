@@ -129,9 +129,11 @@ export function OpenAISourceSetup(props: { sourceId: DModelSourceId }) {
 
     <Box sx={{ display: 'flex', alignItems: 'end', justifyContent: 'space-between' }}>
 
+      {/*
       <FormLabel onClick={() => setShowAdvanced(!showAdvanced)} sx={{ textDecoration: 'underline', cursor: 'pointer' }}>
         {showAdvanced ? 'Hide Advanced' : 'Advanced'}
       </FormLabel>
+      */}
 
       <Button
         variant='solid' color={isError ? 'warning' : 'primary'}

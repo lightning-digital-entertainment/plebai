@@ -34,10 +34,12 @@ export function SettingsModal() {
 
       <Tabs aria-label='Settings tabbed menu' defaultValue={settingsOpenTab} sx={{ borderRadius: 'lg' }}>
         <TabList variant='soft' color='neutral' sx={{ mb: 2 /* gap: 3, minus 0.5 for the Tabs-gap, minus 0.5 for perception */ }}>
-          <Tab value={1}>UI</Tab>
+          <Tab value={1}>User Interface</Tab>
+          {/*
           <Tab value={2}>Draw</Tab>
           <Tab value={3}>Speak</Tab>
           <Tab value={4}>Tools</Tab>
+              */}
         </TabList>
 
         <TabPanel value={1} sx={{ p: 'var(--Tabs-gap)' }}>

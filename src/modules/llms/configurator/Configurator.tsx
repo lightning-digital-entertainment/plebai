@@ -33,7 +33,7 @@ export function Configurator() {
 
   const activeSource = modelSources.find(source => source.id === selectedSourceId);
 
-
+  
   // if no sources at startup, open the modal
   React.useEffect(() => {
     if (!selectedSourceId)
@@ -51,15 +51,19 @@ export function Configurator() {
   return <>
 
     {/* Sources Setup */}
-    <GoodModal title={<>Configure <b>AI Models</b></>} open={modelsSetupOpen} onClose={closeModelsSetup}>
+    <GoodModal title={<>Configure <b>AI Models</b> <br></br>Pick a model from list below and click close</>} open={modelsSetupOpen} onClose={closeModelsSetup}>
 
       <EditSources selectedSourceId={selectedSourceId} setSelectedSourceId={setSelectedSourceId} />
 
       {!!activeSource && <Divider />}
 
+      
+
       {!!activeSource && <VendorSourceSetup source={activeSource} />}
 
       {!!llmCount && <Divider />}
+
+      
 
       {!!llmCount && <LLMList />}
 

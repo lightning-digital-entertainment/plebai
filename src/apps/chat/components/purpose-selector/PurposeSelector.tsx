@@ -139,7 +139,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
 
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 2, mb: 1 }}>
           <Typography level='body2' color='neutral'>
-            Select an AI Avatar to serve your needs
+            Select the right AI assistant to serve your needs
           </Typography>
           <Button variant='plain' color='neutral' size='sm' onClick={toggleEditMode}>
             {editMode ? 'Done' : 'Edit'}
@@ -151,7 +151,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
             <Grid key={spId}>
               <Button
                 variant={(!editMode && systemPurposeId === spId) ? 'solid' : 'soft'}
-                color={(!editMode && systemPurposeId === spId) ? 'primary' : SystemPurposes[spId as SystemPurposeId]?.highlighted ? 'warning' : 'neutral'}
+                color={(!editMode && systemPurposeId === spId) ? 'info' : SystemPurposes[spId as SystemPurposeId]?.highlighted ? 'warning' : 'neutral'}
                 onClick={() => !editMode && handlePurposeChanged(spId as SystemPurposeId)}
                 sx={{
                   flexDirection: 'column',

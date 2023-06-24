@@ -6,7 +6,7 @@ import { SxProps } from '@mui/joy/styles/types';
 import ClearIcon from '@mui/icons-material/Clear';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
-import Face6Icon from '@mui/icons-material/Face6';
+import Face6Icon from '@mui/icons-material/EmojiPeopleRounded'; 
 import FastForwardIcon from '@mui/icons-material/FastForward';
 import FormatPaintIcon from '@mui/icons-material/FormatPaint';
 import MoreVertIcon from '@mui/icons-material/MoreVert';

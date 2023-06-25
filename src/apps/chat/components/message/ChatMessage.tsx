@@ -67,7 +67,7 @@ export function makeAvatar(messageAvatar: string | null, messageRole: DMessage['
             ? 'https://i.giphy.com/media/5t9ujj9cMisyVjUZ0m/giphy.webp'
             : messageOriginLLM?.startsWith('react-')
               ? 'https://i.giphy.com/media/l44QzsOLXxcrigdgI/giphy.webp'
-              : 'https://i.giphy.com/media/jJxaUysjzO9ri/giphy.webp'}
+              : 'https://media.giphy.com/media/H1dxi6xdh4NGQCZSvz/giphy.gif'}
           sx={{ ...mascotSx, borderRadius: 'var(--joy-radius-sm)' }}
         />;
       }

@@ -9,6 +9,7 @@ import { useChatStore } from '~/common/state/store-chats';
 import { useUIPreferencesStore } from '~/common/state/store-ui';
 
 import { SystemPurposeId, SystemPurposes } from '../../../../data';
+import { useModelsStore } from '~/modules/llms/store-llms';
 import { usePurposeStore } from './store-purposes';
 
 
@@ -40,6 +41,10 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   const [searchQuery, setSearchQuery] = React.useState('');
   const [filteredIDs, setFilteredIDs] = React.useState<SystemPurposeId[] | null>(null);
   const [editMode, setEditMode] = React.useState(false);
+
+  const { setChatLLMId } = useModelsStore(state => ({
+    setChatLLMId: state.setChatLLMId,
+  }), shallow);
 
   // external state
   const theme = useTheme();
@@ -92,10 +97,13 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
 
   const toggleEditMode = () => setEditMode(!editMode);
 
-
   const handlePurposeChanged = (purposeId: SystemPurposeId | null) => {
-    if (purposeId)
+    if (purposeId) {
       setSystemPurposeId(props.conversationId, purposeId);
+      console.log(SystemPurposes[purposeId as SystemPurposeId].chatLLM)
+      setChatLLMId(SystemPurposes[purposeId as SystemPurposeId].chatLLM)
+
+    }  
   };
 
   const handleCustomSystemMessageChange = (v: React.ChangeEvent<HTMLTextAreaElement>): void => {

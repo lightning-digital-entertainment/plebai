@@ -10,7 +10,7 @@ export type DLLMId = string;
 export type DLLMOptions = LLMOptionsOpenAI; //DLLMValuesOpenAI | DLLMVaLocalAIDLLMValues;
 export type DModelSourceId = string;
 export type DModelSourceSetup = SourceSetupOpenAI | SourceSetupLocalAI;
-export type ModelVendorId = 'localai' | 'openai'; // | 'anthropic' | 'azure_openai' | 'google_vertex';
+export type ModelVendorId = 'localai' | 'openai' | 'gpt4allloraq4'; // | 'anthropic' | 'azure_openai' | 'google_vertex';
 
 
 /// Large Language Model - a model that can generate text

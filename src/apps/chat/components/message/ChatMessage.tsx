@@ -297,7 +297,7 @@ export function ChatMessage(props: { message: DMessage, isBottom: boolean, onMes
               fontSize: { xs: 'xs', sm: 'sm' }, fontWeight: 500,
               ...(messageTyping ? { animation: `${cssRainbowColorKeyframes} 5s linear infinite` } : {}),
             }}>
-              {prettyBaseModel(messageOriginLLM)}
+              {prettyBaseModel(messagePurposeId)}
             </Typography>
           </Tooltip>
         )}

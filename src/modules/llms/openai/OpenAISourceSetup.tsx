@@ -22,6 +22,8 @@ export function OpenAISourceSetup(props: { sourceId: DModelSourceId }) {
   // state
   const [showAdvanced, setShowAdvanced] = React.useState(false);
 
+  console.log('Source ID: %o ', props.sourceId)
+
   // external state
   const {
     source, sourceLLMs, updateSetup,
@@ -152,7 +154,7 @@ export function OpenAISourceSetup(props: { sourceId: DModelSourceId }) {
 
 
 // this will help with adding metadata to the models
-const knownBases = [
+export const knownBases = [
   {
     id: 'gpt-4-32k-0613',
     label: 'GPT-4-32k (0613)',
@@ -186,7 +188,7 @@ const knownBases = [
 ];
 
 
-function openAIModelToDLLM(model: OpenAI.Wire.Models.ModelDescription, source: DModelSource): DLLM & { options: LLMOptionsOpenAI } {
+export function openAIModelToDLLM(model: OpenAI.Wire.Models.ModelDescription, source: DModelSource): DLLM & { options: LLMOptionsOpenAI } {
   const base = knownBases.find(base => model.id.startsWith(base.id)) || knownBases[knownBases.length - 1];
   const suffix = model.id.slice(base.id.length).trim();
   const hidden = !!suffix && suffix.startsWith('-03');

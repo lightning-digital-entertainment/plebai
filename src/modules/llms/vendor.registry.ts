@@ -1,6 +1,7 @@
 import { DModelSource, DModelSourceId, ModelVendor, ModelVendorId } from './llm.types';
 import { ModelVendorLocalAI } from './localai/localai.vendor';
 import { ModelVendorOpenAI } from './openai/openai.vendor';
+import {ModelVendorGpt4AllAI } from './gpt4all/gpt4all.vendor'
 
 
 export function findAllVendors(): ModelVendor[] {
@@ -39,8 +40,9 @@ export const createDefaultModelSource = (otherSources: DModelSource[]): DModelSo
 const MODEL_VENDOR_REGISTRY: Record<ModelVendorId, ModelVendor> = {
   openai: ModelVendorOpenAI,
   localai: ModelVendorLocalAI,
+  gpt4allloraq4: ModelVendorGpt4AllAI,
   // azure_openai: { id: 'azure_openai', name: 'Azure OpenAI', instanceLimit: 1, location: 'cloud', rank: 30 },
-  // google_vertex: { id: 'google_vertex', name: 'Google Vertex', instanceLimit: 1, location: 'cloud', rank: 40 },
+  //google_vertex: { id: 'google_vertex', name: 'Google Vertex', instanceLimit: 1, location: 'cloud', rank: 40 },
   // anthropic: { id: 'anthropic', name: 'Anthropic', instanceLimit: 1, location: 'cloud', rank: 50 },
 };
 

@@ -12,6 +12,7 @@ import { useModelsStore } from '~/modules/llms/store-llms';
 import { AppBarDropdown, DropdownItems } from '~/common/layouts/appbar/AppBarDropdown';
 import { useChatStore } from '~/common/state/store-chats';
 import { useUIPreferencesStore, useUIStateStore } from '~/common/state/store-ui';
+import { Link } from '~/common/components/Link';
 
 
 export function Dropdowns(props: {
@@ -52,43 +53,19 @@ export function Dropdowns(props: {
       llmItems[llm.id] = { title: llm.label };
 
   return <>
-
-    <AppBarDropdown
-      items={llmItems}
-      value={chatLLMId} onChange={handleChatModelChange}
-      placeholder='Models …'
-      appendOption={<>
-
-        {chatLLMId && (
-          <ListItemButton key='menu-opt' onClick={handleOpenLLMOptions}>
-            <ListItemDecorator>
-              <SettingsIcon color='info' />
-            </ListItemDecorator>
-            <Typography>
-              Options
-            </Typography>
-          </ListItemButton>
-        )}
-
-        <ListItemButton key='menu-llms' onClick={openModelsSetup}>
-          <ListItemDecorator>
-            <BuildCircleIcon color='info' />
-          </ListItemDecorator>
-          <Typography>
-            Models
-          </Typography>
-        </ListItemButton>
-
-      </>}
-    />
-    {/*}
-    {systemPurposeId && (
-      <AppBarDropdown
-        items={SystemPurposes} showSymbols={zenMode === 'clean'}
-        value={systemPurposeId} onChange={handleSystemPurposeChange}
-      />
-    )}
-    */}
-
+            <Typography  level='body1' color='info'  sx={{
+              mt: 0,
+              fontSize: 24,
+              fontWeight: 500,
+              color:'white', 
+              href: 'https://plebai.com',
+               alignItems: 'center', gap: 1,
+              justifyContent: 'center',
+            }} >  
+                PlebAI
+            
+                </Typography>  
+            
+  
   </>;
 }

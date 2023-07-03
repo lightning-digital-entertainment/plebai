@@ -117,7 +117,7 @@ export function ApplicationBar(props: { sx?: SxProps }) {
       <ListDivider />
       {contextMenuItems}
       
-      {/* <SupportMenuItem /> */}
+       <SupportMenuItem /> 
     </Menu>
 
   </>;

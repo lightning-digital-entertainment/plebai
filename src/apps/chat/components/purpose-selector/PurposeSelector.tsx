@@ -146,7 +146,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
       <Box sx={{ maxWidth: bpMaxWidth }}>
 
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 2, mb: 1 }}>
-          <Typography level='body2' color='neutral'>
+          <Typography level='body1' color='neutral'>
             Select the right AI Agent to serve your needs
           </Typography>
           <Button variant='plain' color='neutral' size='sm' onClick={toggleEditMode}>
@@ -180,7 +180,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
                     sx={{ alignSelf: 'flex-start' }}
                   />
                 )}
-                <div style={{ fontSize: '2rem' }}>
+                <div style={{ fontSize: '4.5rem' }}>
                   {SystemPurposes[spId as SystemPurposeId]?.symbol}
                 </div>
                 <div>
@@ -191,18 +191,31 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
           ))}
         </Grid>
 
-        <Typography
-          level='body2'
-          sx={{
-            mt: selectedExample ? 1 : 3,
-            display: 'flex', alignItems: 'center', gap: 1,
-            // justifyContent: 'center',
+        <Typography level='body1' color='neutral' sx={{
+              mt: 2,
+            }} >
+          {selectedPurpose? <div style={{ fontSize: '1rem' }}>  {selectedPurpose.placeHolder}  <br /> </div> : ''}
+        </Typography>
+
+        <Typography level='body1' color='neutral' sx={{
+              mt: 2,
+            }} >
+              {systemPurposeId != 'Custom'? <><text> Start with suggested questions (mouse over and select). </text><br /></>: ''  }
+          
+        </Typography>
+
+        <Typography level='body2' color='neutral' sx={{
+              mt: 2,
+               alignItems: 'left', gap: 1,
+              justifyContent: 'left',
             '&:hover > button': { opacity: 1 },
-          }}>
-          {!selectedPurpose
-            ? 'Oops! No AI purposes found for your search.'
-            : (selectedExample
+            }} >
+          
+          {selectedPurpose?.examples?.map((selectedExample) => (
+             
+              (selectedExample
                 ? <>
+                  
                   <i>{selectedExample}</i>
                   <IconButton
                     variant='plain' color='neutral' size='md'
@@ -210,10 +223,14 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
                     sx={{ opacity: 0, transition: 'opacity 0.3s' }}
                   >
                     💬
-                  </IconButton>
+                  </IconButton><br />
+                  
+                 
                 </>
                 : selectedPurpose.description
-            )}
+              )
+          ))}
+          
         </Typography>
 
         {systemPurposeId === 'Custom' && (

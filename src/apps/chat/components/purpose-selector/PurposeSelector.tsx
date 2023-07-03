@@ -200,7 +200,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
         <Typography level='body1' color='neutral' sx={{
               mt: 2,
             }} >
-              {systemPurposeId != 'Custom'? <><text> Start with suggested questions (mouse over and select). </text><br /></>: ''  }
+              {systemPurposeId != 'Custom'? <><text> Start with suggested questions below. </text><br /></>: ''  }
           
         </Typography>
 
@@ -220,7 +220,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
                   <IconButton
                     variant='plain' color='neutral' size='md'
                     onClick={() => props.runExample(selectedExample)}
-                    sx={{ opacity: 0, transition: 'opacity 0.3s' }}
+                    sx={{ opacity: 1, transition: 'opacity 0.3s' }}
                   >
                     💬
                   </IconButton><br />

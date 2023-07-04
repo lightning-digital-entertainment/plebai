@@ -1,104 +1,61 @@
-# `BIG-AGI` 🤖💬
+# `PlebAI` 💬
 
-Welcome to `big-AGI` 👋 your personal AGI application
-powered by OpenAI GPT-4 and beyond. Designed for smart humans and super-heroes,
-this responsive web app comes with Personas, Drawing, Code Execution, PDF imports, Voice support,
-data Rendering, AGI functions, chats and much more. Comes with plenty of `#big-AGI-energy` 🚀
+PlebAI is a forked version of [BIG-AGI](https://github.com/enricoros/big-agi) 
 
-[![Official Website](https://img.shields.io/badge/BIG--AGI.com-%23096bde?style=for-the-badge&logo=vercel&label=demo)](https://big-agi.com)
 
-Or fork & run on Vercel
+Big techs are pouring billions into building closed source AI models, to keep everyone under lock and key. Yet, the true evolution of AI will come not from walled gardens, but from the open collaboration of plebs worldwide.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fenricoros%2Fbig-agi&env=OPENAI_API_KEY,OPENAI_API_HOST&envDescription=OpenAI%20KEY%20for%20your%20deployment.%20Set%20HOST%20only%20if%20non-default.)
+Plebs will #buildinpublic and beat them at their own game. We built an AI Chatbot that relies solely on open-source large Language Models (LLMs). Check it out.
 
-## Useful 👊
+[![Website: https://plebai.com]()](https://plebai.com)
 
-![Ask away, paste a ton, copy the gems](docs/pixels/big-AGI-compo1.png)
+## Features
 
-- Engaging AI Personas
-- Clean UX, w/ tokens counters
-- Private: user-owned API keys and localStorage, self-hostable if you like
-- Human I/O: Advanced voice support (TTS, STT)
-- Machine I/O: PDF import & Summarization, code execution
-- Many more updates & integrations: ElevenLabs, Helicone, Paste.gg, Prodia
-- Coming up: automatic-AGI reasoning (Reason+Act) and more
 
-## Support 🙌
+- No email or signups required
+- No credit card or up front payment required
+- No Ads or trackers
+- Chat history only stored on the browser
+- Using only open source LLMs
+- Pay with SATS for premium data and faster response (Coming soon)
 
-[//]: # ([![Official Discord]&#40;https://img.shields.io/discord/1098796266906980422?label=discord&logo=discord&logoColor=%23fff&style=for-the-badge&#41;]&#40;https://discord.gg/MkH4qj2Jp9&#41;)
-[![Official Discord](https://discordapp.com/api/guilds/1098796266906980422/widget.png?style=banner2)](https://discord.gg/MkH4qj2Jp9)
+## Chat interface
 
-* Enjoy the hosted open-source app on [big-AGI.com](https://get.big-agi.com)
-* [Chat with us](https://discord.gg/MkH4qj2Jp9)
-* Deploy your [fork](https://github.com/enricoros/big-agi/fork) for your friends and family
-* send PRs! ...
-  🎭[Editing Personas](https://github.com/enricoros/big-agi/issues/35),
-  🧩[Reasoning Systems](https://github.com/enricoros/big-agi/issues/36),
-  🌐[Community Templates](https://github.com/enricoros/big-agi/issues/35),
-  and [your big-IDEAs](https://github.com/enricoros/big-agi/issues/new?labels=RFC&body=Describe+the+idea)
+![chat interface](https://i.current.fyi/current/app/plebai_cover.png)
 
-<br/>
+## Solution Architecture
 
-## Latest Drops 💧🎁
+We carefully select and utilize the appropriate open-source tools to ensure a seamless integration. Fortunately, there is a wide array of tools available that allow us to piece everything together.
 
-#### 🚨 June: scale UP 🚀
+#### Prem AI for hosting Language models
 
-- 🎉 **[New OpenAI Models](https://openai.com/blog/function-calling-and-other-api-updates) support** - 0613 models, including 16k and 32k 
-- 🎉 **Cleaner UI** - with rationalized Settings, Modals, and Configurators
-- 🎉 **Dynamic Models Configurator** - easy connection with different model vendors
-- 🎉 **Multiple Model Vendors Support** framework to support many LLM vendors
-- 🎉 **Per-model Options** (temperature, tokens, etc.) for fine-tuning AI behavior to your needs
-- 🎉 Support for GPT-4-32k
-- 🎉 Improved Dialogs and Messages
-- 🎉 Much Enhanced DX: TRPC integration, modularization, pluggable UI, etc
+By leveraging state-of-the-art Open-Source Large Language Models (LLMs), Prem offers a unified environment for deploying AI models on your infrastructure. Even with small-scale CPU machines, LLMs can be executed, and models can be accessed through APIs.
 
-#### April / May: more #big-agi-energy
+#### GPT4ALL Lora Q4 as LLM
 
-- 🎉 **[Google Search](docs/pixels/feature_react_google.png)** active in ReAct - add your keys to Settings > Google
-  Search
-- 🎉 **[Reason+Act](docs/pixels/feature_react_turn_on.png)** preview feature - activate with 2-taps on the 'Chat' button
-- 🎉 **[Image Generation](docs/pixels/feature_imagine_command.png)** using Prodia (BYO Keys) - /imagine - or menu option
-- 🎉 **[Voice Synthesis](docs/pixels/feature_voice_1.png)** 📣 with ElevenLabs, including selection of custom voices
-- 🎉 **[Precise Token Counter](docs/pixels/feature_token_counter.png)** 📈 extra-useful to pack the context window
-- 🎉 **[Install Mobile APP](docs/pixels/feature_pwa.png)** 📲 looks like native (@harlanlewis)
-- 🎉 **[UI language](docs/pixels/feature_language.png)** with auto-detect, and future app language! (@tbodyston)
-- 🎉 **PDF Summarization** 🧩🤯 - ask questions to a PDF! (@fredliubojin)
-- 🎉 **Code Execution: [Codepen](https://codepen.io/)/[Replit](https://replit.com/)** 💻 (@harlanlewis)
-- 🎉 **[SVG Drawing](docs/pixels/feature_svg_drawing.png)** - draw with AI 🎨
-- 🎉 Chats: multiple chats, AI titles, Import/Export, Selection mode
-- 🎉 Rendering: Markdown, SVG, improved Code blocks
-- 🎉 Integrations: OpenAI organization ID
-- 🎉 [Cloudflare deployment instructions](docs/deploy-cloudflare.md),
-  [awesome-agi](https://github.com/enricoros/awesome-agi)
-- 🎉 [Typing Avatars](docs/pixels/gif_typing_040123.gif) ⌨️
-  <!-- p><a href="docs/pixels/gif_typing_040123.gif"><img src="docs/pixels/gif_typing_040123.gif" width='700' alt="New Typing Avatars"/></a></p -->
+GPT4All, developed by Nomic AI, is a chatbot trained on an extensive corpus of assistant interactions. By fine-tuning LLaMA 7B, GPT4All provides an open-source ecosystem for training and deploying efficient, assistant-style large language models locally on consumer-grade CPUs.
 
-#### March: first release
 
-- 🎉 **[AI Personas](docs/pixels/feature_purpose_two.png)** - including Code, Science, Corporate, and Chat 🎭
-- 🎉 **Privacy**: user-owned API keys 🔑 and localStorage 🛡️
-- 🎉 **Context** - Attach or [Drag & Drop files](docs/pixels/feature_drop_target.png) to add them to the prompt 📁
-- 🎉 **Syntax highlighting** - for multiple languages 🌈
-- 🎉 **Code Execution: Sandpack** -
-   [now on branch]((https://github.com/enricoros/big-agi/commit/f678a0d463d5e9cf0733f577e11bd612b7902d89)) `variant-code-execution`
-- 🎉 Chat with GPT-4 and 3.5 Turbo 🧠💨
-- 🎉 Real-time streaming of AI responses ⚡
-- 🎉 **Voice Input** 🎙️ - works great on Chrome / Windows
-- 🎉 Integration: **[Paste.gg](docs/pixels/feature_paste_gg.png)** integration for chat sharing 📥
-- 🎉 Integration: **[Helicone](https://www.helicone.ai/)** integration for API observability 📊
-- 🌙 Dark model - Wide mode ⛶
+#### BIG-AGI Chat user interface
 
-<br/>
+Big-AGI has developed an easy-to-use chat interface that can be quickly customized and deployed. Although it is primarily designed for use with OpenAI ChatGPT, we have modified it to work with our open-source model.
 
-## Why this? 💡
+#### Langchain
 
-Because the official Chat ___lacks important features___, is ___more limited than the api___, at times
-___slow or unavailable___, and you cannot deploy it yourself, remix it, add features, or share it with
-your friends.
-Our users report that ___big-AGI is faster___, ___more reliable___, and ___features rich___
-with features that matter to them.
+Langchain enables the integration of external data sources, integration with 3rd party APIs, and the ability to utilize long-term memory and call multiple LLMs. We are currently experimenting with new APIs and data sources.
 
-![Much features, so fun](docs/pixels/big-AGI-compo2b.png)
+#### Redis Vector Store
+
+LLMs are stateless and require data to be sent at every invocation. Using redis store to store data as embeddings. Redis can be created inside prem.ai dashboard and monitor the running state. 
+
+#### L402 (Lightning Labs)
+
+L402, previously known as LSAT, is a standard that supports the use case of charging for services and authenticating users in distributed networks. It combines the strengths of Macaroons for improved authentication with the capabilities of the Lightning Network for enhanced payments. We plan to utilize this standard to access 3rd party data and APIs.
+
+#### getAlby (Chrome extension)
+
+In the near future, we will enable payment with sats (satoshis) to access premium features and 3rd party data. This approach ensures user anonymity while facilitating seamless payment processing. The Alby wallet, available as a Chrome extension, simplifies the payment process for these services.
+
 
 ## Develop 🧩
 
@@ -109,51 +66,17 @@ with features that matter to them.
 Clone this repo, install the dependencies, and run the development server:
 
 ```bash
-git clone https://github.com/enricoros/big-agi.git
-cd big-agi
+git clone https://github.com/lightning-digital-entertainment/plebai
+cd plebai
 npm install
 npm run dev
 ```
 
 Now the app should be running on `http://localhost:3000`
 
-### Integrations:
 
-* [ElevenLabs](https://elevenlabs.io/) Voice Synthesis (bring your own voice too) - Settings > Text To Speech
-* [Helicone](https://www.helicone.ai/) LLM Observability Platform - Settings > Advanced > API Host: 'oai.hconeai.com'
-* [Paste.gg](https://paste.gg/) Paste Sharing - Chat Menu > Share via paste.gg
-* [Prodia](https://prodia.com/) Image Generation - Settings > Image Generation > Api Key & Model
+# About Us
 
-## Deploy with Docker 🐳
+We build open source Apps to solve real world problems using Bitcoin, Lightning, Nostr and AI
 
-Specific docker information on [docs/deploy-docker.md](docs/deploy-docker.md). In short:
-
-#### Pre-built image
-
-Add your OpenAI API key to the `.env` file, then in a terminal run:
-
-```bash
-docker-compose up
-```
-
-#### Locally built image
-
-If you wish to build the image yourself, run
-
-```bash
-docker build -t big-agi .
-docker run --detach 'big-agi'
-``` 
-
-<br/>
-
-This project is licensed under the MIT License.
-
-[![GitHub stars](https://img.shields.io/github/stars/enricoros/big-agi)](https://github.com/enricoros/big-agi/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/enricoros/big-agi)](https://github.com/enricoros/big-agi/network)
-[![GitHub pull requests](https://img.shields.io/github/issues-pr/enricoros/big-agi)](https://github.com/enricoros/big-agi/pulls)
-[![License](https://img.shields.io/github/license/enricoros/big-agi)](https://github.com/enricoros/big-agi/LICENSE)
-
-[//]: # ([![GitHub issues]&#40;https://img.shields.io/github/issues/enricoros/big-agi&#41;]&#40;https://github.com/enricoros/big-agi/issues&#41;)
-
-Made with 💙
+For questions, Please reach out to plebai@getcurrent.io

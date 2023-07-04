@@ -9,6 +9,7 @@ import { useChatStore } from '~/common/state/store-chats';
 import { useUIPreferencesStore } from '~/common/state/store-ui';
 
 import { SystemPurposeId, SystemPurposes } from '../../../../data';
+import { useModelsStore } from '~/modules/llms/store-llms';
 import { usePurposeStore } from './store-purposes';
 
 
@@ -40,6 +41,10 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   const [searchQuery, setSearchQuery] = React.useState('');
   const [filteredIDs, setFilteredIDs] = React.useState<SystemPurposeId[] | null>(null);
   const [editMode, setEditMode] = React.useState(false);
+
+  const { setChatLLMId } = useModelsStore(state => ({
+    setChatLLMId: state.setChatLLMId,
+  }), shallow);
 
   // external state
   const theme = useTheme();
@@ -92,10 +97,13 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
 
   const toggleEditMode = () => setEditMode(!editMode);
 
-
   const handlePurposeChanged = (purposeId: SystemPurposeId | null) => {
-    if (purposeId)
+    if (purposeId) {
       setSystemPurposeId(props.conversationId, purposeId);
+      console.log(SystemPurposes[purposeId as SystemPurposeId].chatLLM)
+      setChatLLMId(SystemPurposes[purposeId as SystemPurposeId].chatLLM)
+
+    }  
   };
 
   const handleCustomSystemMessageChange = (v: React.ChangeEvent<HTMLTextAreaElement>): void => {
@@ -138,8 +146,8 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
       <Box sx={{ maxWidth: bpMaxWidth }}>
 
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 2, mb: 1 }}>
-          <Typography level='body2' color='neutral'>
-            Select the right AI assistant to serve your needs
+          <Typography level='body1' color='neutral'>
+            Select the right AI Agent to serve your needs
           </Typography>
           <Button variant='plain' color='neutral' size='sm' onClick={toggleEditMode}>
             {editMode ? 'Done' : 'Edit'}
@@ -172,7 +180,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
                     sx={{ alignSelf: 'flex-start' }}
                   />
                 )}
-                <div style={{ fontSize: '2rem' }}>
+                <div style={{ fontSize: '4.5rem' }}>
                   {SystemPurposes[spId as SystemPurposeId]?.symbol}
                 </div>
                 <div>
@@ -183,29 +191,46 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
           ))}
         </Grid>
 
-        <Typography
-          level='body2'
-          sx={{
-            mt: selectedExample ? 1 : 3,
-            display: 'flex', alignItems: 'center', gap: 1,
-            // justifyContent: 'center',
+        <Typography level='body1' color='neutral' sx={{
+              mt: 2,
+            }} >
+          {selectedPurpose? <div style={{ fontSize: '1rem' }}>  {selectedPurpose.placeHolder}  <br /> </div> : ''}
+        </Typography>
+
+        <Typography level='body1' color='neutral' sx={{
+              mt: 2,
+            }} >
+              {systemPurposeId != 'Custom'? <><text> Start with suggested questions below. </text><br /></>: ''  }
+          
+        </Typography>
+
+        <Typography level='body2' color='neutral' sx={{
+              mt: 2,
+               alignItems: 'left', gap: 1,
+              justifyContent: 'left',
             '&:hover > button': { opacity: 1 },
-          }}>
-          {!selectedPurpose
-            ? 'Oops! No AI purposes found for your search.'
-            : (selectedExample
+            }} >
+          
+          {selectedPurpose?.examples?.map((selectedExample) => (
+             
+              (selectedExample
                 ? <>
+                  
                   <i>{selectedExample}</i>
                   <IconButton
                     variant='plain' color='neutral' size='md'
                     onClick={() => props.runExample(selectedExample)}
-                    sx={{ opacity: 0, transition: 'opacity 0.3s' }}
+                    sx={{ opacity: 1, transition: 'opacity 0.3s' }}
                   >
                     💬
-                  </IconButton>
+                  </IconButton><br />
+                  
+                 
                 </>
                 : selectedPurpose.description
-            )}
+              )
+          ))}
+          
         </Typography>
 
         {systemPurposeId === 'Custom' && (

@@ -52,6 +52,8 @@ async function streamAssistantMessage(
   const llm = findLLMOrThrow(llmId);
   const oaiSetup: Partial<SourceSetupOpenAI> = llm._source.setup as Partial<SourceSetupOpenAI>;
 
+  console.log('llm: %o', llm)
+
   const { llmRef, llmTemperature, llmResponseTokens }: Partial<LLMOptionsOpenAI> = llm.options || {};
   if (!llmRef || llmTemperature === undefined || llmResponseTokens === undefined)
     throw new Error(`Error in openAI configuration for model ${llmId}: ${llm.options}`);
@@ -69,6 +71,8 @@ async function streamAssistantMessage(
       content: text,
     })),
   };
+
+  
 
   // other params
   const shallSpeakFirstLine = useElevenlabsStore.getState().elevenLabsAutoSpeak === 'firstLine';
@@ -114,6 +118,9 @@ async function streamAssistantMessage(
 
   try {
 
+    console.log('input: %o', input)
+
+    
     const response = await fetch('/api/openai/stream-chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

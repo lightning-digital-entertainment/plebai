@@ -22,13 +22,9 @@ export function SettingsModal() {
   const { settingsOpenTab, closeSettings, openModelsSetup } = useUIStateStore();
 
   return (
-    <GoodModal title={`Preferences`} open={!!settingsOpenTab} onClose={closeSettings}
-               startButton={
-                 <Button variant='plain' color='info' onClick={openModelsSetup} startDecorator={<BuildCircleIcon />}>
-                   Models
-                 </Button>
-               }
-               sx={{ p: { xs: 1, sm: 2, lg: 2.5 } }}>
+    <GoodModal title={`Preferences`} open={!!settingsOpenTab} onClose={closeSettings}>
+               
+              
 
       {/*<Divider />*/}
 

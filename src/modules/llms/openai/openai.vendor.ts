@@ -52,7 +52,7 @@ export function normalizeOAIOptions(partialOptions?: Partial<LLMOptionsOpenAI>):
   return {
     llmRef: 'unknown_id',
     llmTemperature: 0.5,
-    llmResponseTokens: 1024,
+    llmResponseTokens: 128,
     ...partialOptions,
   };
 }

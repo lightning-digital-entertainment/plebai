@@ -3,6 +3,8 @@ import * as React from 'react';
 import { Box, Button, ListItem, SvgIcon, useTheme } from '@mui/joy';
 import { SxProps } from '@mui/joy/styles/types';
 import GitHubIcon from '@mui/icons-material/GitHub';
+import TelegramIcon from '@mui/icons-material/Telegram';
+import HomeIcon from '@mui/icons-material/TempleBuddhist';
 
 import { Brand } from '../../brand';
 import { Link } from '../../components/Link';
@@ -49,15 +51,9 @@ export function SupportMenuItem() {
         display: 'flex', flexDirection: 'row', gap: 1,
         justifyContent: 'space-between',
       }}>
-      <Box
-        sx={{
-          mx: { xs: 1, sm: 2 },
-          fontWeight: 600,
-          color: fadedColor,
-        }}>
-        {Brand.Meta.SiteName}
-      </Box>
-      <BringTheLove text='Discord' icon={<DiscordIcon sx={{ color: iconColor }} />} link={Brand.URIs.SupportInvite} />
+      
+      <BringTheLove text='PlebAI' icon={<HomeIcon sx={{ color: iconColor }} />} link={'https://plebai.com'} />
+      <BringTheLove text='Telegram' icon={<TelegramIcon sx={{ color: iconColor }} />} link={Brand.URIs.SupportInvite} />
       <BringTheLove text='GitHub' icon={<GitHubIcon sx={{ color: iconColor }} />} link={Brand.URIs.OpenRepo} />
     </ListItem>
   );

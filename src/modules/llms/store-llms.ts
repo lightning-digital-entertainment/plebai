@@ -30,7 +30,12 @@ interface ModelsStore {
 
 export const useModelsStore = create<ModelsStore>()(
   persist(
-    (set) => ({
+    (set): {
+      chatLLMId: null; fastLLMId: null; llms: never[]; sources: never[]; setChatLLMId: (id: DLLMId | null) => void; setFastLLMId: (id: DLLMId | null) => void;
+      // NOTE: make sure to the _source links (sId foreign) are already set before calling this
+      // this will replace existing llms with the same id
+      addLLMs: (llms: DLLM[]) => void; removeLLM: (id: DLLMId) => void; updateLLM: (id: DLLMId, partial: Partial<DLLM>) => void; updateLLMOptions: <T>(id: DLLMId, partialOptions: Partial<T>) => void; addSource: (source: DModelSource) => void; removeSource: (id: DModelSourceId) => void; updateSourceSetup: <T>(id: DModelSourceId, partialSetup: Partial<T>) => void;
+    } => ({
 
       chatLLMId: null,
       fastLLMId: null,
@@ -124,7 +129,7 @@ export const useModelsStore = create<ModelsStore>()(
       // re-link the memory references on rehydration
       onRehydrateStorage: () => (state) => {
         if (!state) return;
-
+        console.log('before state llms: %o', state)
         state.llms = state.llms.map(llm => {
           const source = state.sources.find(source => source.id === llm.sId);
           if (!source) return null;
@@ -135,8 +140,8 @@ export const useModelsStore = create<ModelsStore>()(
 );
 
 
-const defaultChatSuffixPreference = ['gpt-4-0613', 'gpt-4', 'gpt-4-32k', 'gpt-3.5-turbo'];
-const defaultFastSuffixPreference = ['gpt-3.5-turbo-0613', 'gpt-3.5-turbo-16k-0613', 'gpt-3.5-turbo-16k', 'gpt-3.5-turbo'];
+const defaultChatSuffixPreference = ['gpt-4-0613', 'gpt-4', 'gpt-4-32k', 'gpt-3.5-turbo', 'gpt4all-lora-q4'];
+const defaultFastSuffixPreference = ['gpt-3.5-turbo-0613', 'gpt-3.5-turbo-16k-0613', 'gpt-3.5-turbo-16k', 'gpt-3.5-turbo', 'gpt4all-lora-q4'];
 
 function findLlmIdBySuffix(llms: DLLM[], suffixes: string[]): DLLMId | null {
   if (!llms?.length) return null;

@@ -189,10 +189,12 @@ export function Composer(props: {
   const historyTokens = conversationTokenCount;
   const responseTokens = chatLLM?.options?.llmResponseTokens || 0;
   const remainingTokens = tokenLimit - directTokens - historyTokens - responseTokens;
+  const paySats: number = Math.floor(chatLLM?.id.startsWith('openai-gpt-4')?(responseTokens+directTokens)*0.2:(responseTokens+directTokens)*0.05);
 
 
   const handleSendClicked = () => {
     const text = (composeText || '').trim();
+    console.log('Sats to be paid: %o', paySats);
     if (text.length && props.conversationId) {
       setComposeText('');
       props.onSendMessage(sendModeId, props.conversationId, text);

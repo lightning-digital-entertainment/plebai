@@ -11,8 +11,12 @@ import { EditSources } from './EditSources';
 import { LLMList } from './LLMList';
 import { LLMOptions } from './LLMOptions';
 import { VendorSourceSetup } from './VendorSourceSetup';
-import { createDefaultModelSource } from '../vendor.registry';
-import { useModelsStore } from '../store-llms';
+import { createDefaultModelSource, createModelSource } from '../vendor.registry';
+import { useModelsStore, useSourceSetup } from '../store-llms';
+import { localAIToDLLM } from '../gpt4all/GPT4ALLSourceSetup';
+import { openAIModelToDLLM } from '../openai/OpenAISourceSetup';
+import { apiQuery } from '~/modules/trpc/trpc.client';
+import { normalizeOAISetup } from '../openai/openai.vendor';
 
 
 export function Configurator() {
@@ -22,30 +26,51 @@ export function Configurator() {
 
   // external state
   const { modelsSetupOpen, openModelsSetup, closeModelsSetup, llmOptionsId } = useUIStateStore();
-  const { modelSources, llmCount } = useModelsStore(state => ({
+  const { modelSources, addModelSource,llmCount } = useModelsStore(state => ({
     modelSources: state.sources,
     llmCount: state.llms.length,
+    addModelSource: state.addSource, removeModelSource: state.removeSource,
   }), shallow);
 
   // auto-select the first source - note: we could use a useEffect() here, but this is more efficient
   // also note that state-persistence is unneeded
   const selectedSourceId = _selectedSourceId ?? modelSources[0]?.id ?? null;
 
-  const activeSource = modelSources.find(source => source.id === selectedSourceId);
+  const activeSource = modelSources.find(source => source.id === selectedSourceId); 
 
-  
-  // if no sources at startup, open the modal
-  React.useEffect(() => {
-    if (!selectedSourceId)
-      openModelsSetup();
-  }, [selectedSourceId, openModelsSetup]);
+  const modelSource = createModelSource('gpt4allloraq4', modelSources);
+
+  // external state
+  const {
+    source, sourceLLMs, updateSetup,
+    normSetup: { heliKey, oaiHost, oaiKey, oaiOrg, moderationCheck },
+  } = useSourceSetup('openai', normalizeOAISetup);
+
+  const { isFetching, refetch, isError } = apiQuery.openai.listModels.useQuery({ oaiKey, oaiHost, oaiOrg, heliKey, moderationCheck  }, {
+    onSuccess: models => {
+      const llms = source ? models.map(model => openAIModelToDLLM(model, source)) : [];
+      useModelsStore.getState().addLLMs(llms);
+    },
+    staleTime: Infinity,
+  });
+
 
   // add the default source on cold - will require setup
   React.useEffect(() => {
     const { addSource, sources } = useModelsStore.getState();
-    if (!sources.length)
+    if (!selectedSourceId) {
+      console.log('Model Source: %o', modelSource)
+      useModelsStore.getState().addLLMs(modelSource ?localAIToDLLM(modelSource ): []);
+
+    }
+    if (!sources.length) {
       addSource(createDefaultModelSource(sources));
-  }, []);
+      refetch()
+      addModelSource(modelSource);
+      
+    }
+      
+  }, [selectedSourceId, modelSource, addModelSource, refetch]);
 
 
   return <>
@@ -59,7 +84,7 @@ export function Configurator() {
 
       
 
-      {!!activeSource && <VendorSourceSetup source={activeSource} />}
+       {!!activeSource && <VendorSourceSetup source={activeSource} />} 
 
       {!!llmCount && <Divider />}
 
@@ -76,3 +101,4 @@ export function Configurator() {
 
   </>;
 }
+

@@ -3,6 +3,7 @@ import { createParser } from 'eventsource-parser';
 
 import { ChatGenerateSchema, chatGenerateSchema, openAIAccess, openAICompletionRequest } from '~/modules/llms/openai/openai.router';
 import { OpenAI } from '~/modules/llms/openai/openai.types';
+import { gpt4allAccess } from '~/modules/llms/gpt4all/gpt4all.router';
 
 
 async function rethrowOpenAIError(response: Response) {
@@ -30,8 +31,18 @@ async function chatStreamRepeater(access: ChatGenerateSchema['access'], model: C
   try {
 
     // prepare request objects
-    const { headers, url } = openAIAccess(access, '/v1/chat/completions');
+
+    
+   
+    const { headers, url } = llmAccess(model.id, access, '/v1/chat/completions')
+
+    console.log('Model: %o', model)
+
     const body: OpenAI.Wire.ChatCompletion.Request = openAICompletionRequest(model, history, true);
+
+    console.log('oAI url %o', url)
+    console.log('oAI headers %o', headers)
+    console.log('oAI body %o', JSON.stringify(body))
 
     // perform the request
     upstreamResponse = await fetch(url, { headers, method: 'POST', body: JSON.stringify(body), signal });
@@ -40,7 +51,22 @@ async function chatStreamRepeater(access: ChatGenerateSchema['access'], model: C
   } catch (error: any) {
     console.log(error);
     const message = '[OpenAI Issue] ' + (error?.message || typeof error === 'string' ? error : JSON.stringify(error)) + (error?.cause ? ' · ' + error.cause : '');
+    
     throw new Error(message);
+  }
+
+  function llmAccess(modelId: string, access: ChatGenerateSchema['access'], link: string): any {
+
+        console.log('model ID: %o', modelId)
+        if (modelId === 'gpt4all-lora-q4') {
+            return gpt4allAccess(access, link)
+
+        }
+        else {
+            return openAIAccess(access, link)
+
+        }
+
   }
 
 
@@ -123,6 +149,8 @@ async function chatStreamRepeater(access: ChatGenerateSchema['access'], model: C
 export default async function handler(req: NextRequest): Promise<Response> {
   try {
     const { access, model, history } = chatGenerateSchema.parse(await req.json());
+    console.log('history: %o', history)
+
     const chatResponseStream: ReadableStream = await chatStreamRepeater(access, model, history, req.signal);
     return new NextResponse(chatResponseStream);
   } catch (error: any) {

@@ -7,7 +7,9 @@ Big techs are pouring billions into building closed source AI models, to keep ev
 
 Plebs will #buildinpublic and beat them at their own game. We built an AI Chatbot that relies solely on open-source large Language Models (LLMs). Check it out.
 
-[![Website: https://plebai.com]()](https://plebai.com)
+Website: https://plebai.com
+
+AI Chat: https://chat.plebai.com
 
 ## Features
 
@@ -65,12 +67,22 @@ In the near future, we will enable payment with sats (satoshis) to access premiu
 
 Clone this repo, install the dependencies, and run the development server:
 
+
 ```bash
 git clone https://github.com/lightning-digital-entertainment/plebai
 cd plebai
 npm install
 npm run dev
 ```
+
+NOTE: Create env file
+
+- Copy .env.example to .env
+
+- Change the GPT4ALL_API_HOST to the backend server running opensource LLMs
+
+- OPEN_API_KEY can be anything. It is just a placeholder
+
 
 Now the app should be running on `http://localhost:3000`
 
@@ -80,3 +92,7 @@ Now the app should be running on `http://localhost:3000`
 We build open source Apps to solve real world problems using Bitcoin, Lightning, Nostr and AI
 
 For questions, Please reach out to plebai@getcurrent.io
+
+# License
+
+[MIT](https://choosealicense.com/licenses/mit/)

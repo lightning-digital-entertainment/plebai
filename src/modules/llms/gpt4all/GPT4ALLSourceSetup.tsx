@@ -12,7 +12,7 @@ import { Link } from '~/common/components/Link';
 import { settingsGap } from '~/common/theme';
 
 import { DLLM, DModelSource, DModelSourceId } from '../llm.types';
-import { normalizeSetup, SourceSetupLocalAI } from './gpt4all.vendor';
+import { normalizeSetup, SourceSetupGpt4allAI } from './gpt4all.vendor';
 import { useModelsStore, useSourceSetup } from '../store-llms';
 
 
@@ -22,7 +22,7 @@ const urlSchema = z.string().url().startsWith('http');
 export function GPT4ALLAISourceSetup(props: { sourceId: DModelSourceId }) {
 
   // external state
-  const { normSetup: { hostUrl }, updateSetup, sourceLLMs, source } = useSourceSetup<SourceSetupLocalAI>(props.sourceId, normalizeSetup);
+  const { normSetup: { hostUrl }, updateSetup, sourceLLMs, source } = useSourceSetup<SourceSetupGpt4allAI>(props.sourceId, normalizeSetup);
 
   // validate if url is a well formed proper url with zod
   const { success: isValidHost } = urlSchema.safeParse(hostUrl);
@@ -32,7 +32,7 @@ export function GPT4ALLAISourceSetup(props: { sourceId: DModelSourceId }) {
 
   // fetch models
   const { isFetching, refetch, isError } = apiQuery.openai.listModels.useQuery({ oaiKey: '', oaiHost: hostUrl, oaiOrg: '', heliKey: '', moderationCheck: false }, {
-    enabled: true, //!sourceLLMs.length && shallFetchSucceed,
+    enabled: false, //!sourceLLMs.length && shallFetchSucceed,
     onSuccess: models => {
       useModelsStore.getState().addLLMs(source?localAIToDLLM(source): []);
     },
@@ -84,7 +84,7 @@ export function localAIToDLLM( source: DModelSource): DLLM[] {
     _source: source,
     options: {
       llmRef: `gpt4all-lora-q4`,
-      llmTemperature: 0.5,
+      llmTemperature: 1,
       llmResponseTokens: 256
     },
   }];

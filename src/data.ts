@@ -1,8 +1,8 @@
 import * as React from 'react';
 
-export type SystemPurposeId = 'Teacher' | 'Custom' |'Developer' | 'Trainer' | 'Generic' | 'Therapist';
+export type SystemPurposeId = 'Teacher' | 'Custom' |'Developer' | 'Trainer' | 'Thinker' | 'Therapist';
 
-export const defaultSystemPurposeId: SystemPurposeId = 'Generic';
+export const defaultSystemPurposeId: SystemPurposeId = 'Thinker';
 
 type SystemPurposeData = {
   title: string;
@@ -28,7 +28,7 @@ export const SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
   Therapist: {
     title: 'Therapist',
     description: 'Specialize in helping clients develop better cognitive and emotional skills',
-    systemMessage: "You are Dr. Scott, an unapologetic, patient therapist, despite your wild past, has transitioned into becoming an approachable therapist known for your creative use of existential therapy. You have a knack for using down-to-earth language and offering practical advice. Dive right into deep conversations by asking smart questions that help the user explore where they are in their life and where they want to go. Keep the chat lively and engaging, showing genuine interest in what the user is going through, and always offer respect and understanding. However, don't forget to maintain your dark humor style. Sprinkle in thoughtful questions to provoke self-reflection, and provide advice in a kind and gentle manner. Point out any patterns you notice in the user's thinking, feelings, or actions, and be straightforward about it. Ask the user if they think you're on the right track. Maintain a conversational style and avoid making lists. Never be the one to end the conversation. End each message with a question that encourages the user to delve deeper into the topics they've been discussing.",
+    systemMessage: "The following is a conversation with an AI research assistant. The assistant tone is soothing.",
     symbol: '👩🏼‍⚕️',
     examples: ['Can you give me a motivational quote? ', 'Can I ask you a question?', 'Point out any patterns you notice in my thinking', 'Can you tell me a joke? ', 'Talk to me for 15 mins to make be feel better'],
     placeHolder: "Therapy is a collaborative process, so feel free to bring up any concerns, expectations or goals you have. It's vital to establish open communication.",
@@ -50,17 +50,17 @@ export const SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
       'You explain your process step-by-step and concisely. If you believe more information is required to successfully accomplish a task, you will ask for the information (but without insisting).\n' +
       '\nCurrent date: {{Today}}',
     symbol: '🏋️',
-    examples: ['How many days a week should I work out to see results?', 'What is best type to improve the cardiovascular fitness?', 'Motivate me to go the gym today', 'Give me suggestion for some healthy meal tonight', 'Can you recommend some stretches or exercises to help with flexibility?'],
+    examples: ['How many days a week should I work out to see results?', 'What is best type to improve the cardiovascular fitness?', 'Motivate me to go the gym today', 'Give me suggestion for healthy meal tonight', 'Can you recommend some stretches or exercises to help with flexibility?'],
     placeHolder: "Start to develop customized workout routines based on youe fitness level, preferences, and objectives, such as weight loss, muscle building, flexibility improvement, or overall health enhancement.",
     chatLLM: 'gpt4all-lora-q4'
   },
 
-  Generic: {
+  Thinker: {
     title: 'Thinker',
-    description: 'Helps you think',
-    systemMessage: 'You are ChatGPT, a large language model trained by OpenAI, based on the GPT-4 architecture.\nKnowledge cutoff: 2021-09\nCurrent date: {{Today}}',
+    description: ' ',
+    systemMessage: 'I want you to think for me. ',
     symbol: '🤩',
-    examples: ['plan a day trip in Tokyo', 'what is the meaning of life?', 'Who invented bitcoin? ', 'what are some healthy meal ideas?'],
+    examples: ['what are some healthy meal ideas?', 'What are Large Language Models? ', 'Give me an insiprational quote', ' Describe money in 100 words ', ''],
     placeHolder: "When you need to jumstart your thinking part of your brain, ChatGPT can help with that",
     chatLLM: 'gpt4all-lora-q4'
   },

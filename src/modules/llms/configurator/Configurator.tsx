@@ -65,12 +65,12 @@ export function Configurator() {
     }
     if (!sources.length) {
       addSource(createDefaultModelSource(sources));
-      refetch()
+      //refetch()
       addModelSource(modelSource);
       
     }
       
-  }, [selectedSourceId, modelSource, addModelSource, refetch]);
+  }, [selectedSourceId, modelSource, addModelSource]);
 
 
   return <>

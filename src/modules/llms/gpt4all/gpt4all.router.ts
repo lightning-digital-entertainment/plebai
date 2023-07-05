@@ -29,6 +29,7 @@ export function gpt4allAccess(access: AccessSchema, apiPath: string): { headers:
       headers: {
         Authorization: `Bearer ${oaiKey}`,
         'Content-Type': 'application/json',
+        'Content-Encoding': 'none',
         ...(heliKey && { 'Helicone-Auth': `Bearer ${heliKey}` }),
       },
       url: oaiHost + apiPath,

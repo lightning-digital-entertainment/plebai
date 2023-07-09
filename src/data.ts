@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-export type SystemPurposeId = 'Teacher' | 'Custom' |'Developer' | 'Trainer' | 'Thinker' | 'Therapist';
+export type SystemPurposeId = 'Teacher' | 'Custom' |'Developer' | 'Trainer' | 'Thinker' | 'GPT_3_5' | 'GPT_4'| 'Therapist';
 
 export const defaultSystemPurposeId: SystemPurposeId = 'Thinker';
 
@@ -60,10 +60,29 @@ export const SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
     description: ' ',
     systemMessage: 'I want you to think for me. ',
     symbol: '🤩',
-    examples: ['what are some healthy meal ideas?', 'What are Large Language Models? ', 'Give me an insiprational quote', ' Describe money in 100 words ', ''],
+    examples: ['what are some healthy meal ideas?', 'What are Large Language Models? ', 'Give me an inspirational quote', ' Describe money in 100 words ', ''],
     placeHolder: "When you need to jumstart your thinking part of your brain, ChatGPT can help with that",
     chatLLM: 'gpt4all-lora-q4'
   },
+  GPT_3_5: {
+    title: 'ChatGPT 3.5',
+    description: ' ',
+    systemMessage: 'You are GPT3.5, a large open source language model. Can you role play as knowledge resource and answer my questions? \nCurrent date: {{Today}}',
+    symbol: '🐵',
+    examples: ['Give me an inspirational quote'],
+    placeHolder: "Access OpenAI 3.5 TURBO API with just using SATS. Require SATS to pay per use. Fast, accurate text responses. All your data goes into ChatGPT to get answers. We do not recommend putting any personal information in here. ",
+    chatLLM: 'gpt-3.5-turbo'
+  },
+  GPT_4: {
+    title: 'ChatGPT 4.0',
+    description: ' ',
+    systemMessage: 'You are GPT4.0, a large open source language model. Can you role play as knowledge resource and answer my questions? \nCurrent date: {{Today}}',
+    symbol: '💀',
+    examples: ['Help me write some code?'],
+    placeHolder: "Access OpenAI faster 4.0 (0613) API with just using SATS. Require SATS to pay per use. Fast, accurate text responses. All your data goes into ChatGPT to get answers. We do not recommend putting any personal information in here. ",
+    chatLLM: 'openai-gpt-4-0613'
+  },
+
   Custom: {
     title: 'Custom',
     description: 'User-defined purpose',

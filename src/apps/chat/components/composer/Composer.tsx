@@ -34,6 +34,9 @@ import { SendModeMenu } from './SendModeMenu';
 import { TokenBadge } from './TokenBadge';
 import { TokenProgressbar } from './TokenProgressbar';
 import { useComposerStore } from './store-composer';
+import Wallet_Service from '~/modules/webln/wallet';
+import { requestOutputSchema } from '~/modules/current/request.router';
+
 
 
 /// Text template helpers
@@ -189,17 +192,65 @@ export function Composer(props: {
   const historyTokens = conversationTokenCount;
   const responseTokens = chatLLM?.options?.llmResponseTokens || 0;
   const remainingTokens = tokenLimit - directTokens - historyTokens - responseTokens;
-  const paySats: number = Math.floor(chatLLM?.id.startsWith('openai-gpt-4')?(responseTokens+directTokens)*0.2:(responseTokens+directTokens)*0.05);
-
+  const paySats: number = Math.floor(chatLLM?.id.startsWith('openai-gpt-4')?(responseTokens+directTokens)*200:(responseTokens+directTokens)*50);
+  const purposeModel: string = SystemPurposes[props.systemPurpose as SystemPurposeId].chatLLM;
 
   const handleSendClicked = () => {
     const text = (composeText || '').trim();
+    console.log('inside handle clicked')
     console.log('Sats to be paid: %o', paySats);
-    if (text.length && props.conversationId) {
-      setComposeText('');
-      props.onSendMessage(sendModeId, props.conversationId, text);
-      appendSentMessage(text);
+    console.log('purpose Model: %o', purposeModel)
+    if (purposeModel === 'gpt4all-lora-q4') {
+      if (text.length && props.conversationId) {
+        setComposeText('');
+        props.onSendMessage(sendModeId, props.conversationId, text);
+        appendSentMessage(text);
+      }
+
+    } else {
+
+      Wallet_Service.getWebln()
+            .then(async webln => {
+                if (!webln) {
+                    console.log('no webln detected')
+                } else {
+                  try {
+
+                    console.log('webln found')
+                    const response = await fetch('/api/current/request', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({'amtinsats': paySats })
+                    });
+                    
+                    const payResponse  = await response.json();
+                    const { pr, verify } = requestOutputSchema.parse(payResponse);
+                    const paymentResponse = await webln.sendPayment(pr);
+                  
+                    if (text.length && props.conversationId) {
+                      setComposeText('');
+                      props.onSendMessage(sendModeId, props.conversationId, text);
+                      appendSentMessage(text);
+                    }
+                    
+                  } catch (error) {
+
+                    console.log('webln catch: %o', error)
+                    
+                  }
+                  
+
+
+                }
+                
+
+              })
+
+
     }
+    
+
+    
   };
 
   const handleShowSendMode = (event: React.MouseEvent<HTMLAnchorElement>) => setSendModeMenuAnchor(event.currentTarget);

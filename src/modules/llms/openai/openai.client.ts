@@ -19,9 +19,10 @@ export async function callChat(llm: DLLM, messages: OpenAI.Wire.ChatCompletion.R
   const sourceSetupOpenAI = normalizeOAISetup(partialSetup);
 
   // model params (llm)
-  const openaiLlmRef = 'gpt-3.5-turbo'; //llm.options.llmRef!;
+  console.log('llmref: %o', llm.options.llmRef!)
+  const openaiLlmRef = llm.options.llmRef!='gpt4all-lora-q4'? llm.options.llmRef!: 'gpt-3.5-turbo'; 
   const modelTemperature = llm.options.llmTemperature || 0.5;
-  // const maxTokens = llm.options.llmResponseTokens || 1024; // <- note: this would be for chat answers, not programmatic chat calls
+  maxTokens = llm.options.llmResponseTokens || 1024; // <- note: this would be for chat answers, not programmatic chat calls
 
   console.log('LLML %o', llm )  
   try {

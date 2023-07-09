@@ -140,7 +140,7 @@ export const useModelsStore = create<ModelsStore>()(
 );
 
 
-const defaultChatSuffixPreference = ['gpt-4-0613', 'gpt-4', 'gpt-4-32k', 'gpt-3.5-turbo', 'gpt4all-lora-q4'];
+const defaultChatSuffixPreference = ['gpt-3.5-turbo', 'gpt-4-0613', 'gpt-4', 'gpt-4-32k', 'gpt4all-lora-q4'];
 const defaultFastSuffixPreference = ['gpt-3.5-turbo-0613', 'gpt-3.5-turbo-16k-0613', 'gpt-3.5-turbo-16k', 'gpt-3.5-turbo', 'gpt4all-lora-q4'];
 
 function findLlmIdBySuffix(llms: DLLM[], suffixes: string[]): DLLMId | null {

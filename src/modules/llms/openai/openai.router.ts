@@ -183,9 +183,9 @@ export function openAIAccess(access: AccessSchema, apiPath: string): { headers: 
   const oaiOrg = access.oaiOrg || process.env.OPENAI_API_ORG_ID || '';
 
   // API host
-  let oaiHost = access.oaiHost || process.env.GPT4ALL_API_HOST || 'https://api.openai.com';
+  let oaiHost = access.oaiHost || process.env.OPENAI_API_HOST || 'https://api.openai.com';
   if (!oaiHost.startsWith('http'))
-    //oaiHost = `https://${oaiHost}`;
+    oaiHost = `https://${oaiHost}`;
   if (oaiHost.endsWith('/') && apiPath.startsWith('/'))
     oaiHost = oaiHost.slice(0, -1);
 

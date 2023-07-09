@@ -3,7 +3,7 @@ import DevicesIcon from '@mui/icons-material/Devices';
 import { GPT4ALLAISourceSetup } from './GPT4ALLSourceSetup';
 import { ModelVendor } from '../llm.types';
 import { GPT4LLMOptions } from './GPT4LLMOptions';
-import { callChat } from './gpt4all.client';
+import { callChat } from '../openai/openai.client';
 
 
 

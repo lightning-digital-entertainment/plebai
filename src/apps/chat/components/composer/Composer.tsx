@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { shallow } from 'zustand/shallow';
 
-import { Box, Button, Card, Grid, IconButton, ListDivider, ListItemDecorator, Menu, MenuItem, Stack, Textarea, Tooltip, Typography, useTheme } from '@mui/joy';
+import { Box, Button, Card, Grid, IconButton, ListDivider, ListItemDecorator, Menu, MenuItem, ModalProps, Stack, Textarea, Tooltip, Typography, useTheme } from '@mui/joy';
 import { ColorPaletteProp, SxProps, VariantProp } from '@mui/joy/styles/types';
 import ContentPasteGoIcon from '@mui/icons-material/ContentPasteGo';
 import DataArrayIcon from '@mui/icons-material/DataArray';
@@ -37,6 +37,7 @@ import { useComposerStore } from './store-composer';
 import Wallet_Service from '~/modules/webln/wallet';
 import { requestOutputSchema } from '~/modules/current/request.router';
 import { verifyOutputSchema } from '~/modules/current/verify.router';
+import { NoWebLnModal } from '~/common/components/NoWebLnModal';
 
 
 
@@ -196,9 +197,8 @@ export function Composer(props: {
   const historyTokens = conversationTokenCount;
   const responseTokens = chatLLM?.options?.llmResponseTokens || 0;
   const remainingTokens = tokenLimit - directTokens - historyTokens - responseTokens;
-  const paySats: number = Math.floor(chatLLM?.id.startsWith('openai-gpt-4')?(responseTokens+directTokens)*200:(responseTokens+directTokens)*50);
+  const paySats: number = Math.round(Math.floor(chatLLM?.id.startsWith('openai-gpt-4')?(responseTokens+directTokens)*200:(responseTokens+directTokens)*50)/ 1000) * 1000;
   const purposeModel: string = SystemPurposes[props.systemPurpose as SystemPurposeId].chatLLM;
-
   const handleSendClicked = () => {
     const text = (composeText || '').trim();
     console.log('inside handle clicked')
@@ -231,25 +231,28 @@ export function Composer(props: {
                     const payResponse  = await response.json();
                     const { pr, verify } = requestOutputSchema.parse(payResponse);
                     const weblnResponse = await webln.sendPayment(pr);
-
+                    let settle=false;
                     if (payResponse) {
+                        do {
 
-                        console.log('Payment Response: %o', weblnResponse.preimage)
-                        const verifyResponse = await fetch('/api/current/verify', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({'verifyUrl': verify })
-                        });
-                        const verifyResponseParsed  = await verifyResponse.json();
-                        const { preimage, settled } = verifyOutputSchema.parse(verifyResponseParsed);
-                        console.log('preimage from verify url: %o', preimage)
+                          console.log('Payment Response: %o', weblnResponse.preimage)
+                          const verifyResponse = await fetch('/api/current/verify', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({'verifyUrl': verify })
+                          });
+                          const verifyResponseParsed  = await verifyResponse.json();
+                          const { preimage, settled } = verifyOutputSchema.parse(verifyResponseParsed);
+                          console.log('preimage from verify url: %o', preimage)
+                          settle=settled;
+                          if (text.length && props.conversationId && preimage === weblnResponse.preimage && settled) {
+                            setComposeText('');
+                            props.onSendMessage(sendModeId, props.conversationId, text);
+                            appendSentMessage(text);
+                          }
 
-                        if (text.length && props.conversationId && preimage === weblnResponse.preimage && settled) {
-                          setComposeText('');
-                          props.onSendMessage(sendModeId, props.conversationId, text);
-                          appendSentMessage(text);
-                        }
-
+                        } while (!settle)
+                        
                     }
                   
 
@@ -257,6 +260,7 @@ export function Composer(props: {
                   } catch (error) {
 
                     console.log('webln catch: %o', error)
+                    setOpenNoWebLnModal(true);
                     
                   }
                   
@@ -425,6 +429,8 @@ export function Composer(props: {
   const handleClearSent = () => setConfirmClearSent(true);
 
   const handleCancelClearSent = () => setConfirmClearSent(false);
+
+  const handleNoWeblnClose = () => setOpenNoWebLnModal(false);
 
   const handleConfirmedClearSent = () => {
     setConfirmClearSent(false);
@@ -663,6 +669,11 @@ export function Composer(props: {
         <ConfirmationModal
           open={confirmClearSent} onClose={handleCancelClearSent} onPositive={handleConfirmedClearSent}
           confirmationText={'Are you sure you want to clear all your sent messages?'} positiveActionText={'Clear all'}
+        />
+
+        <NoWebLnModal
+          open={openNoWebLnModal} onClose={handleNoWeblnClose}
+          confirmationText={'To pay using sats, you need to enable WebLn. Please visit https://getalby.com  to get started'}
         />
 
       </Grid>

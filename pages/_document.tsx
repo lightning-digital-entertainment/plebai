@@ -49,6 +49,9 @@ export default function MyDocument({ emotionStyleTags }: MyDocumentProps) {
         <meta name='twitter:site' content={Brand.Meta.TwitterSite} />
         <meta name='twitter:card' content='summary_large_image' />
 
+         {/* alby */}
+         <meta property='alby:image' content='https://i.current.fyi/current/app/plebai_32x32.png' />
+
         {/* Style Sheets (injected and server-side) */}
         <meta name='emotion-insertion-point' content='' />
         {emotionStyleTags}

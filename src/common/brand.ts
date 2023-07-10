@@ -23,7 +23,7 @@ export const Brand = {
   URIs: {
     // Slug: 'big-agi',
     Home: 'https://plebai.com',
-    CardImage: 'https://big-agi.com/icons/card-dark-1200.png',
+    CardImage: 'https://i.current.fyi/current/app/plebai_web.png',
     OpenRepo: 'https://github.com/lightning-digital-entertainment/plebai',
     SupportInvite: 'https://t.me/+1NhSTfdwv1M2MTky',
   },

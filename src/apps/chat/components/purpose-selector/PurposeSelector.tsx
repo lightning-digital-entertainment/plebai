@@ -200,7 +200,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
         <Typography level='body1' color='neutral' sx={{
               mt: 2,
             }} >
-              {systemPurposeId != 'Custom'? <><text> Start with suggested questions below. </text><br /></>: ''  }
+              {systemPurposeId != 'Custom'? <> Start with suggested questions below. <br /></>: ''  }
           
         </Typography>
 

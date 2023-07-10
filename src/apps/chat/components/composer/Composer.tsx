@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { shallow } from 'zustand/shallow';
 
-import { Box, Button, Card, Grid, IconButton, ListDivider, ListItemDecorator, Menu, MenuItem, Stack, Textarea, Tooltip, Typography, useTheme } from '@mui/joy';
+import { Box, Button, Card, Grid, IconButton, ListDivider, ListItemDecorator, Menu, MenuItem, ModalProps, Stack, Textarea, Tooltip, Typography, useTheme } from '@mui/joy';
 import { ColorPaletteProp, SxProps, VariantProp } from '@mui/joy/styles/types';
 import ContentPasteGoIcon from '@mui/icons-material/ContentPasteGo';
 import DataArrayIcon from '@mui/icons-material/DataArray';
@@ -27,13 +27,19 @@ import { htmlTableToMarkdown } from '~/common/util/htmlTableToMarkdown';
 import { pdfToText } from '~/common/util/pdfToText';
 import { useChatStore } from '~/common/state/store-chats';
 import { useSpeechRecognition } from '~/common/components/useSpeechRecognition';
-import { useUIPreferencesStore } from '~/common/state/store-ui';
+import { useUIPreferencesStore, useUIStateStore } from '~/common/state/store-ui';
 
 import { SendModeId } from '../../Chat';
 import { SendModeMenu } from './SendModeMenu';
 import { TokenBadge } from './TokenBadge';
 import { TokenProgressbar } from './TokenProgressbar';
 import { useComposerStore } from './store-composer';
+import Wallet_Service from '~/modules/webln/wallet';
+import { requestOutputSchema } from '~/modules/current/request.router';
+import { verifyOutputSchema } from '~/modules/current/verify.router';
+import { NoWebLnModal } from '~/common/components/NoWebLnModal';
+
+
 
 
 /// Text template helpers
@@ -50,6 +56,7 @@ const expandPromptTemplate = (template: string, dict: object) => (inputValue: st
     expanded = expanded.replaceAll(`{{${key}}}`, value.trim());
   return expanded;
 };
+
 
 
 const attachFileLegend =
@@ -157,6 +164,7 @@ export function Composer(props: {
   const [sendModeMenuAnchor, setSendModeMenuAnchor] = React.useState<HTMLAnchorElement | null>(null);
   const [sentMessagesAnchor, setSentMessagesAnchor] = React.useState<HTMLAnchorElement | null>(null);
   const [confirmClearSent, setConfirmClearSent] = React.useState(false);
+  const [openNoWebLnModal, setOpenNoWebLnModal] = React.useState(false);
   const attachmentFileInputRef = React.useRef<HTMLInputElement>(null);
 
   // external state
@@ -189,17 +197,85 @@ export function Composer(props: {
   const historyTokens = conversationTokenCount;
   const responseTokens = chatLLM?.options?.llmResponseTokens || 0;
   const remainingTokens = tokenLimit - directTokens - historyTokens - responseTokens;
-  const paySats: number = Math.floor(chatLLM?.id.startsWith('openai-gpt-4')?(responseTokens+directTokens)*0.2:(responseTokens+directTokens)*0.05);
-
-
+  const paySats: number = Math.round(Math.floor(chatLLM?.id.startsWith('openai-gpt-4')?(responseTokens+directTokens)*200:(responseTokens+directTokens)*50)/ 1000) * 1000;
+  const purposeModel: string = SystemPurposes[props.systemPurpose as SystemPurposeId].chatLLM;
   const handleSendClicked = () => {
     const text = (composeText || '').trim();
+    console.log('inside handle clicked')
     console.log('Sats to be paid: %o', paySats);
-    if (text.length && props.conversationId) {
-      setComposeText('');
-      props.onSendMessage(sendModeId, props.conversationId, text);
-      appendSentMessage(text);
+    console.log('purpose Model: %o', purposeModel)
+    if (purposeModel === 'gpt4all-lora-q4') {
+      if (text.length && props.conversationId) {
+        setComposeText('');
+        props.onSendMessage(sendModeId, props.conversationId, text);
+        appendSentMessage(text);
+      }
+
+    } else {
+
+      Wallet_Service.getWebln()
+            .then(async webln => {
+                if (!webln) {
+                    console.log('no webln detected')
+                    setOpenNoWebLnModal(true);
+                } else {
+                  try {
+
+                    console.log('webln found')
+                    const response = await fetch('/api/current/request', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({'amtinsats': paySats })
+                    });
+                    
+                    const payResponse  = await response.json();
+                    const { pr, verify } = requestOutputSchema.parse(payResponse);
+                    const weblnResponse = await webln.sendPayment(pr);
+                    let settle=false;
+                    if (payResponse) {
+                        do {
+
+                          console.log('Payment Response: %o', weblnResponse.preimage)
+                          const verifyResponse = await fetch('/api/current/verify', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({'verifyUrl': verify })
+                          });
+                          const verifyResponseParsed  = await verifyResponse.json();
+                          const { preimage, settled } = verifyOutputSchema.parse(verifyResponseParsed);
+                          console.log('preimage from verify url: %o', preimage)
+                          settle=settled;
+                          if (text.length && props.conversationId && preimage === weblnResponse.preimage && settled) {
+                            setComposeText('');
+                            props.onSendMessage(sendModeId, props.conversationId, text);
+                            appendSentMessage(text);
+                          }
+
+                        } while (!settle)
+                        
+                    }
+                  
+
+                    
+                  } catch (error) {
+
+                    console.log('webln catch: %o', error)
+                    setOpenNoWebLnModal(true);
+                    
+                  }
+                  
+
+
+                }
+                
+
+              })
+
+
     }
+    
+
+    
   };
 
   const handleShowSendMode = (event: React.MouseEvent<HTMLAnchorElement>) => setSendModeMenuAnchor(event.currentTarget);
@@ -353,6 +429,8 @@ export function Composer(props: {
   const handleClearSent = () => setConfirmClearSent(true);
 
   const handleCancelClearSent = () => setConfirmClearSent(false);
+
+  const handleNoWeblnClose = () => setOpenNoWebLnModal(false);
 
   const handleConfirmedClearSent = () => {
     setConfirmClearSent(false);
@@ -591,6 +669,11 @@ export function Composer(props: {
         <ConfirmationModal
           open={confirmClearSent} onClose={handleCancelClearSent} onPositive={handleConfirmedClearSent}
           confirmationText={'Are you sure you want to clear all your sent messages?'} positiveActionText={'Clear all'}
+        />
+
+        <NoWebLnModal
+          open={openNoWebLnModal} onClose={handleNoWeblnClose}
+          confirmationText={'To pay using sats, you need to enable WebLn. Please visit https://getalby.com  to get started'}
         />
 
       </Grid>

@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-import { createTRPCRouter, publicProcedure } from '~/modules/trpc/trpc.server';
-
 export const requestInputSchema = z.object({
     amtinsats: z.number()
   });
@@ -29,11 +27,3 @@ export const requestInputSchema = z.object({
       url: host + apiPath,
     };
   }
-
-  export interface payResponse {
-    "disposable": null,
-    "verify": string,
-    "routes": [],  
-    "pr": string,
-    "memo": string
-  };

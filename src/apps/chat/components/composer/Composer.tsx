@@ -27,7 +27,7 @@ import { htmlTableToMarkdown } from '~/common/util/htmlTableToMarkdown';
 import { pdfToText } from '~/common/util/pdfToText';
 import { useChatStore } from '~/common/state/store-chats';
 import { useSpeechRecognition } from '~/common/components/useSpeechRecognition';
-import { useUIPreferencesStore } from '~/common/state/store-ui';
+import { useUIPreferencesStore, useUIStateStore } from '~/common/state/store-ui';
 
 import { SendModeId } from '../../Chat';
 import { SendModeMenu } from './SendModeMenu';
@@ -36,6 +36,8 @@ import { TokenProgressbar } from './TokenProgressbar';
 import { useComposerStore } from './store-composer';
 import Wallet_Service from '~/modules/webln/wallet';
 import { requestOutputSchema } from '~/modules/current/request.router';
+import { verifyOutputSchema } from '~/modules/current/verify.router';
+
 
 
 
@@ -53,6 +55,7 @@ const expandPromptTemplate = (template: string, dict: object) => (inputValue: st
     expanded = expanded.replaceAll(`{{${key}}}`, value.trim());
   return expanded;
 };
+
 
 
 const attachFileLegend =
@@ -160,6 +163,7 @@ export function Composer(props: {
   const [sendModeMenuAnchor, setSendModeMenuAnchor] = React.useState<HTMLAnchorElement | null>(null);
   const [sentMessagesAnchor, setSentMessagesAnchor] = React.useState<HTMLAnchorElement | null>(null);
   const [confirmClearSent, setConfirmClearSent] = React.useState(false);
+  const [openNoWebLnModal, setOpenNoWebLnModal] = React.useState(false);
   const attachmentFileInputRef = React.useRef<HTMLInputElement>(null);
 
   // external state
@@ -213,6 +217,7 @@ export function Composer(props: {
             .then(async webln => {
                 if (!webln) {
                     console.log('no webln detected')
+                    setOpenNoWebLnModal(true);
                 } else {
                   try {
 
@@ -225,13 +230,29 @@ export function Composer(props: {
                     
                     const payResponse  = await response.json();
                     const { pr, verify } = requestOutputSchema.parse(payResponse);
-                    const paymentResponse = await webln.sendPayment(pr);
-                  
-                    if (text.length && props.conversationId) {
-                      setComposeText('');
-                      props.onSendMessage(sendModeId, props.conversationId, text);
-                      appendSentMessage(text);
+                    const weblnResponse = await webln.sendPayment(pr);
+
+                    if (payResponse) {
+
+                        console.log('Payment Response: %o', weblnResponse.preimage)
+                        const verifyResponse = await fetch('/api/current/verify', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({'verifyUrl': verify })
+                        });
+                        const verifyResponseParsed  = await verifyResponse.json();
+                        const { preimage, settled } = verifyOutputSchema.parse(verifyResponseParsed);
+                        console.log('preimage from verify url: %o', preimage)
+
+                        if (text.length && props.conversationId && preimage === weblnResponse.preimage && settled) {
+                          setComposeText('');
+                          props.onSendMessage(sendModeId, props.conversationId, text);
+                          appendSentMessage(text);
+                        }
+
                     }
+                  
+
                     
                   } catch (error) {
 

@@ -38,7 +38,7 @@ import Wallet_Service from '~/modules/webln/wallet';
 import { requestOutputSchema } from '~/modules/current/request.router';
 import { verifyOutputSchema } from '~/modules/current/verify.router';
 import { NoWebLnModal } from '~/common/components/NoWebLnModal';
-
+import { Invoice } from "alby-tools";
 
 
 
@@ -232,10 +232,21 @@ export function Composer(props: {
                     const { pr, verify } = requestOutputSchema.parse(payResponse);
                     const weblnResponse = await webln.sendPayment(pr);
                     let settle=false;
-                    if (payResponse) {
+                    if (weblnResponse) {
+
                         do {
 
                           console.log('Payment Response: %o', weblnResponse.preimage)
+                          const invoice = new Invoice({pr: pr, preimage: weblnResponse.preimage});
+                          settle = await invoice.isPaid();
+
+                          if (text.length && props.conversationId && settle) {
+                            setComposeText('');
+                            props.onSendMessage(sendModeId, props.conversationId, text);
+                            appendSentMessage(text);
+                          }
+
+                          /* Not wasting 2-3 seconds by going to node to check payment status. 
                           const verifyResponse = await fetch('/api/current/verify', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -250,6 +261,7 @@ export function Composer(props: {
                             props.onSendMessage(sendModeId, props.conversationId, text);
                             appendSentMessage(text);
                           }
+                          */
 
                         } while (!settle)
                         

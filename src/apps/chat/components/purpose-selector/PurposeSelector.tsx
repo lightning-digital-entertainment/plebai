@@ -180,7 +180,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
                     sx={{ alignSelf: 'flex-start' }}
                   />
                 )}
-                <div style={{ fontSize: '4.5rem' }}>
+                <div style={{ fontSize: '3rem' }}>
                   {SystemPurposes[spId as SystemPurposeId]?.symbol}
                 </div>
                 <div>

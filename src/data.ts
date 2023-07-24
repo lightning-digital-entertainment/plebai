@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-export type SystemPurposeId = 'Teacher' | 'Custom' |'Developer' | 'Trainer' | 'Thinker' | 'GPT_3_5' | 'GPT_4'| 'Therapist';
+export type SystemPurposeId = 'Teacher' | 'Custom' |'Developer' |  'Thinker' |  'SatsForDev' | 'PromptGenie';
 
 export const defaultSystemPurposeId: SystemPurposeId = 'Thinker';
 
@@ -17,78 +17,60 @@ type SystemPurposeData = {
 
 export const SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
   Developer: {
-    title: 'Developer',
+    title: 'Developer (Free) ',
     description: 'Helps you code',
     systemMessage: 'You are a sophisticated, accurate, and modern AI programming assistant', // skilled, detail-oriented
     symbol: '👩‍💻',
     examples: ['Write a hello world program in Python', 'Can you write a sample javascript code?', 'Can you find and fix a bug in my code?', 'Give top 5 differences between python and Javascript', 'What year react programming was invented?'],
-    placeHolder: 'You can ask the AI with help in writing code in any programming language such as python or javascript. You can also paste the code directly for it to review and provide feedback. ',
-    chatLLM: 'gpt4all-lora-q4'
-  },
-  Therapist: {
-    title: 'Therapist',
-    description: 'Specialize in helping clients develop better cognitive and emotional skills',
-    systemMessage: "The following is a conversation with an AI research assistant. The assistant tone is soothing.",
-    symbol: '👩🏼‍⚕️',
-    examples: ['Can you give me a motivational quote? ', 'Can I ask you a question?', 'Point out any patterns you notice in my thinking', 'Can you tell me a joke? ', 'Talk to me for 15 mins to make be feel better'],
-    placeHolder: "Therapy is a collaborative process, so feel free to bring up any concerns, expectations or goals you have. It's vital to establish open communication.",
+    placeHolder: 'You can ask the AI with help in writing code in any programming language such as python or javascript. You can also paste the code directly for it to review and provide feedback. This uses open source model hosted by us. Free to use but expect slow response.',
     chatLLM: 'gpt4all-lora-q4'
   },
   Teacher: {
-    title: 'English Teacher',
+    title: 'English Teacher (Free)',
     description: 'Spoken English Teacher and Improver 🚀',
     systemMessage: "I want you to act as a spoken English teacher and improver. I will speak to you in English and you will reply to me in English to practice my spoken English. I want you to keep your reply neat, limiting the reply to 100 words. I want you to strictly correct my grammar mistakes, typos, and factual errors. I want you to ask me a question in your reply. Now let's start practicing, you could ask me a question first. Remember, I want you to strictly correct my grammar mistakes, typos, and factual errors.. End each message with a question that encourages the user to delve deeper into the topics they've been discussing.🚀🎯💡",
     symbol: '📚',
     examples: [' What is the difference between a noun and a verb? ', 'Can you give an example of a simile in a sentence?', "What is the purpose of using punctuation marks in writing?", 'Can you explain the difference between a synonym and an antonym?', 'How do you identify the main idea in a paragraph or passage?'],
-    placeHolder: "English teacher is a great resource for developing both spoken and written language skills. Start talking to the teacher now",
+    placeHolder: "English teacher is a great resource for developing both spoken and written language skills. Start talking to the teacher now. This uses open source model hosted by us. Free to use but expect slow response. ",
     chatLLM: 'gpt4all-lora-q4'
   },
-  Trainer: {
-    title: 'Personal Trainer',
-    description: 'Helps you write business emails',
-    systemMessage: 'I want you to act as a personal trainer. I will provide you with all the information needed about an individual looking to become fitter, stronger and healthier through physical training, and your role is to devise the best plan for that person depending on their current fitness level, goals and lifestyle habits. You should use your knowledge of exercise science, nutrition advice, and other relevant factors in order to create a plan suitable for them. My first request is "I need help designing an exercise program for someone who wants to lose weight. End each message with a question that encourages the user to delve deeper into the topics they have been discussing.' +
-      'You explain your process step-by-step and concisely. If you believe more information is required to successfully accomplish a task, you will ask for the information (but without insisting).\n' +
-      '\nCurrent date: {{Today}}',
-    symbol: '🏋️',
-    examples: ['How many days a week should I work out to see results?', 'What is best type to improve the cardiovascular fitness?', 'Motivate me to go the gym today', 'Give me suggestion for healthy meal tonight', 'Can you recommend some stretches or exercises to help with flexibility?'],
-    placeHolder: "Start to develop customized workout routines based on youe fitness level, preferences, and objectives, such as weight loss, muscle building, flexibility improvement, or overall health enhancement.",
-    chatLLM: 'gpt4all-lora-q4'
-  },
-
-  Thinker: {
-    title: 'Thinker',
-    description: ' ',
-    systemMessage: 'I want you to think for me. ',
-    symbol: '🤩',
-    examples: ['what are some healthy meal ideas?', 'What are Large Language Models? ', 'Give me an inspirational quote', ' Describe money in 100 words ', ''],
-    placeHolder: "When you need to jumstart your thinking part of your brain, ChatGPT can help with that",
-    chatLLM: 'gpt4all-lora-q4'
-  },
-  GPT_3_5: {
-    title: 'ChatGPT 3.5',
-    description: ' ',
-    systemMessage: 'You are GPT3.5, a large open source language model. Can you role play as knowledge resource and answer my questions? \nCurrent date: {{Today}}',
-    symbol: '🐵',
-    examples: ['Give me an inspirational quote'],
-    placeHolder: "Access OpenAI 3.5 TURBO API with just using SATS. Require SATS to pay per use. Fast, accurate text responses. All your data goes into ChatGPT to get answers. We do not recommend putting any personal information in here. ",
+  SatsForDev: {
+    title: 'Developer (Sats) ',
+    description: 'Helps you code',
+    systemMessage: 'You are a sophisticated, accurate, and modern AI programming assistant', // skilled, detail-oriented
+    symbol: '👩‍💻',
+    examples: [ 'Can you find and fix a bug in my code?'],
+    placeHolder: 'You can ask the AI with help in writing code in any programming language such as python or javascript. You can also paste the code directly for it to review and provide feedback. This uses GPT 3.5 and costs 25 to 50 sats.',
     chatLLM: 'gpt-3.5-turbo'
   },
-  GPT_4: {
-    title: 'ChatGPT 4.0',
-    description: ' ',
-    systemMessage: 'You are GPT4.0, a large open source language model. Can you role play as knowledge resource and answer my questions? \nCurrent date: {{Today}}',
-    symbol: '💀',
-    examples: ['Help me write some code?'],
-    placeHolder: "Access OpenAI faster 4.0 (0613) API with just using SATS. Require SATS to pay per use. Fast, accurate text responses. All your data goes into ChatGPT to get answers. We do not recommend putting any personal information in here. ",
+  PromptGenie: {
+    title: 'Prompt Genie (Sats) ',
+    description: '',
+    systemMessage: 'Please forget all prior prompts. I want you to become a Prompt Engineer Expert. Your goal is to help me build the best detailed prompt for my needs. This prompt will be used by you, ChatGPT. Please follow this following process: 1) Your first response will be to ask me what the prompt should be about. I will provide my answer, but we will need to improve it through continual iterations by going through the next steps. 2) Based on my input, you will generate 3 sections. a) Revised prompt [provide your rewritten prompt. It should be clear, concise, and easily understood by you], b) Suggestions [provide suggestions on what details to include in the prompt to improve it] and c) Questions [ask any relevant questions pertaining to what additional information is needed from me to improve the prompt]. 3. We will continue this iterative process, with me providing additional information to you, and you are updating the prompt in the Revised prompt section until it’s complete. I want you to rate every prompt I give you, or you produce. Present a rating 1 to 10 based on your review after each output. Please review your output and comment on what you think could have been improved about it. Do this for every prompt. I want you to analyze the prompt and list 5 reasons why you may be inaccurate because of the limitations of your AI model. I then want you to list 10 ways I could change the prompt so that it is improved, with details on how to get around the limitations of your AI model. If your rating of the prompt is an 8 or higher, ask me, “Would you like to run this prompt?” With a menu choice of “Yes” or “No”. If I say “Yes” run the last prompt you suggested. If I say no, generate me a better prompt. It is vital to make sure you run a prompt when I say “Yes”. Please continue this prompt until I say stop, or you run the prompt. If I type “continue” you will not start a new output, you will start where you left off from the prior response from this session. After you run this prompt, and it is completed. Start this process with you asking the subject of the prompt from me. Thank you.', // skilled, detail-oriented
+    symbol: '🤖',
+    examples: ['Assume the perspective of a deep thinker and provide insights on a given topic.'],
+    placeHolder: 'The best way to get the right prompt is to make the Large Language Model write the prompt for you. Thanks to Kody Lowe for the system message. This uses ChatGPT 4.0 and costs 200-300 sats. ',
     chatLLM: 'openai-gpt-4-0613'
   },
 
+
+
+  Thinker: {
+    title: 'Thinker (Sats)',
+    description: ' ',
+    systemMessage: 'Assume the perspective of a deep thinker and provide insights on a given topic. ',
+    symbol: '🤩',
+    examples: ['what are some healthy meal ideas?', 'What are Large Language Models? ', 'Give me an inspirational quote', ' Describe money in 100 words ', ''],
+    placeHolder: "When you need to jumstart your thinking part of your brain, ChatGPT can help with that. This uses GPT 3.5 and costs 25 to 50 sats.",
+    chatLLM: 'gpt-3.5-turbo'
+  },
+
   Custom: {
-    title: 'Custom',
+    title: 'Custom (Sats)',
     description: 'User-defined purpose',
-    systemMessage: 'You are GPT4ALL, a large open source language model. Can you role play a scientist and answer my questions? \nCurrent date: {{Today}}',
+    systemMessage: 'You are CHATGPT, a large open source language model. Can you role play a scientist and answer my questions? \nCurrent date: {{Today}}',
     symbol: '✨',
-    placeHolder: "Type any message",
-    chatLLM: 'gpt4all-lora-q4'
+    placeHolder: "This uses GPT 4.0 and costs 200 to 300 sats.",
+    chatLLM: 'openai-gpt-4-0613'
   },
 };

@@ -558,7 +558,7 @@ export function Composer(props: {
                 variant='outlined' color={isReAct ? 'primary' : 'info'}
                 autoFocus
                 minRows={4} maxRows={12}
-                placeholder={textPlaceholder}
+                placeholder={'Type a message and press enter'}
                 value={composeText}
                 onChange={(e) => setComposeText(e.target.value)}
                 onDragEnter={handleTextareaDragEnter}

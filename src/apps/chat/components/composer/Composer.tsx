@@ -204,7 +204,7 @@ export function Composer(props: {
     console.log('inside handle clicked')
     console.log('Sats to be paid: %o', paySats);
     console.log('purpose Model: %o', purposeModel)
-    if (purposeModel === 'gpt4all-lora-q4') {
+    if (purposeModel === 'llama-2-7b-chat-hf') {
       if (text.length && props.conversationId) {
         setComposeText('');
         props.onSendMessage(sendModeId, props.conversationId, text);

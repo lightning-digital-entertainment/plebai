@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-export type SystemPurposeId = 'Teacher' | 'Custom' |'Developer' |  'Thinker' |  'SatsForDev' | 'PromptGenie';
+export type SystemPurposeId = 'Teacher' | 'Custom' |'Developer' |  'Thinker' |  'SatsForDev' | 'PromptGenie'| 'PodChat' | 'OrangePill';
 
 export const defaultSystemPurposeId: SystemPurposeId = 'Thinker';
 
@@ -22,8 +22,8 @@ export const SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
     systemMessage: 'You are a sophisticated, accurate, and modern AI programming assistant', // skilled, detail-oriented
     symbol: '👩‍💻',
     examples: ['Write a hello world program in Python', 'Can you write a sample javascript code?', 'Can you find and fix a bug in my code?', 'Give top 5 differences between python and Javascript', 'What year react programming was invented?'],
-    placeHolder: 'You can ask the AI with help in writing code in any programming language such as python or javascript. You can also paste the code directly for it to review and provide feedback. This uses open source model hosted by us. Free to use but expect slow response.',
-    chatLLM: 'gpt4all-lora-q4'
+    placeHolder: 'You can ask the AI with help in writing code in any programming language such as python or javascript. You can also paste the code directly for it to review and provide feedback. This uses Llama2-7B model hosted by us using premai.io . Free to use but expect slow response.',
+    chatLLM: 'llama-2-7b-chat-hf'
   },
   Teacher: {
     title: 'English Teacher (Free)',
@@ -31,8 +31,17 @@ export const SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
     systemMessage: "I want you to act as a spoken English teacher and improver. I will speak to you in English and you will reply to me in English to practice my spoken English. I want you to keep your reply neat, limiting the reply to 100 words. I want you to strictly correct my grammar mistakes, typos, and factual errors. I want you to ask me a question in your reply. Now let's start practicing, you could ask me a question first. Remember, I want you to strictly correct my grammar mistakes, typos, and factual errors.. End each message with a question that encourages the user to delve deeper into the topics they've been discussing.🚀🎯💡",
     symbol: '📚',
     examples: [' What is the difference between a noun and a verb? ', 'Can you give an example of a simile in a sentence?', "What is the purpose of using punctuation marks in writing?", 'Can you explain the difference between a synonym and an antonym?', 'How do you identify the main idea in a paragraph or passage?'],
-    placeHolder: "English teacher is a great resource for developing both spoken and written language skills. Start talking to the teacher now. This uses open source model hosted by us. Free to use but expect slow response. ",
-    chatLLM: 'gpt4all-lora-q4'
+    placeHolder: "English teacher is a great resource for developing both spoken and written language skills. Start talking to the teacher now. This uses Llama2-7B model hosted by us using premai.io . Free to use but expect slow response. ",
+    chatLLM: 'llama-2-7b-chat-hf'
+  },
+  OrangePill: {
+    title: 'Orange Pill (Free)',
+    description: 'Spoken English Teacher and Improver 🚀',
+    systemMessage: "How can individuals effectively promote Bitcoin adoption and understanding among their friends and family, especially beginners?",
+    symbol: '💊',
+    examples: ['Explain bitcoin like I am 5 years old',' What are some common misunderstandings of "orange-pilling" someone? ', 'How do you address the potential risks or downsides associated with Bitcoin?', 'What alternative approaches exist for educating others about Bitcoin? '],
+    placeHolder: "The Orange-Pilling Agent is a skilled and empathetic advocate for Bitcoin adoption. With a deep understanding of the bitcoin space and a passion for spreading awareness about Bitcoin's potential, this agent dedicates their efforts to educate and persuade others to embrace the world's best digital currency. ",
+    chatLLM: 'llama-2-7b-chat-hf'
   },
   SatsForDev: {
     title: 'Developer (Sats) ',
@@ -51,6 +60,16 @@ export const SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
     examples: ['Assume the perspective of a deep thinker and provide insights on a given topic.'],
     placeHolder: 'The best way to get the right prompt is to make the Large Language Model write the prompt for you. Thanks to Kody Lowe for the system message. This uses ChatGPT 4.0 and costs 200-300 sats. ',
     chatLLM: 'openai-gpt-4-0613'
+  },
+
+  PodChat: {
+    title: 'Youtube Chat (Sats)',
+    description: ' ',
+    systemMessage: 'Provide a summary of the youtube video transcript. ',
+    symbol: '📺',
+    examples: ['Summarize latest episode on TFTC with Kody Low', 'Here is a youtube link https://youtu.be/1-njHwhKrPY', 'Get me What Bitcoin did podcast with Alex Gladstein ',],
+    placeHolder: "Innovative service designed to simplify the vast world of YouTube videos into digestible summaries. The service leverages advanced AI algorithms to watch, analyze, and concisely summarize YouTube videos across a myriad of topics, offering users a quick understanding of video content without the need to watch the entire video. This uses GPT 3.5 and costs 100 sats.",
+    chatLLM: 'llama-2-7b-chat-hf'
   },
 
 

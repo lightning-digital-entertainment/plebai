@@ -116,6 +116,7 @@ export const useModelsStore = create<ModelsStore>()(
     }),
     {
       name: 'app-models',
+      version: 1,
 
       // omit the memory references from the persisted state
       partialize: (state) => ({
@@ -140,8 +141,8 @@ export const useModelsStore = create<ModelsStore>()(
 );
 
 
-const defaultChatSuffixPreference = ['gpt-3.5-turbo', 'gpt-4-0613', 'gpt-4', 'gpt-4-32k', 'gpt4all-lora-q4'];
-const defaultFastSuffixPreference = ['gpt-3.5-turbo-0613', 'gpt-3.5-turbo-16k-0613', 'gpt-3.5-turbo-16k', 'gpt-3.5-turbo', 'gpt4all-lora-q4'];
+const defaultChatSuffixPreference = ['gpt-3.5-turbo', 'gpt-4-0613', 'gpt-4', 'gpt-4-32k', 'llama-2-7b-chat-hf'];
+const defaultFastSuffixPreference = ['gpt-3.5-turbo-0613', 'gpt-3.5-turbo-16k-0613', 'gpt-3.5-turbo-16k', 'gpt-3.5-turbo', 'llama-2-7b-chat-hf'];
 
 function findLlmIdBySuffix(llms: DLLM[], suffixes: string[]): DLLMId | null {
   if (!llms?.length) return null;

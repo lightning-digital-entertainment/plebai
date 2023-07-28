@@ -30,7 +30,7 @@ export async function runAssistantUpdatingState(conversationId: string, history:
   const { startTyping, editMessage } = useChatStore.getState();
   startTyping(conversationId, controller);
 
-  await streamAssistantMessage(conversationId, assistantMessageId, history, assistantLlmId, editMessage, controller.signal);
+  await streamAssistantMessage(conversationId, systemPurpose, assistantMessageId, history, assistantLlmId, editMessage, controller.signal);
 
   // clear to send, again
   startTyping(conversationId, null);
@@ -41,7 +41,7 @@ export async function runAssistantUpdatingState(conversationId: string, history:
 
 
 async function streamAssistantMessage(
-  conversationId: string, assistantMessageId: string,
+  conversationId: string, systemPurpose: SystemPurposeId, assistantMessageId: string,
   history: DMessage[],
   llmId: DLLMId,
   editMessage: (conversationId: string, messageId: string, updatedMessage: Partial<DMessage>, touch: boolean) => void,
@@ -65,14 +65,17 @@ async function streamAssistantMessage(
       id: llmRef,
       temperature: llmTemperature,
       maxTokens: llmResponseTokens,
+    
     },
+  
+
     history: history.map(({ role, text }) => ({
       role: role,
       content: text,
     })),
   };
 
-  
+  if (llmRef === 'llama-2-7b-chat-hf')   input.model.systemPurpose = systemPurpose;
 
   // other params
   const shallSpeakFirstLine = useElevenlabsStore.getState().elevenLabsAutoSpeak === 'firstLine';

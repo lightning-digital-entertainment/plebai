@@ -39,8 +39,8 @@ export const SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
     description: 'Spoken English Teacher and Improver 🚀',
     systemMessage: "How can individuals effectively promote Bitcoin adoption and understanding among their friends and family, especially beginners?",
     symbol: '💊',
-    examples: ['Explain bitcoin like I am 5 years old',' What are some common misunderstandings of "orange-pilling" someone? ', 'How do you address the potential risks or downsides associated with Bitcoin?', 'What alternative approaches exist for educating others about Bitcoin? '],
-    placeHolder: "The Orange-Pilling Agent is a skilled and empathetic advocate for Bitcoin adoption. With a deep understanding of the bitcoin space and a passion for spreading awareness about Bitcoin's potential, this agent dedicates their efforts to educate and persuade others to embrace the world's best digital currency. ",
+    examples: ['Explain bitcoin like I am 5 years old', 'How do you address the potential risks or downsides associated with Bitcoin?', 'What alternative approaches exist for educating others about Bitcoin? '],
+    placeHolder: "The Orange-Pilling Agent is a skilled and empathetic advocate for Bitcoin adoption. With a deep understanding of the bitcoin space and a passion for spreading awareness about Bitcoin's potential, This uses ReAct approach of thought and reasoning and uses internet for real time search. ",
     chatLLM: 'llama-2-7b-chat-hf'
   },
   SatsForDev: {
@@ -67,8 +67,8 @@ export const SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
     description: ' ',
     systemMessage: 'Provide a summary of the youtube video transcript. ',
     symbol: '📺',
-    examples: ['Summarize latest episode on TFTC with Kody Low', 'Here is a youtube link https://youtu.be/1-njHwhKrPY', 'Get me What Bitcoin did podcast with Alex Gladstein ',],
-    placeHolder: "Innovative service designed to simplify the vast world of YouTube videos into digestible summaries. The service leverages advanced AI algorithms to watch, analyze, and concisely summarize YouTube videos across a myriad of topics, offering users a quick understanding of video content without the need to watch the entire video. This uses GPT 3.5 and costs 100 sats.",
+    examples: ['Summarize latest episode on TFTC with Kody Low', 'Get this video https://youtu.be/1-njHwhKrPY', 'Get me What Bitcoin did podcast with Alex Gladstein ',],
+    placeHolder: "Innovative service designed to simplify the vast world of YouTube videos into digestible summaries. AI agent leverages advanced AI algorithms to watch, analyze, and concisely summarize YouTube videos across a myriad of topics, you can search a video or simply provide a youtube link to see the magic happen.  This uses GPT 3.5 and costs 100 sats.",
     chatLLM: 'llama-2-7b-chat-hf'
   },
 

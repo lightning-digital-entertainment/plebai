@@ -197,14 +197,16 @@ export function Composer(props: {
   const historyTokens = conversationTokenCount;
   const responseTokens = chatLLM?.options?.llmResponseTokens || 0;
   const remainingTokens = tokenLimit - directTokens - historyTokens - responseTokens;
-  const paySats: number = Math.round(Math.floor(chatLLM?.id.startsWith('openai-gpt-4')?(responseTokens+directTokens)*200:(responseTokens+directTokens)*50)/ 1000) * 1000;
+  const purposeTitle: string = SystemPurposes[props.systemPurpose as SystemPurposeId].title;
+  const paySats: number = purposeTitle==='Youtube Chat (Sats)'?100000:Math.round(Math.floor(chatLLM?.id.startsWith('openai-gpt-4')?(responseTokens+directTokens)*200:(responseTokens+directTokens)*50)/ 1000) * 1000;
   const purposeModel: string = SystemPurposes[props.systemPurpose as SystemPurposeId].chatLLM;
+
   const handleSendClicked = () => {
     const text = (composeText || '').trim();
     console.log('inside handle clicked')
     console.log('Sats to be paid: %o', paySats);
     console.log('purpose Model: %o', purposeModel)
-    if (purposeModel === 'llama-2-7b-chat-hf') {
+    if (purposeModel === 'llama-2-7b-chat-hf' && purposeTitle !== 'Youtube Chat (Sats)') {
       if (text.length && props.conversationId) {
         setComposeText('');
         props.onSendMessage(sendModeId, props.conversationId, text);

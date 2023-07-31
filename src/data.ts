@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-export type SystemPurposeId = 'Teacher' | 'Custom' |'Developer' |  'Thinker' |  'SatsForDev' | 'PromptGenie'| 'PodChat' | 'OrangePill';
+export type SystemPurposeId = 'Teacher' | 'Custom' |'Developer' |  'Thinker' |  'SatsForDev' | 'PromptGenie'| 'PodChat' | 'OrangePill' | 'GenImage' | 'HumanAI';
 
 export const defaultSystemPurposeId: SystemPurposeId = 'Thinker';
 
@@ -26,7 +26,7 @@ export const SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
     chatLLM: 'llama-2-7b-chat-hf'
   },
   Teacher: {
-    title: 'English Teacher (Free)',
+    title: 'Teacher (Free)',
     description: 'Spoken English Teacher and Improver 🚀',
     systemMessage: "I want you to act as a spoken English teacher and improver. I will speak to you in English and you will reply to me in English to practice my spoken English. I want you to keep your reply neat, limiting the reply to 100 words. I want you to strictly correct my grammar mistakes, typos, and factual errors. I want you to ask me a question in your reply. Now let's start practicing, you could ask me a question first. Remember, I want you to strictly correct my grammar mistakes, typos, and factual errors.. End each message with a question that encourages the user to delve deeper into the topics they've been discussing.🚀🎯💡",
     symbol: '📚',
@@ -72,6 +72,26 @@ export const SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
     chatLLM: 'llama-2-7b-chat-hf'
   },
 
+  GenImage: {
+    title: 'Gen Image AI (Free) ',
+    description: ' ',
+    systemMessage: 'Provide a summary of the youtube video transcript. ',
+    symbol: '🖼️',
+    examples: ['A white and brown colored cat with sunglasses on a beach',  'Portrait photo of muscular bearded guy in a worn mech suit, ((light bokeh)), intricate, (steel metal [rust]), elegant, sharp focus, photo by greg rutkowski, soft lighting, vibrant colors, (masterpiece), ((streets)), (detailed face:1.2), (glowing blue eyes:1.1)', 'photo of a young woman, birthday party, cake', '8k portrait of beautiful cyborg with brown hair, intricate, elegant, highly detailed, majestic, digital photography, art by artgerm and ruan jia and greg rutkowski surreal painting gold butterfly filigree, broken glass, (masterpiece, sidelighting, finely detailed beautiful eyes: 1.2), hdr, (detailed background window to a new dimension, plants and flowers:0.7)  infinity, infinite symbol,'],
+    placeHolder: "This tool generates any type of image using prompts. It employs the open-source Stable Diffusion 1.5, with Automatic1111 interface, and runs on a small Nvidia A10 instance. Image seeds are randomly generated, ensuring that no two images are alike. Currently, this service is offered for free. Image generation should take approximately 5-10 seconds. ",
+    chatLLM: 'llama-2-7b-chat-hf'
+  },
+
+  HumanAI: {
+    title: 'Human + AI (sats) ',
+    description: ' ',
+    systemMessage: 'Provide a summary of the youtube video transcript. ',
+    symbol: '🧝',
+    examples: ['A white and brown colored cat with sunglasses on a beach',  'Portrait photo of muscular bearded guy in a worn mech suit, ((light bokeh)), intricate, (steel metal [rust]), elegant, sharp focus, photo by greg rutkowski, soft lighting, vibrant colors, (masterpiece), ((streets)), (detailed face:1.2), (glowing blue eyes:1.1)', 'photo of a young woman, birthday party, cake', '8k portrait of beautiful cyborg with brown hair, intricate, elegant, highly detailed, majestic, digital photography, art by artgerm and ruan jia and greg rutkowski surreal painting gold butterfly filigree, broken glass, (masterpiece, sidelighting, finely detailed beautiful eyes: 1.2), hdr, (detailed background window to a new dimension, plants and flowers:0.7)  infinity, infinite symbol,'],
+    placeHolder: "This tool generates any type of image using prompts. It employs the open-source Stable Diffusion 1.5, with Automatic1111 frontend, and runs on a small Nvidia A10 instance. Image seeds are randomly generated, ensuring that no two images are alike. Currently, this service is offered for free. Image generation should take approximately 5-10 seconds. ",
+    chatLLM: 'llama-2-7b-chat-hf'
+  },
+
 
 
   Thinker: {
@@ -92,4 +112,5 @@ export const SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
     placeHolder: "This uses GPT 4.0 and costs 200 to 300 sats.",
     chatLLM: 'openai-gpt-4-0613'
   },
+
 };

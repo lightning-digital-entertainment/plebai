@@ -19,8 +19,8 @@ import { usePurposeStore } from './store-purposes';
 // Absolutely dislike this workaround, but it's the only way I found to make it work
 
 const bpTileSize = { xs: 116, md: 125, xl: 130 };
-const tileCols = [3, 4, 6];
-const tileSpacing = 1;
+const tileCols = [3, 5, 6];
+const tileSpacing = 2;
 const bpMaxWidth = Object.entries(bpTileSize).reduce((acc, [key, value], index) => {
   acc[key] = tileCols[index] * (value + 8 * tileSpacing) - 8 * tileSpacing;
   return acc;
@@ -112,6 +112,14 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
     SystemPurposes['Custom'].systemMessage = v.target.value;
   };
 
+  function truncateStringWithDots(input: string): string {
+    const maxLength = 70;
+    if (input.length > maxLength) {
+      return input.slice(0, maxLength - 3) + '...';
+    }
+    return input;
+  }
+
 
   // we show them all if the filter is clear (null)
   const unfilteredPurposeIDs = (filteredIDs && showPurposeFinder) ? filteredIDs : Object.keys(SystemPurposes);
@@ -180,10 +188,10 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
                     sx={{ alignSelf: 'flex-start' }}
                   />
                 )}
-                <div style={{ fontSize: '3rem' }}>
+                <div style={{ fontSize: '3.5rem' }}>
                   {SystemPurposes[spId as SystemPurposeId]?.symbol}
                 </div>
-                <div>
+                <div style={{ fontSize: '0.9rem' }}>
                   {SystemPurposes[spId as SystemPurposeId]?.title}
                 </div>
               </Button>
@@ -216,7 +224,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
               (selectedExample
                 ? <>
                   
-                  <Button variant='outlined' color='neutral' size='md' onClick={() => props.runExample(selectedExample)}>{selectedExample}</Button>
+                  <Button variant='outlined' color='neutral' size='md' onClick={() => props.runExample(selectedExample)}>{truncateStringWithDots(selectedExample) }</Button>
                 
                   
                  

@@ -27,8 +27,9 @@ export type HtmlBlock = { type: 'html'; html: string; };
 export const parseBlocks = (forceText: boolean, text: string): Block[] => {
   if (forceText)
     return [{ type: 'text', content: text }];
-
-  if (text.startsWith('https://i.ytimg.com/'))
+  console.log(text);
+  
+  if (text.startsWith('https://i.current.fyi/'))
     return [{ type: 'image', url: text.trim() }];
 
   if (text.startsWith('<!DOCTYPE html'))

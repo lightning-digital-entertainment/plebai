@@ -22,6 +22,7 @@ const modelSchema = z.object({
   id: z.string(),
   temperature: z.number().min(0).max(1).optional(),
   maxTokens: z.number().min(1).max(100000).optional(),
+  systemPurpose: z.string().optional()
 });
 
 const historySchema = z.array(z.object({
@@ -211,6 +212,7 @@ export function openAICompletionRequest(model: ModelSchema, history: HistorySche
     // ...(functions && { functions: functions, function_call: 'auto', }),
     ...(model.temperature && { temperature: model.temperature }),
     ...(model.maxTokens && { max_tokens: model.maxTokens }),
+    ...(model.systemPurpose && { system_purpose: model.systemPurpose }),
     stream,
     n: 1,
   };

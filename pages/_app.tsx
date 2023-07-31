@@ -26,7 +26,7 @@ function MyApp({ Component, emotionCache = clientSideEmotionCache, pageProps }: 
     <CacheProvider value={emotionCache}>
       <Head>
         <title>{Brand.Title.Common}</title>
-        <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no' />
+        <meta name='viewport' content='initial-scale=1, width=device-width, shrink-to-fit=no' />
       </Head>
       {/* Rect-query provider */}
       <QueryClientProvider client={queryClient}>

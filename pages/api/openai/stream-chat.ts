@@ -58,7 +58,7 @@ async function chatStreamRepeater(access: ChatGenerateSchema['access'], model: C
   function llmAccess(modelId: string, access: ChatGenerateSchema['access'], link: string): any {
 
         console.log('model ID: %o', modelId)
-        if (modelId === 'gpt4all-lora-q4') {
+        if (modelId === 'llama-2-7b-chat-hf') {
             return gpt4allAccess(access, link)
 
         }

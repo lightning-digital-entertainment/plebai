@@ -36,8 +36,8 @@ export interface SourceSetupGpt4allAI {
 
 export function normalizeOAIOptions(partialOptions?: Partial<LLMOptionsOpenAI>): LLMOptionsOpenAI {
   return {
-    llmRef: 'gpt4all-lora-q4',
-    llmTemperature: 1,
+    llmRef: 'llama-2-7b-chat-hf',
+    llmTemperature: 0.2,
     llmResponseTokens: 256,
     llmPresence_penalty:0,
     ...partialOptions,

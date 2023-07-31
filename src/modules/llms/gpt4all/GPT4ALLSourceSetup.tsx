@@ -63,7 +63,7 @@ export function GPT4ALLAISourceSetup(props: { sourceId: DModelSourceId }) {
 
 
 export function localAIToDLLM( source: DModelSource): DLLM[] {
-  let label = 'gpt4all-lora-q4'
+  let label = 'llama-2-7b-chat-hf'
     .replace('ggml-', '')
     .replace('.bin', '')
     .replaceAll('-', ' ');
@@ -73,7 +73,7 @@ export function localAIToDLLM( source: DModelSource): DLLM[] {
   // shall we do some heuristics
   const contextTokens = 4096; // FIXME
   return[{
-    id: `gpt4all-lora-q4`,
+    id: `llama-2-7b-chat-hf`,
     label,
     created: 0,
     description: 'Local model',
@@ -83,7 +83,7 @@ export function localAIToDLLM( source: DModelSource): DLLM[] {
     sId: source.id,
     _source: source,
     options: {
-      llmRef: `gpt4all-lora-q4`,
+      llmRef: `llama-2-7b-chat-hf`,
       llmTemperature: 1,
       llmResponseTokens: 256
     },

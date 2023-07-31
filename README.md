@@ -1,11 +1,8 @@
 # `PlebAI` 💬
 
-PlebAI is a forked version of [BIG-AGI](https://github.com/enricoros/big-agi) 
+Silicon valley elites are pouring billions of dollars in building closed AI systems that can ingest all of our data. Then scare politicians into creating regulations that install them as overlords. They will not win in that game because of millions of Plebs like us band together, build in public (#buildinpublic), democratize AI access for all and beat them in their own game.
 
-
-Big techs are pouring billions into building closed source AI models, to keep everyone under lock and key. Yet, the true evolution of AI will come not from walled gardens, but from the open collaboration of plebs worldwide.
-
-Plebs will #buildinpublic and beat them at their own game. We built an AI Chatbot that relies solely on open-source large Language Models (LLMs). Check it out.
+We call this movement PlebAI.
 
 Website: https://plebai.com
 
@@ -37,6 +34,9 @@ By leveraging state-of-the-art Open-Source Large Language Models (LLMs), Prem of
 
 GPT4All, developed by Nomic AI, is a chatbot trained on an extensive corpus of assistant interactions. By fine-tuning LLaMA 7B, GPT4All provides an open-source ecosystem for training and deploying efficient, assistant-style large language models locally on consumer-grade CPUs.
 
+#### LLAMA2-7B-HF as LLM
+
+Llama2, developed by Meta, Meta developed and publicly released the Llama 2 family of large language models (LLMs), a collection of pretrained and fine-tuned generative text models ranging in scale from 7 billion to 70 billion parameters. Our fine-tuned LLMs, called Llama-2-Chat, are optimized for dialogue use cases.
 
 #### BIG-AGI Chat user interface
 
@@ -50,6 +50,10 @@ Langchain enables the integration of external data sources, integration with 3rd
 
 LLMs are stateless and require data to be sent at every invocation. Using redis store to store data as embeddings. Redis can be created inside prem.ai dashboard and monitor the running state. 
 
+#### Zep long term memory
+
+Open source project focused on providing tools to work with langchain to store conversational data for future retrieval. (https://getzep.com)
+
 #### L402 (Lightning Labs)
 
 L402, previously known as LSAT, is a standard that supports the use case of charging for services and authenticating users in distributed networks. It combines the strengths of Macaroons for improved authentication with the capabilities of the Lightning Network for enhanced payments. We plan to utilize this standard to access 3rd party data and APIs.
@@ -60,6 +64,8 @@ In the near future, we will enable payment with sats (satoshis) to access premiu
 
 
 ## Develop 🧩
+
+PlebAI is a forked version of [BIG-AGI](https://github.com/enricoros/big-agi) 
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=&logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/React-61DAFB?style=&logo=react&logoColor=black)

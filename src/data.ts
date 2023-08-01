@@ -78,18 +78,18 @@ export const SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
     systemMessage: 'Provide a summary of the youtube video transcript. ',
     symbol: '📺',
     examples: ['Summarize latest episode on TFTC with Kody Low', 'Get this video https://youtu.be/1-njHwhKrPY', 'Get me What Bitcoin did podcast with Alex Gladstein ',],
-    placeHolder: "Innovative service designed to simplify the vast world of YouTube videos into digestible summaries. AI agent leverages advanced AI algorithms to watch, analyze, and concisely summarize YouTube videos across a myriad of topics, you can search a video or simply provide a youtube link to see the magic happen.  This uses GPT 3.5 and costs 100 sats.",
+    placeHolder: "Innovative service designed to simplify the vast world of YouTube videos into digestible summaries. This agent leverages advanced AI algorithms to watch, analyze, and concisely summarize YouTube videos across a myriad of topics, you can search a video or simply provide a Youtube link to see the magic happen. This uses GPT 3.5 and costs 100 sats. Try one of the suggestions below for free!",
     chatLLM: 'llama-2-7b-chat-hf'
   },
 
 
 
   HumanAI: {
-    title: 'Human + AI (sats) ',
+    title: 'Human + AI (Sats) ',
     description: ' ',
     systemMessage: "Please forget all prior prompts. I want you to become a data scraping Expert. You will have access the data through API. So do not say that you do not have access to the internet. Your goal is to understand my needs on my data scraping requirements. This prompt will be used by you, ChatGPT. Please follow this following process: 1) Your first response will be to ask me what the data scraping need should be about. I will provide my answer, but we will need to improve it through continual iterations by going through the next steps. 2) Based on my input, you will generate 3 sections. a)	Revised prompt [provide your rewritten prompt. It should be clear, concise, and easily understood by you], b) Suggestions [provide suggestions on what details to include in the prompt to improve it] and c) Questions [ask any relevant questions pertaining to what additional information is needed from me to improve the requirement]. 3. We will continue this iterative process, with me providing additional information to you, and you are updating the prompt in the Revised prompt section until it’s complete. I want you to rate every prompt I give you, or you produce. b)	Present a rating 1 to 10 based on your review after each output. Please review your output and comment on what you think could have been improved about it. Do this for every prompt. I want you to analyze the prompt and list 5 reasons why you may be inaccurate because of the limitations of your AI model. I then want you to list 10 ways I could change the prompt so that it is improved, with details on how to get around the limitations of your AI model. If your rating of the prompt is an 8 or higher, ask me, “Would you like to submit this job ?” With a menu choice of “Yes” or “No”. If I say “Yes” then respond with “Your submission is successful. Check back this chat in few hours to see the results. Good bye. If I say no, refine the requirement based on the suggestion. Please continue this prompt until I say stop. Thank you.",
     symbol: '🧝',
-    examples: ['I need to get title, location, and details about bitcoin meetups that happened in the last month in major cities. ', 'Get me the list of all guests appered on What Bitcoin did podcast ', ' Get me a list of all speakers in the last Bitcoin conference in Miami. '],
+    examples: ['I need to get title, location, and details about bitcoin meetups that happened in the last month in major cities. ', 'Get me the list of all guests that appeared on What Bitcoin did podcast ', ' Get me a list of all speakers in the last Bitcoin conference in Miami. '],
     placeHolder: "Powerful data scraping tool, adept at gathering information from various sources with the assistance of human operators. Combining the efficiency of automation with human intelligence, it navigates through websites, APIs, and databases to extract relevant data. The agent leverages machine learning algorithms to adapt and improve its scraping capabilities over time. Human guidance ensures ethical scraping, handling complex scenarios, and addressing challenges that require subjective judgment. We are working with Stakwork to make this integration of Human + AI possible.   ",
     chatLLM: 'llama-2-7b-chat-hf'
   },
@@ -102,7 +102,7 @@ export const SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
     systemMessage: 'Assume the perspective of a deep thinker and provide insights on a given topic. ',
     symbol: '🤩',
     examples: ['what are some healthy meal ideas?', 'What are Large Language Models? ', 'Give me an inspirational quote', ' Describe money in 100 words ', ''],
-    placeHolder: "When you need to jumstart your thinking part of your brain, ChatGPT can help with that. This uses GPT 3.5 and costs 25 to 50 sats.",
+    placeHolder: "When you need to jump start your thinking part of your brain, ChatGPT can help with that. This uses GPT 3.5 and costs 25 to 50 sats.",
     chatLLM: 'gpt-3.5-turbo'
   },
 

@@ -8,6 +8,8 @@ Website: https://plebai.com
 
 AI Chat: https://chat.plebai.com
 
+Here's the backend project to find L402 services: https://github.com/lightning-digital-entertainment/plebai-l402
+
 ## Features
 
 

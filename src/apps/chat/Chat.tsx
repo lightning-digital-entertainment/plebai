@@ -102,7 +102,7 @@ export function Chat() {
     }
 
     // synchronous long-duration tasks, which update the state as they go
-    if (sendModeId && chatLLMId && systemPurposeId) {
+    if (sendModeId && chatLLMId && systemPurposeId && conversationsCount < 20) {
       switch (sendModeId) {
         case 'immediate':
           return await runAssistantUpdatingState(conversationId, history, chatLLMId, systemPurposeId);

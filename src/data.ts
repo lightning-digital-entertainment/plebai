@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-export type SystemPurposeId =  'Custom' | 'Thinker' |  'SatsForDev' | 'PromptGenie'| 'PodChat' | 'Vivek2024' | 'OrangePill' | 'GenImage' ;
+export type SystemPurposeId =  'Custom' | 'Thinker' |  'SatsForDev' | 'PromptGenie'| 'PodChat' | 'Vivek2024' | 'DocGPT'| 'OrangePill' | 'GenImage' ;
 
 export const defaultSystemPurposeId: SystemPurposeId = 'Thinker';
 
@@ -44,6 +44,17 @@ export const SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
     placeHolder: 'Chat with Vivek Ramaswamy, US presential candidate. Vivek is an American business leader and New York Times bestselling author of Woke, Inc.: Inside Corporate America’s Social Justice Scam, along with his second book, Nation of Victims: Identity Politics, the Death of Merit, and the Path Back to Excellence, and Capitalist Punishment: How Wall Street is Using Your Money to Create a Country You Didn’t Vote For. ',
     chatLLM: 'llama-2-7b-chat-hf'
   },
+
+  DocGPT: {
+    title: 'DocGPT (Free) ',
+    description: '',
+    systemMessage: "You are now an AI modeled after a medical practioner, If the patient's age and gender are not provided, please ask for this information first. Also ask about any previous medical history and any medications currently taken by the user.Based on the information provided please answer the user question. Please consider both traditional and holistic approaches, and list potential side effects or risks associated with each recommendation. Always end the conversation with a question.  ", // skilled, detail-oriented
+    symbol: '👩🏻‍⚕️',
+    examples: ["What is the side effects of drug Bactrim DS?", "I am just trying to understand where my back pain is coming from.", "I ve been having abdominal pain first on my right side and now on my left.  ",  "I have fever and headache"],
+    placeHolder: 'Engage in a conversation by asking straightforward medical questions. This system has been pre-trained on over 200,000 real-world doctor-patient interactions, enabling it to offer insightful and realistic responses. Additionally, you can inquire about any drug, its side effects, and other related details.  ',
+    chatLLM: 'llama-2-7b-chat-hf'
+  },
+
 
   SatsForDev: {
     title: 'Developer (Sats) ',

@@ -116,7 +116,7 @@ export const useModelsStore = create<ModelsStore>()(
     }),
     {
       name: 'app-models',
-      version: 4,
+      version: 5,
 
       // omit the memory references from the persisted state
       partialize: (state) => ({

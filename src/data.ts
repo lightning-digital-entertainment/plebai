@@ -27,12 +27,12 @@ export const SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
     chatLLM: 'llama-2-7b-chat-hf'
   },
   GenImage: {
-    title: 'Gen Image AI (Free) ',
+    title: 'Gen Image AI (Sats) ',
     description: ' ',
     systemMessage: '',
     symbol: '🖼️',
     examples: ['A white and brown colored cat with sunglasses on a beach',  'Portrait photo of muscular bearded guy in a worn mech suit, ((light bokeh)), intricate, (steel metal [rust]), elegant, sharp focus, photo by greg rutkowski, soft lighting, vibrant colors, (masterpiece), ((streets)), (detailed face:1.2), (glowing blue eyes:1.1)', 'photo of a young woman, birthday party, cake', '8k portrait of beautiful cyborg with brown hair, intricate, elegant, highly detailed, majestic, digital photography, art by artgerm and ruan jia and greg rutkowski surreal painting gold butterfly filigree, broken glass, (masterpiece, sidelighting, finely detailed beautiful eyes: 1.2), hdr, (detailed background window to a new dimension, plants and flowers:0.7)  infinity, infinite symbol,'],
-    placeHolder: "This tool generates any type of image using prompts. It employs the open-source Stable Diffusion 1.5, with Automatic1111 interface, and runs on a small Nvidia A10 instance. Image seeds are randomly generated, ensuring that no two images are alike. Currently, this service is offered for free. Image generation should take approximately 5-10 seconds. ",
+    placeHolder: "To keep off the scammers, I added 50 sats to generate up to 5 images. This tool generates any type of image using prompts. It employs the open-source Stable Diffusion 1.5, with Automatic1111 interface, and runs on a small Nvidia A10 instance. Image seeds are randomly generated, ensuring that no two images are alike. Currently, this service is offered for free. Image generation should take approximately 5-10 seconds. ",
     chatLLM: 'llama-2-7b-chat-hf'
   },
   Vivek2024: {

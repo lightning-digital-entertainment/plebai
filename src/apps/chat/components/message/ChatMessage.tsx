@@ -76,15 +76,10 @@ export function makeAvatar(messageAvatar: string | null, messageRole: DMessage['
         return <PaletteOutlinedIcon sx={iconSx} />;
       const symbol = SystemPurposes[messagePurposeId as SystemPurposeId]?.symbol;
       if (symbol)
-        return <Box
-          sx={{
-            fontSize: '24px',
-            textAlign: 'center',
-            width: '100%', minWidth: `${iconSx.width}px`, lineHeight: `${iconSx.height}px`,
-          }}
-        >
-          {symbol}
-        </Box>;
+        return  <Avatar  alt=""
+        src={symbol} 
+        sx={{ width: `${iconSx.width}px`, height: `${iconSx.height}px`, mt: 1, }}/>
+        
       // default assistant avatar
       return <SmartToyOutlinedIcon sx={iconSx} />; // https://mui.com/static/images/avatar/2.jpg
 
@@ -297,7 +292,7 @@ export function ChatMessage(props: { message: DMessage, isBottom: boolean, onMes
               fontSize: { xs: 'xs', sm: 'sm' }, fontWeight: 500,
               ...(messageTyping ? { animation: `${cssRainbowColorKeyframes} 5s linear infinite` } : {}),
             }}>
-              {prettyBaseModel(messagePurposeId)}
+              {prettyBaseModel(SystemPurposes[messagePurposeId as SystemPurposeId]?.title)}
             </Typography>
           </Tooltip>
         )}
@@ -399,12 +394,12 @@ export function ChatMessage(props: { message: DMessage, isBottom: boolean, onMes
               Retry
             </MenuItem>
           )}
-          {fromUser && (
+          {/*fromUser && (
             <MenuItem onClick={handleMenuRunAgain}>
               <ListItemDecorator><FastForwardIcon /></ListItemDecorator>
               Run Again
             </MenuItem>
-          )}
+          )*/}
           <MenuItem onClick={props.onMessageDelete} disabled={false /*fromSystem*/}>
             <ListItemDecorator><ClearIcon /></ListItemDecorator>
             Delete

@@ -63,11 +63,7 @@ export function ChatContextItems(props: {
       </Typography>
     </ListItem>
 
-    <MenuItem onClick={handleSystemMessagesToggle}>
-      <ListItemDecorator><SettingsSuggestIcon /></ListItemDecorator>
-      System message
-      <Switch checked={showSystemMessages} onChange={handleSystemMessagesToggle} sx={{ ml: 'auto' }} />
-    </MenuItem>
+  
 
     <ListDivider inset='startContent' />
 

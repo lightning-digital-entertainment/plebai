@@ -33,6 +33,8 @@ export const countModelTokens: (text: string, llmId: DLLMId, debugFrom: string) 
     return count;
   }
 
+
+
   // preload the tokenizer for the default model
   const { chatLLMId } = useModelsStore.getState();
   if (chatLLMId)

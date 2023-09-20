@@ -25,6 +25,6 @@ export const Brand = {
     Home: 'https://plebai.com',
     CardImage: 'https://i.current.fyi/current/app/plebai_web.png',
     OpenRepo: 'https://github.com/lightning-digital-entertainment/plebai',
-    SupportInvite: 'https://t.me/+1NhSTfdwv1M2MTky',
+    SupportInvite: 'https://discord.gg/qz2JRkXj',
   },
 };

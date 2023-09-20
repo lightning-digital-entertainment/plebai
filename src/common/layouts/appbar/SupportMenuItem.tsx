@@ -53,7 +53,7 @@ export function SupportMenuItem() {
       }}>
       
       <BringTheLove text='PlebAI' icon={<HomeIcon sx={{ color: iconColor }} />} link={'https://plebai.com'} />
-      <BringTheLove text='Telegram' icon={<TelegramIcon sx={{ color: iconColor }} />} link={Brand.URIs.SupportInvite} />
+      <BringTheLove text='Discord' icon={<DiscordIcon sx={{ color: iconColor }} />} link={Brand.URIs.SupportInvite} />
       <BringTheLove text='GitHub' icon={<GitHubIcon sx={{ color: iconColor }} />} link={Brand.URIs.OpenRepo} />
     </ListItem>
   );

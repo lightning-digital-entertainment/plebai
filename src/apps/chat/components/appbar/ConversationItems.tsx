@@ -83,7 +83,7 @@ export function ConversationItems(props: {
         conversationId={conversationId}
         isActive={conversationId === props.conversationId}
         isSingle={singleChat}
-        showSymbols={showSymbols}
+        showSymbols={false}
         conversationActivate={handleConversationActivate}
         conversationDelete={handleConversationDelete}
       />)}

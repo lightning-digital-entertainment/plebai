@@ -17,6 +17,7 @@
     "@emotion/react": "^11.11.1",
     "@emotion/server": "^11.11.0",
     "@emotion/styled": "^11.11.0",
+    "@fingerprintjs/fingerprintjs": "^4.1.0",
     "@mui/icons-material": "^5.11.16",
     "@mui/joy": "^5.0.0-alpha.84",
     "@next/bundle-analyzer": "^13.4.7",

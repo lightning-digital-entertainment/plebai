@@ -6,6 +6,7 @@ import { SxProps } from '@mui/joy/styles/types';
 import { extractCommands } from '~/common/util/extractCommands';
 
 import { TextBlock } from './Block';
+import Link from 'next/link';
 
 
 export const RenderText = ({ textBlock, sx }: { textBlock: TextBlock; sx?: SxProps; }) => {
@@ -24,7 +25,7 @@ export const RenderText = ({ textBlock, sx }: { textBlock: TextBlock; sx?: SxPro
       {elements.map((element, index) =>
         element.type === 'cmd'
           ? <Chip key={index} component='span' size='md' variant='solid' color='neutral' sx={{ mr: 1 }}>{element.value}</Chip>
-          : <span key={index}>{element.value}</span>,
+          : element.value.startsWith('https://')? <Link key={index} href={element.value} target='_blank'> {element.value} </Link>: <span key={index}>{element.value}</span>,
       )}
     </Typography>
   );

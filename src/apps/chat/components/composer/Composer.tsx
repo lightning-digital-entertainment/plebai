@@ -18,7 +18,8 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { SystemPurposeId, SystemPurposes } from '../../../../data';
 import { ContentReducer } from '~/modules/aifn/summarize/ContentReducer';
 import { useChatLLM } from '~/modules/llms/store-llms';
-
+import HistoryIcon from '@mui/icons-material/History';
+import SendIcon from '@mui/icons-material/Send';
 import { ConfirmationModal } from '~/common/components/ConfirmationModal';
 import { countModelTokens } from '~/common/llm-util/token-counter';
 import { extractFilePathsWithCommonRadix } from '~/common/util/dropTextUtils';
@@ -171,12 +172,15 @@ export function Composer(props: {
   const theme = useTheme();
   const enterToSend = useUIPreferencesStore(state => state.enterToSend);
   const { sentMessages, appendSentMessage, clearSentMessages, startupText, setStartupText } = useComposerStore();
-  const { assistantTyping, tokenCount: conversationTokenCount, stopTyping } = useChatStore(state => {
-    const conversation = state.conversations.find(conversation => conversation.id === props.conversationId);
+  const { assistantTyping, tokenCount: conversationTokenCount, stopTyping, setTokenCount, setConversationCount, conversationCount } = useChatStore(state => {
+  const conversation = state.conversations.find(conversation => conversation.id === props.conversationId);
     return {
       assistantTyping: conversation ? !!conversation.abortController : false,
       tokenCount: conversation ? conversation.tokenCount : 0,
-      stopTyping: state.stopTyping,
+      stopTyping: state.stopTyping,  
+      setTokenCount: state.setTokenCount,
+      conversationCount: conversation ? conversation.conversationCount : 0,
+      setConversationCount: state.setConversationCount
     };
   }, shallow);
   const { chatLLMId, chatLLM } = useChatLLM();
@@ -206,10 +210,13 @@ export function Composer(props: {
     console.log('inside handle clicked')
     console.log('Sats to be paid: %o', paySats);
     console.log('purpose Model: %o', purposeModel)
-    if (purposeModel === 'llama-2-7b-chat-hf' && purposeTitle !== 'Youtube Chat (Sats)') {
+    console.log('conversationTokenCount: %o',conversationTokenCount)
+    if ( conversationCount <  SystemPurposes[props.systemPurpose as SystemPurposeId].convoCount && !SystemPurposes[props.systemPurpose as SystemPurposeId].paid ) {
       if (text.length && props.conversationId) {
         setComposeText('');
+        setConversationCount(props.conversationId, conversationCount + 1);
         props.onSendMessage(sendModeId, props.conversationId, text);
+
         appendSentMessage(text);
       }
 
@@ -227,7 +234,7 @@ export function Composer(props: {
                     const response = await fetch('/api/current/request', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({'amtinsats': paySats })
+                      body: JSON.stringify({'amtinsats': SystemPurposes[props.systemPurpose as SystemPurposeId].satsPay*1000 })
                     });
                     
                     const payResponse  = await response.json();
@@ -243,27 +250,14 @@ export function Composer(props: {
                           settle = await invoice.isPaid();
 
                           if (text.length && props.conversationId && settle) {
+                            setConversationCount(props.conversationId, 1);
+                            console.log('tokenCount: ', props.conversationId)
+        
                             setComposeText('');
+                      
                             props.onSendMessage(sendModeId, props.conversationId, text);
                             appendSentMessage(text);
                           }
-
-                          /* Not wasting 2-3 seconds by going to node to check payment status. 
-                          const verifyResponse = await fetch('/api/current/verify', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({'verifyUrl': verify })
-                          });
-                          const verifyResponseParsed  = await verifyResponse.json();
-                          const { preimage, settled } = verifyOutputSchema.parse(verifyResponseParsed);
-                          console.log('preimage from verify url: %o', preimage)
-                          settle=settled;
-                          if (text.length && props.conversationId && preimage === weblnResponse.preimage && settled) {
-                            setComposeText('');
-                            props.onSendMessage(sendModeId, props.conversationId, text);
-                            appendSentMessage(text);
-                          }
-                          */
 
                         } while (!settle)
                         
@@ -512,55 +506,84 @@ export function Composer(props: {
       <Grid container spacing={{ xs: 1, md: 2 }}>
 
         {/* Left pane (buttons and Textarea) */}
-        <Grid xs={12} md={9}><Stack direction='row' spacing={{ xs: 1, md: 2 }}>
+        <Grid xs={12} md={10}><Stack direction='row' spacing={{ xs: 1, md: 0, mb: 2 }}>
 
           {/* Vertical Buttons Bar */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 0, md: 2 } }}>
+          <Box sx={{ display: 'flex', flexDirection: 'row', gap: { xs: 0, md: 0 } }}>
 
             {/*<Typography level='body3' sx={{mb: 2}}>Context</Typography>*/}
 
             {isSpeechEnabled && <Box sx={hideOnDesktop}>
               <MicButton variant={micVariant} color={micColor} onClick={handleMicClicked} />
             </Box>}
-
-            <IconButton variant='plain' color='neutral' onClick={handleShowFilePicker} sx={{ ...hideOnDesktop }}>
+            {/* 
+            <IconButton variant='soft' color='neutral' onClick={handleShowFilePicker} sx={{ ...hideOnDesktop }}>
               <UploadFileIcon />
             </IconButton>
             <Tooltip
-              variant='solid' placement='top-start'
+              variant='soft' placement='top-start'
               title={attachFileLegend}>
-              <Button fullWidth variant='plain' color='neutral' onClick={handleShowFilePicker} startDecorator={<UploadFileIcon />}
+              <Button variant='plain' color='neutral' onClick={handleShowFilePicker} startDecorator={<UploadFileIcon />}
                       sx={{ ...hideOnMobile, justifyContent: 'flex-start' }}>
-                Attach
+               
               </Button>
             </Tooltip>
 
-            <IconButton variant='plain' color='neutral' onClick={handlePasteButtonClicked} sx={{ ...hideOnDesktop }}>
+            <IconButton variant='soft' color='neutral' onClick={handlePasteButtonClicked} sx={{ ...hideOnDesktop }}>
               <ContentPasteGoIcon />
             </IconButton>
             <Tooltip
-              variant='solid' placement='top-start'
+              variant='soft' placement='top-start'
               title={pasteClipboardLegend}>
               <Button fullWidth variant='plain' color='neutral' startDecorator={<ContentPasteGoIcon />} onClick={handlePasteButtonClicked}
                       sx={{ ...hideOnMobile, justifyContent: 'flex-start' }}>
-                
+              
               </Button>
             </Tooltip>
-
+            */}
             <input type='file' multiple hidden ref={attachmentFileInputRef} onChange={handleLoadAttachment} />
 
           </Box>
 
+          <Grid xs={1} md={2}>
+          <Stack spacing={2}>
+
+            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+
+              {/* [mobile-only] Sent messages arrow */}
+              {sentMessages.length > 0 && (
+                <IconButton disabled={!!sentMessagesAnchor} variant='plain' color='neutral' onClick={showSentMessages} sx={{ ...hideOnDesktop, mr: { xs: 1, md: 2 } }}>
+                  <HistoryIcon />
+                </IconButton>
+              )}
+
+              {/* Send / Stop */}
+             
+                            {/* [desktop-only] row with Sent Messages button */}
+                <Stack direction='row' spacing={1} sx={{ ...hideOnMobile, flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'flex-end' }}>
+                  {sentMessages.length > 0 && (
+                    <Button disabled={!!sentMessagesAnchor} variant='plain' color='neutral' startDecorator={<HistoryIcon />} onClick={showSentMessages}>
+                      
+                    </Button>
+                  )}
+                </Stack>
+            </Box>
+
+
+
+          </Stack>
+        </Grid>
+
           {/* Edit box, with Drop overlay */}
-          <Box sx={{ flexGrow: 1, position: 'relative' }}>
+          <Box sx={{ flexGrow: 2, position: 'relative' }}>
 
             <Box sx={{ position: 'relative' }}>
 
               <Textarea
-                variant='outlined' color={isReAct ? 'primary' : 'info'}
+                variant='outlined' color={isReAct ? 'neutral' : 'neutral'}
                 autoFocus
-                minRows={4} maxRows={12}
-                placeholder={'Type a message and press enter'}
+                minRows={1} maxRows={12}
+                placeholder={"Tell me what's on your mind..."}
                 value={composeText}
                 onChange={(e) => setComposeText(e.target.value)}
                 onDragEnter={handleTextareaDragEnter}
@@ -576,7 +599,10 @@ export function Composer(props: {
                   },
                 }}
                 sx={{
-                  background: theme.vars.palette.background.level1,
+                  '&::before': {
+                    outline: '0.5px solid var(--Textarea-focusedHighlight)',
+                  },
+                  background: theme.vars.palette.background.level2,
                   fontSize: '16px',
                   lineHeight: 1.75,
                 }} />
@@ -585,12 +611,34 @@ export function Composer(props: {
               */}
             </Box>
 
-            {isSpeechEnabled && <MicButton variant={micVariant} color={micColor} onClick={handleMicClicked} sx={{ ...hideOnMobile, position: 'absolute', top: 0, right: 0, margin: 1 }} />}
+            {assistantTyping
+                ? (
+                  <Button
+                    variant='soft' color={isReAct ? 'info' : 'neutral'} disabled={!props.conversationId}
+                    onClick={handleStopClicked}
+                    endDecorator={<StopOutlinedIcon />}
+                    sx={{ position: 'absolute', top: 0, right: 0, margin: 1, mb: 0.5 }}
+                  >
+                    Stop
+                  </Button>
+                ) : (
+                  <Button
+                    variant='plain' color={isReAct ? 'info' : 'neutral'} disabled={!props.conversationId || !chatLLM}
+                    onClick={handleSendClicked}  
+                    endDecorator={isReAct ? <PsychologyIcon /> : <SendIcon />}
+                    sx={{ position: 'absolute', top: 0, right: 0, margin: 1 }}
+                  >
+                    {isReAct ? 'ReAct' : ''}
+                  </Button>
+                )}
+
+
+            {/* isSpeechEnabled && <MicButton variant={micVariant} color={micColor} onClick={handleMicClicked} sx={{ ...hideOnMobile, position: 'absolute', top: 0, right: 0, margin: 1 }} />} */}
 
             {/* {!!tokenLimit && <TokenBadge directTokens={directTokens} indirectTokens={historyTokens + responseTokens} tokenLimit={tokenLimit} absoluteBottomRight />} */}
 
             <Card
-              color='info' invertedColors variant='soft'
+              color='neutral' invertedColors variant='soft'
               sx={{
                 display: isDragging ? 'flex' : 'none',
                 position: 'absolute', bottom: 0, left: 0, right: 0, top: 0,
@@ -612,50 +660,7 @@ export function Composer(props: {
         </Stack></Grid>
 
         {/* Send pane */}
-        <Grid xs={12} md={3}>
-          <Stack spacing={2}>
 
-            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-
-              {/* [mobile-only] Sent messages arrow */}
-              {sentMessages.length > 0 && (
-                <IconButton disabled={!!sentMessagesAnchor} variant='plain' color='neutral' onClick={showSentMessages} sx={{ ...hideOnDesktop, mr: { xs: 1, md: 2 } }}>
-                  <KeyboardArrowUpIcon />
-                </IconButton>
-              )}
-
-              {/* Send / Stop */}
-              {assistantTyping
-                ? (
-                  <Button
-                    fullWidth variant='soft' color={isReAct ? 'primary' : 'info'} disabled={!props.conversationId}
-                    onClick={handleStopClicked}
-                    endDecorator={<StopOutlinedIcon />}
-                  >
-                    Stop
-                  </Button>
-                ) : (
-                  <Button
-                    fullWidth variant='solid' color={isReAct ? 'primary' : 'info'} disabled={!props.conversationId || !chatLLM}
-                    onClick={handleSendClicked} onDoubleClick={handleShowSendMode}
-                    endDecorator={isReAct ? <PsychologyIcon /> : <TelegramIcon />}
-                  >
-                    {isReAct ? 'ReAct' : 'Chat'}
-                  </Button>
-                )}
-            </Box>
-
-            {/* [desktop-only] row with Sent Messages button */}
-            <Stack direction='row' spacing={1} sx={{ ...hideOnMobile, flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'flex-end' }}>
-              {sentMessages.length > 0 && (
-                <Button disabled={!!sentMessagesAnchor} fullWidth variant='plain' color='neutral' startDecorator={<KeyboardArrowUpIcon />} onClick={showSentMessages}>
-                  History
-                </Button>
-              )}
-            </Stack>
-
-          </Stack>
-        </Grid>
 
 
         {/* Mode selector */}
@@ -694,3 +699,4 @@ export function Composer(props: {
     </Box>
   );
 }
+

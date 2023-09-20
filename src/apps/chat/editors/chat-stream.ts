@@ -2,7 +2,7 @@ import { ChatGenerateSchema } from '~/modules/llms/openai/openai.router';
 import { DLLMId } from '~/modules/llms/llm.types';
 import { LLMOptionsOpenAI, normalizeOAISetup, SourceSetupOpenAI } from '~/modules/llms/openai/openai.vendor';
 import { OpenAI } from '~/modules/llms/openai/openai.types';
-import { SystemPurposeId } from '../../../data';
+import { SystemPurposeId, SystemPurposes } from '../../../data';
 import { apiAsync } from '~/modules/trpc/trpc.client';
 import { autoTitle } from '~/modules/aifn/autotitle/autoTitle';
 import { findLLMOrThrow } from '~/modules/llms/store-llms';
@@ -12,6 +12,7 @@ import { useElevenlabsStore } from '~/modules/elevenlabs/store-elevenlabs';
 import { DMessage, useChatStore } from '~/common/state/store-chats';
 
 import { createAssistantTypingMessage, updatePurposeInHistory } from './editors';
+
 
 
 /**
@@ -50,6 +51,11 @@ async function streamAssistantMessage(
 
   // access params
   const llm = findLLMOrThrow(llmId);
+
+  const appFingerPrint = localStorage.getItem('appFingerPrint');
+
+  console.log(appFingerPrint);
+ 
   const oaiSetup: Partial<SourceSetupOpenAI> = llm._source.setup as Partial<SourceSetupOpenAI>;
 
   console.log('llm: %o', llm)
@@ -64,7 +70,13 @@ async function streamAssistantMessage(
     model: {
       id: llmRef,
       temperature: llmTemperature,
-      maxTokens: llmResponseTokens,
+      maxTokens: SystemPurposes[systemPurpose as SystemPurposeId].maxToken,
+      conversationId: conversationId?conversationId:'',
+      messageId: assistantMessageId? assistantMessageId:'',
+      llmRouter: SystemPurposes[systemPurpose as SystemPurposeId].llmRouter,
+      systemPurpose:systemPurpose,
+      convoCount: 0,
+      appFingerPrint: appFingerPrint===null?undefined:appFingerPrint   
     
     },
   
@@ -73,9 +85,7 @@ async function streamAssistantMessage(
       role: role,
       content: text,
     })),
-  };
-
-  if (llmRef === 'llama-2-7b-chat-hf')   input.model.systemPurpose = systemPurpose;
+  }; 
 
   // other params
   const shallSpeakFirstLine = useElevenlabsStore.getState().elevenLabsAutoSpeak === 'firstLine';

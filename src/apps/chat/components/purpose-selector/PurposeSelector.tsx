@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { shallow } from 'zustand/shallow';
 
-import { Box, Button, Checkbox, Grid, IconButton, Input, Stack, Textarea, Typography, useTheme } from '@mui/joy';
+import { Avatar, Box, Button, Checkbox, Grid, IconButton, Input, Stack, Textarea, Typography, useTheme } from '@mui/joy';
 import ClearIcon from '@mui/icons-material/Clear';
 import SearchIcon from '@mui/icons-material/Search';
 
@@ -18,9 +18,10 @@ import { usePurposeStore } from './store-purposes';
 //
 // Absolutely dislike this workaround, but it's the only way I found to make it work
 
-const bpTileSize = { xs: 116, md: 125, xl: 130 };
+const bpTileSize = { xs: 116, md: 150, xl: 150 };
 const tileCols = [3, 5, 6];
 const tileSpacing = 2;
+const tileSx = { xs: 42, md: 96, xl: 96 };
 const bpMaxWidth = Object.entries(bpTileSize).reduce((acc, [key, value], index) => {
   acc[key] = tileCols[index] * (value + 8 * tileSpacing) - 8 * tileSpacing;
   return acc;
@@ -109,7 +110,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   const handleCustomSystemMessageChange = (v: React.ChangeEvent<HTMLTextAreaElement>): void => {
     // TODO: persist this change? Right now it's reset every time.
     //       maybe we shall have a "save" button just save on a state to persist between sessions
-    SystemPurposes['Custom'].systemMessage = v.target.value;
+    // SystemPurposes['Custom'].systemMessage = v.target.value;
   };
 
   function truncateStringWithDots(input: string): string {
@@ -162,7 +163,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
           </Button>
         </Box>
 
-        <Grid container spacing={tileSpacing} sx={{ justifyContent: 'flex-start' }}>
+        <Grid container spacing={tileSpacing} sx={{ justifyContent: 'center' }}>
           {purposeIDs.map((spId) => (
             <Grid key={spId}>
               <Button
@@ -188,12 +189,14 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
                     sx={{ alignSelf: 'flex-start' }}
                   />
                 )}
-                <div style={{ fontSize: '3.5rem' }}>
-                  {SystemPurposes[spId as SystemPurposeId]?.symbol}
-                </div>
-                <div style={{ fontSize: '0.9rem' }}>
+                
+                <Avatar  alt=""
+                        src={SystemPurposes[spId as SystemPurposeId]?.symbol} 
+                        sx={{ width: tileSx, height: tileSx, mt: 1, }}/>
+
                   {SystemPurposes[spId as SystemPurposeId]?.title}
-                </div>
+                  
+              
               </Button>
             </Grid>
           ))}
@@ -208,8 +211,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
         <Typography level='body1' color='neutral' sx={{
               mt: 2,
             }} >
-              {systemPurposeId != 'Custom'? <> Start with suggested questions below. Click to execute.  <br /></>: ''  }
-          
+             Start with these suggested prompts...
         </Typography>
 
         <Typography level='body2' color='neutral' sx={{
@@ -235,17 +237,17 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
           
         </Typography>
 
-        {systemPurposeId === 'Custom' && (
-          <Textarea
-            variant='outlined' autoFocus placeholder={'Craft your custom system message here…'}
-            minRows={3}
-            defaultValue={SystemPurposes['Custom']?.systemMessage} onChange={handleCustomSystemMessageChange}
-            sx={{
-              background: theme.vars.palette.background.level1,
-              lineHeight: 1.75,
-              mt: 1,
-            }} />
-        )}
+        <Typography level='body2' color='neutral' sx={{
+              mt: 2,
+               alignItems: 'left', gap: 1,
+              justifyContent: 'left',
+            '&:hover > button': { opacity: 1 },
+            }} >
+
+NOTE: PlebAI exclusively utilizes open-source large language models and is not biased to any particular ideology. We do not use closed source OpenAI or Anthropic models. You can have unprotected and unfiltered conversations without bias.
+            </Typography>
+
+        
 
       </Box>
 

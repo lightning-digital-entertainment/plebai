@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { shallow } from 'zustand/shallow';
 
-import { ListItemButton, ListItemDecorator, Typography } from '@mui/joy';
+import { Avatar, Box, Button,ListItemButton, ListItemDecorator, Typography } from '@mui/joy';
 import BuildCircleIcon from '@mui/icons-material/BuildCircle';
 import SettingsIcon from '@mui/icons-material/Settings';
 
@@ -27,11 +27,14 @@ export function Dropdowns(props: {
   }), shallow);
 
   const { zenMode } = useUIPreferencesStore(state => ({ zenMode: state.zenMode }), shallow);
-  const { systemPurposeId, setSystemPurposeId } = useChatStore(state => {
+  const { topNewConversationId, setActiveConversationId, createConversation } = useChatStore(state => {
     const conversation = state.conversations.find(conversation => conversation.id === props.conversationId);
     return {
       systemPurposeId: conversation?.systemPurposeId ?? null,
       setSystemPurposeId: state.setSystemPurposeId,
+      topNewConversationId: state.conversations.length ? state.conversations[0].messages.length === 0 ? state.conversations[0].id : null : null,
+       setActiveConversationId: state.setActiveConversationId,
+       createConversation: state.createConversation,
     };
   }, shallow);
   const { openLLMOptions, openModelsSetup } = useUIStateStore(state => ({
@@ -41,8 +44,14 @@ export function Dropdowns(props: {
   const handleChatModelChange = (event: any, value: DLLMId | null) =>
     value && props.conversationId && setChatLLMId(value);
 
-  const handleSystemPurposeChange = (event: any, value: SystemPurposeId | null) =>
-    value && props.conversationId && setSystemPurposeId(props.conversationId, value);
+  const handleNew = () => {
+    // if the first in the stack is a new conversation, just activate it
+    if (topNewConversationId)
+      setActiveConversationId(topNewConversationId);
+    else
+      createConversation();
+
+  };  
 
   const handleOpenLLMOptions = () => chatLLMId && openLLMOptions(chatLLMId);
 
@@ -53,18 +62,18 @@ export function Dropdowns(props: {
       llmItems[llm.id] = { title: llm.label };
 
   return <>
-            <Typography  level='body1' color='info'  sx={{
-              mt: 0,
-              fontSize: 24,
-              fontWeight: 500,
-              color:'white', 
-              href: 'https://plebai.com',
-               alignItems: 'center', gap: 1,
-              justifyContent: 'center',
-            }} >  
+           <Button  variant='plain' disabled={!!topNewConversationId && topNewConversationId === props.conversationId}  onClick={handleNew}  sx={{
+               mt: 0,
+               fontSize: 24,
+               fontWeight: 500,
+               color:'white', 
+
+                alignItems: 'center', gap: 0,
+               justifyContent: 'center',
+             }} >  
                 PlebAI
             
-                </Typography>  
+                </Button>  
             
   
   </>;

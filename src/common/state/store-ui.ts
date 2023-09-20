@@ -96,5 +96,6 @@ export const useUIPreferencesStore = create<UIPreferencesStore>()(
     }),
     {
       name: 'app-ui',
+      version: 3,
     }),
 );

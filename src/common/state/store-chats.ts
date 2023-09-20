@@ -389,7 +389,7 @@ export const useChatStore = create<ChatStore>()(devtools(
       // version history:
       //  - 1: [2023-03-18] app launch, single chat
       //  - 2: [2023-04-10] multi-chat version - invalidating data to be sure
-      version: 2,
+      version: 3,
 
       // omit the transient property from the persisted state
       partialize: (state) => ({

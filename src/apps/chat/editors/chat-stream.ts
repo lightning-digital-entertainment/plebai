@@ -1,8 +1,8 @@
 import { ChatGenerateSchema } from '~/modules/llms/openai/openai.router';
 import { DLLMId } from '~/modules/llms/llm.types';
 import { LLMOptionsOpenAI, normalizeOAISetup, SourceSetupOpenAI } from '~/modules/llms/openai/openai.vendor';
-import { OpenAI } from '~/modules/llms/openai/openai.types';
-import { SystemPurposeId, SystemPurposes } from '../../../data';
+import { OpenAI } from '~/modules/llms/openai/openai.types'; 
+import { SystemPurposeId, SystemPurposes } from  '../components/composer/Composer';
 import { apiAsync } from '~/modules/trpc/trpc.client';
 import { autoTitle } from '~/modules/aifn/autotitle/autoTitle';
 import { findLLMOrThrow } from '~/modules/llms/store-llms';

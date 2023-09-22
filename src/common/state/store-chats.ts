@@ -6,7 +6,7 @@ import { DLLMId } from '~/modules/llms/llm.types';
 import { useModelsStore } from '~/modules/llms/store-llms';
 
 import { countModelTokens } from '../llm-util/token-counter';
-import { defaultSystemPurposeId, SystemPurposeId } from '../../data';
+import { defaultSystemPurposeId, SystemPurposeId } from 'src/apps/chat/components/composer/Composer';
 
 
 // configuration
@@ -38,7 +38,7 @@ function createDConversation(systemPurposeId?: SystemPurposeId): DConversation {
   return {
     id: uuidv4(),
     messages: [],
-    systemPurposeId: systemPurposeId || defaultSystemPurposeId,
+    systemPurposeId: systemPurposeId || 'OrangePill',
     tokenCount: 0,
     conversationCount: 0,
     created: Date.now(),

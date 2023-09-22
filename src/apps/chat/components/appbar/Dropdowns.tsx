@@ -6,7 +6,7 @@ import BuildCircleIcon from '@mui/icons-material/BuildCircle';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 import { DLLMId } from '~/modules/llms/llm.types';
-import { SystemPurposeId, SystemPurposes } from '../../../../data';
+import { SystemPurposeId, SystemPurposes } from '../../../../apps/chat/components/composer/Composer';
 import { useModelsStore } from '~/modules/llms/store-llms';
 
 import { AppBarDropdown, DropdownItems } from '~/common/layouts/appbar/AppBarDropdown';

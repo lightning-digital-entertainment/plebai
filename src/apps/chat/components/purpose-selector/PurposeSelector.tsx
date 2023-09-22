@@ -8,9 +8,10 @@ import SearchIcon from '@mui/icons-material/Search';
 import { useChatStore } from '~/common/state/store-chats';
 import { useUIPreferencesStore } from '~/common/state/store-ui';
 
-import { SystemPurposeId, SystemPurposes } from '../../../../data';
+import { SystemPurposeId, SystemPurposes } from '../../../../apps/chat/components/composer/Composer';
 import { useModelsStore } from '~/modules/llms/store-llms';
 import { usePurposeStore } from './store-purposes';
+
 
 
 // Constants for tile sizes / grid width - breakpoints need to be computed here to work around
@@ -47,6 +48,8 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
     setChatLLMId: state.setChatLLMId,
   }), shallow);
 
+  console.log('System purposes: ', Object.keys(SystemPurposes).length);
+
   // external state
   const theme = useTheme();
   const showPurposeFinder = useUIPreferencesStore(state => state.showPurposeFinder);
@@ -63,11 +66,14 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   if (!systemPurposeId || !setSystemPurposeId)
     return null;
 
+    
 
   const handleSearchClear = () => {
     setSearchQuery('');
     setFilteredIDs(null);
   };
+
+  
 
   const handleSearchOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -84,6 +90,9 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
           || (typeof purpose.description === 'string' && purpose.description.toLowerCase().includes(query.toLowerCase()));
       });
     setFilteredIDs(ids as SystemPurposeId[]);
+
+    console.log("fileter: ", filteredIDs)
+
 
     // If there's a search term, activate the first item
     if (ids.length && !ids.includes(systemPurposeId))
@@ -130,7 +139,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   const selectedExample = selectedPurpose?.examples && getRandomElement(selectedPurpose.examples) || null;
 
   return <>
-
+   
     {showPurposeFinder && <Box sx={{ p: 2 * tileSpacing }}>
       <Input
         fullWidth
@@ -164,7 +173,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
         </Box>
 
         <Grid container spacing={tileSpacing} sx={{ justifyContent: 'center' }}>
-          {purposeIDs.map((spId) => (
+          {SystemPurposes && purposeIDs.map((spId) => (
             <Grid key={spId}>
               <Button
                 variant={(!editMode && systemPurposeId === spId) ? 'solid' : 'soft'}

@@ -15,7 +15,7 @@ import PsychologyIcon from '@mui/icons-material/Psychology';
 import StopOutlinedIcon from '@mui/icons-material/StopOutlined';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
-import { SystemPurposeId, SystemPurposes } from '../../../../data';
+
 import { ContentReducer } from '~/modules/aifn/summarize/ContentReducer';
 import { useChatLLM } from '~/modules/llms/store-llms';
 import HistoryIcon from '@mui/icons-material/History';
@@ -40,6 +40,7 @@ import { requestOutputSchema } from '~/modules/current/request.router';
 import { verifyOutputSchema } from '~/modules/current/verify.router';
 import { NoWebLnModal } from '~/common/components/NoWebLnModal';
 import { Invoice } from "alby-tools";
+import { SystemPurposeData } from '~/modules/data/request.router';
 
 
 
@@ -58,6 +59,29 @@ const expandPromptTemplate = (template: string, dict: object) => (inputValue: st
   return expanded;
 };
 
+export type SystemPurposeId = string;
+
+export let defaultSystemPurposeId: any = '';
+
+export let SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
+
+  OrangePill: {
+    title: 'Orange Pill GPT',
+    description: '',
+    systemMessage: "How can individuals effectively promote Bitcoin adoption and understanding among their friends and family, especially beginners?",
+    symbol: 'https://i.current.fyi/current/app/orangepill.png',
+    examples: ['Explain bitcoin like I am 5 years old', 'How do you address the potential risks or downsides associated with Bitcoin?', 'What alternative approaches exist for educating others about Bitcoin? '],
+    placeHolder: "The Orange-Pilling Agent is a skilled and empathetic advocate for Bitcoin adoption. With a deep understanding of the bitcoin space and a passion for spreading awareness about Bitcoin's potential, This uses ReAct approach of thought and reasoning and uses internet for real time search. ",
+    chatLLM: 'llama-2-7b-chat-hf',
+    llmRouter: 'nousresearch/nous-hermes-llama2-13b',
+    convoCount: 5,
+    maxToken: 512,
+    temperature: 0.5,
+    satsPay: 50,
+    paid: false,
+  },
+
+};
 
 
 const attachFileLegend =
@@ -158,6 +182,7 @@ export function Composer(props: {
 }) {
   // state
   const [composeText, setComposeText] = React.useState('');
+  const [agentsData, setAgentsData] = React.useState('');
   const [sendModeId, setSendModeId] = React.useState<SendModeId>('immediate');
   const [isDragging, setIsDragging] = React.useState(false);
   const [reducerText, setReducerText] = React.useState('');
@@ -185,13 +210,35 @@ export function Composer(props: {
   }, shallow);
   const { chatLLMId, chatLLM } = useChatLLM();
 
+  const agentData = React.useCallback(async () => {
+    const response =  await fetch('/api/data/agents', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({fingerPrint: 'appFingerPrint' })
+    })
+    const jsonData = await response.json();
+    console.log(jsonData);
+    SystemPurposes = jsonData.SystemPurposes;
+
+    return SystemPurposes
+
+  }, []);
+
+    
+  
+    
+  
+
+ 
+
   // Effect: load initial text if queued up (e.g. by /share)
   React.useEffect(() => {
-    if (startupText) {
+    agentData()
+    if (startupText) {   
       setStartupText(null);
       setComposeText(startupText);
     }
-  }, [startupText, setStartupText]);
+  }, [startupText, setStartupText, agentData]);
 
   // derived state
   const tokenLimit = chatLLM?.contextTokens || 0;
@@ -201,9 +248,10 @@ export function Composer(props: {
   const historyTokens = conversationTokenCount;
   const responseTokens = chatLLM?.options?.llmResponseTokens || 0;
   const remainingTokens = tokenLimit - directTokens - historyTokens - responseTokens;
-  const purposeTitle: string = SystemPurposes[props.systemPurpose as SystemPurposeId].title;
+  console.log('props.systemPurpose: ',props.systemPurpose)
+  const purposeTitle: string = SystemPurposes[props.systemPurpose as SystemPurposeId]?.title?SystemPurposes[props.systemPurpose as SystemPurposeId].title:''
   const paySats: number = purposeTitle==='Gen Image AI (Sats) '?100000:purposeTitle==='Youtube Chat (Sats)'?100000:Math.round(Math.floor(chatLLM?.id.startsWith('openai-gpt-4')?(responseTokens+directTokens)*200:(responseTokens+directTokens)*50)/ 1000) * 1000;
-  const purposeModel: string = SystemPurposes[props.systemPurpose as SystemPurposeId].chatLLM;
+  const purposeModel: string = SystemPurposes[props.systemPurpose as SystemPurposeId]?.chatLLM?SystemPurposes[props.systemPurpose as SystemPurposeId].chatLLM:'';
 
   const handleSendClicked = () => {
     const text = (composeText || '').trim();
@@ -381,6 +429,8 @@ export function Composer(props: {
     e.target.value = '';
   };
 
+  
+
 
   const handlePasteButtonClicked = async () => {
     for (const clipboardItem of await navigator.clipboard.read()) {
@@ -497,7 +547,7 @@ export function Composer(props: {
 
   // const prodiaApiKey = isValidProdiaApiKey(useSettingsStore(state => state.prodiaApiKey));
   // const isProdiaConfigured = !requireUserKeyProdia || prodiaApiKey; 
-  const textPlaceholder: string = SystemPurposes[props.systemPurpose as SystemPurposeId].placeHolder;
+  const textPlaceholder: string = SystemPurposes[props.systemPurpose as SystemPurposeId]?.placeHolder?SystemPurposes[props.systemPurpose as SystemPurposeId].placeHolder:'';
     
   const isReAct = sendModeId === 'react';
 

@@ -1,5 +1,5 @@
 import { DConversation } from '../state/store-chats';
-import { SystemPurposes } from '../../data';
+import { SystemPurposes } from 'src/apps/chat/components/composer/Composer';
 
 
 export function prettyBaseModel(model: string | undefined): string {

@@ -14,6 +14,10 @@ import { ApplicationBar } from './appbar/ApplicationBar';
 import { NoSSR } from '../components/NoSSR';
 
 
+
+
+
+
 export function AppLayout(props: {
   noAppBar?: boolean, noSettings?: boolean, noModelsSetup?: boolean,
   children: React.ReactNode,
@@ -22,14 +26,33 @@ export function AppLayout(props: {
   const theme = useTheme();
   const { centerMode } = useUIPreferencesStore(state => ({ centerMode: isPwa() ? 'full' : state.centerMode }), shallow);
 
+ 
+
   // usage counter, for progressive disclosure of features
   // noinspection JSUnusedLocalSymbols
   const usageCount = useAppStateStore(state => state.usageCount);
+  
+  //const appFingerPrint = localStorage.getItem('appFingerPrint');
+
+  //console.log(appFingerPrint);
+
+  
+  /*
+  const agentData = fetch('/api/data/agents', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({fingerPrint: 'appFingerPrint' })
+  }).then((response) => response.json())
+  .then((jsonData) => {
+   SystemPurposes = jsonData.SystemPurposes;
+   console.log(SystemPurposes);
+  });
+  */
 
   return (
     // Global NoSSR wrapper: the overall Container could have hydration issues when using localStorage and non-default maxWidth
     <NoSSR>
-
+     
       <Container
         disableGutters
         maxWidth={centerMode === 'full' ? false : centerMode === 'narrow' ? 'md' : 'xl'}

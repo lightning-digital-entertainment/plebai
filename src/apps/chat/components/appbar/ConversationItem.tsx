@@ -8,7 +8,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 import { DConversation, useChatStore } from '~/common/state/store-chats';
 import { InlineTextarea } from '~/common/components/InlineTextarea';
-import { SystemPurposes } from '../../../../data';
+import { SystemPurposes } from '../../../../apps/chat/components/composer/Composer';
 
 
 const DEBUG_CONVERSATION_IDs = false;

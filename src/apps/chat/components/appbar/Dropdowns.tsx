@@ -62,7 +62,8 @@ export function Dropdowns(props: {
       llmItems[llm.id] = { title: llm.label };
 
   return <>
-           <Button  variant='plain' disabled={!!topNewConversationId && topNewConversationId === props.conversationId}  onClick={handleNew}  sx={{
+          {!!topNewConversationId && topNewConversationId === props.conversationId? 
+           <Button  variant='plain' disabled={!!topNewConversationId && topNewConversationId === props.conversationId}   sx={{
                mt: 0,
                fontSize: 24,
                fontWeight: 500,
@@ -73,8 +74,21 @@ export function Dropdowns(props: {
              }} >  
                 PlebAI
             
-                </Button>  
+          </Button>  
+          :
+            <Button  variant='plain'  onClick={handleNew}  sx={{
+              mt: 0,
+              fontSize: 24,
+              fontWeight: 500,
+              color:'white', 
+
+              alignItems: 'center', gap: 0,
+              justifyContent: 'center',
+            }} >  
+              {'<- AI Agents'}
+          
+        </Button>  
             
-  
+            }
   </>;
 }

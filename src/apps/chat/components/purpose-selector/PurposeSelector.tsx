@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { shallow } from 'zustand/shallow';
 
-import { Avatar, Box, Button, Checkbox, Grid, IconButton, Input, Stack, Textarea, Typography, useTheme } from '@mui/joy';
+import { Avatar, Box, Button, Checkbox, Divider, Grid, IconButton, Input, Stack, Textarea, Typography, useTheme } from '@mui/joy';
 import ClearIcon from '@mui/icons-material/Clear';
 import SearchIcon from '@mui/icons-material/Search';
 
@@ -11,7 +11,9 @@ import { useUIPreferencesStore } from '~/common/state/store-ui';
 import { SystemPurposeId, SystemPurposes } from '../../../../apps/chat/components/composer/Composer';
 import { useModelsStore } from '~/modules/llms/store-llms';
 import { usePurposeStore } from './store-purposes';
-
+import { WelcomeModal } from '~/common/components/WelcomeModal';
+import { useUIStateStore } from '~/common/state/store-ui';
+import { DetailModal } from '~/common/components/DetailModal';
 
 
 // Constants for tile sizes / grid width - breakpoints need to be computed here to work around
@@ -23,6 +25,8 @@ const bpTileSize = { xs: 116, md: 150, xl: 150 };
 const tileCols = [3, 5, 6];
 const tileSpacing = 2;
 const tileSx = { xs: 42, md: 96, xl: 96 };
+const detailAvatarSx = { xs: 62, md: 122, xl: 130 };
+const searchWidthSx = { xs: 162, md: 322, xl: 430 };
 const bpMaxWidth = Object.entries(bpTileSize).reduce((acc, [key, value], index) => {
   acc[key] = tileCols[index] * (value + 8 * tileSpacing) - 8 * tileSpacing;
   return acc;
@@ -43,6 +47,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   const [searchQuery, setSearchQuery] = React.useState('');
   const [filteredIDs, setFilteredIDs] = React.useState<SystemPurposeId[] | null>(null);
   const [editMode, setEditMode] = React.useState(false);
+  const [detailModal, setDetailModal] = React.useState(false);
 
   const { setChatLLMId } = useModelsStore(state => ({
     setChatLLMId: state.setChatLLMId,
@@ -52,7 +57,8 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
 
   // external state
   const theme = useTheme();
-  const showPurposeFinder = useUIPreferencesStore(state => state.showPurposeFinder);
+  //const showPurposeFinder = useUIPreferencesStore(state => state.showPurposeFinder);
+  const showPurposeFinder = true;
   const { systemPurposeId, setSystemPurposeId } = useChatStore(state => {
     const conversation = state.conversations.find(conversation => conversation.id === props.conversationId);
     return {
@@ -61,7 +67,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
     };
   }, shallow);
   const { hiddenPurposeIDs, toggleHiddenPurposeId } = usePurposeStore(state => ({ hiddenPurposeIDs: state.hiddenPurposeIDs, toggleHiddenPurposeId: state.toggleHiddenPurposeId }), shallow);
-
+  const {  openModelsSetup, closeModelsSetup} = useUIStateStore();
   // safety check - shouldn't happen
   if (!systemPurposeId || !setSystemPurposeId)
     return null;
@@ -112,9 +118,12 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
       setSystemPurposeId(props.conversationId, purposeId);
       console.log(SystemPurposes[purposeId as SystemPurposeId].chatLLM)
       setChatLLMId(SystemPurposes[purposeId as SystemPurposeId].chatLLM)
+      setDetailModal(true);
 
     }  
   };
+
+  const onDetailClose = () => {setDetailModal(false)};
 
   const handleCustomSystemMessageChange = (v: React.ChangeEvent<HTMLTextAreaElement>): void => {
     // TODO: persist this change? Right now it's reset every time.
@@ -139,39 +148,104 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   const selectedExample = selectedPurpose?.examples && getRandomElement(selectedPurpose.examples) || null;
 
   return <>
+
+    {Object.keys(SystemPurposes).length<2? <WelcomeModal title={<>Welcome to  <b>PlebAI</b> <br></br></>} open={true} onClose={closeModelsSetup} ><Divider /></WelcomeModal>:''}
+    {detailModal? <DetailModal title={SystemPurposes[systemPurposeId as SystemPurposeId]?.title} open={detailModal} onClose={onDetailClose}>
+      
+       <Divider />
+    
+       <Avatar  alt=""
+                        src={SystemPurposes[systemPurposeId as SystemPurposeId]?.symbol} 
+                        sx={{ width: detailAvatarSx, height: detailAvatarSx, mt: 1, }}/>
+
+      <Typography level='body1' color='neutral' sx={{
+              mt: 0,
+            }} >
+        {selectedPurpose? <div style={{ fontSize: '1rem' }}>  LLM Type:  {selectedPurpose.llmRouter}  </div> : ''}
+        {selectedPurpose? <div style={{ fontSize: '1rem' }}>  Price:  {selectedPurpose.satsPay} SATS for {selectedPurpose.convoCount} conversations   </div> : ''}
+        </Typography>
+
+      <Typography level='body1' color='neutral' sx={{
+              mt: 0,
+            }} >
+          {selectedPurpose? <div style={{ fontSize: '1rem' }}>  {selectedPurpose.placeHolder}  <br /> </div> : ''}
+        </Typography>
+
+        <Box sx={{ mb: -1, display: 'flex', flexDirection: 'column', alignItems: 'left', justifyContent: 'left' }}>
+
+                  <Typography level='body1' color='neutral' sx={{
+                        mt: 2,
+                        alignItems: 'left', gap: 1,
+                      }} >
+                      Start with these suggested prompts
+                  </Typography>
+
+                  <Typography level='body2' color='neutral' sx={{
+                        mt: 2,
+                        alignItems: 'left', gap: 1,
+                        justifyContent: 'left',
+                      '&:hover > button': { opacity: 1 },
+                      }} >
+                    
+                    {selectedPurpose?.examples?.map((selectedExample) => (
+                      
+                        (selectedExample
+                          ? <>
+                            
+                            <Button style={{justifyContent: "flex-start"}} variant='outlined'  color='neutral' size='md' onClick={() => props.runExample(selectedExample)}>{truncateStringWithDots(selectedExample) }</Button>
+                          
+                            <br></br>
+                          
+                          </>
+                          : selectedPurpose.description
+                        )
+                    ))}
+                    
+                  </Typography>   
+
+        </Box>              
    
-    {showPurposeFinder && <Box sx={{ p: 2 * tileSpacing }}>
-      <Input
-        fullWidth
-        variant='outlined' color='neutral'
-        value={searchQuery} onChange={handleSearchOnChange}
-        onKeyDown={handleSearchOnKeyDown}
-        placeholder='Search for purpose…'
-        startDecorator={<SearchIcon />}
-        endDecorator={searchQuery && (
-          <IconButton variant='plain' color='neutral' onClick={handleSearchClear}>
-            <ClearIcon />
-          </IconButton>
-        )}
-        sx={{
-          boxShadow: theme.shadow.sm,
-        }}
-      />
-    </Box>}
+       </DetailModal>:''}
+   
+    
+   
 
     <Stack direction='column' sx={{ minHeight: '60vh', justifyContent: 'center', alignItems: 'center' }}>
 
+        {showPurposeFinder && <Box sx={{  mt: 4, minWidth: searchWidthSx, justifyContent: 'center', alignItems: 'center' }}>
+          <Input
+            
+            variant='outlined' color='neutral'
+            value={searchQuery} onChange={handleSearchOnChange}
+            onKeyDown={handleSearchOnKeyDown}
+            placeholder='Search AI Agents'
+            startDecorator={<SearchIcon />}
+            endDecorator={searchQuery && (
+              <IconButton variant='plain' color='neutral' onClick={handleSearchClear}>
+                <ClearIcon />
+              </IconButton>
+            )}
+            sx={{
+              boxShadow: theme.shadow.sm,
+            }}
+          />
+
+          
+        </Box>}
+
+       
+
       <Box sx={{ maxWidth: bpMaxWidth }}>
 
-        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 2, mb: 1 }}>
-          <Typography level='body1' color='neutral'>
-            Select the right AI Agent to serve your needs
-          </Typography>
-          <Button variant='plain' color='neutral' size='sm' onClick={toggleEditMode}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 2, mb: 1, mt:4 }}>
+           <Button onClick={function (){}} sx={{position: 'left'}} variant="outlined"  color='neutral'> Add Agent</Button>
+    
+          <Button variant="outlined" color='neutral' size='sm' onClick={toggleEditMode}>
             {editMode ? 'Done' : 'Edit'}
           </Button>
+          
         </Box>
-
+        
         <Grid container spacing={tileSpacing} sx={{ justifyContent: 'center' }}>
           {SystemPurposes && purposeIDs.map((spId) => (
             <Grid key={spId}>
@@ -207,44 +281,12 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
                   
               
               </Button>
+          
             </Grid>
           ))}
         </Grid>
 
-        <Typography level='body1' color='neutral' sx={{
-              mt: 2,
-            }} >
-          {selectedPurpose? <div style={{ fontSize: '1rem' }}>  {selectedPurpose.placeHolder}  <br /> </div> : ''}
-        </Typography>
-
-        <Typography level='body1' color='neutral' sx={{
-              mt: 2,
-            }} >
-             Start with these suggested prompts...
-        </Typography>
-
-        <Typography level='body2' color='neutral' sx={{
-              mt: 2,
-               alignItems: 'left', gap: 1,
-              justifyContent: 'left',
-            '&:hover > button': { opacity: 1 },
-            }} >
-          
-          {selectedPurpose?.examples?.map((selectedExample) => (
-             
-              (selectedExample
-                ? <>
-                  
-                  <Button variant='outlined' color='neutral' size='md' onClick={() => props.runExample(selectedExample)}>{truncateStringWithDots(selectedExample) }</Button>
-                
-                  
-                 
-                </>
-                : selectedPurpose.description
-              )
-          ))}
-          
-        </Typography>
+      
 
         <Typography level='body2' color='neutral' sx={{
               mt: 2,

@@ -40,6 +40,7 @@
     "react-markdown": "^8.0.7",
     "react-native-webln": "^0.1.11",
     "react-native-webview": "^13.2.2",
+    "react-share": "^4.4.1",
     "remark-gfm": "^3.0.1",
     "superjson": "^1.12.3",
     "uuid": "^9.0.0",

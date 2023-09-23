@@ -27,7 +27,7 @@ function MyApp({ Component, emotionCache = clientSideEmotionCache, pageProps }: 
 
 
   React.useEffect(() => {
-    const currentVersion:any = '0.0.2'; 
+    const currentVersion:any = '0.0.3'; 
 
     const setFp = async () => {
       const fp = await FingerprintJS.load();

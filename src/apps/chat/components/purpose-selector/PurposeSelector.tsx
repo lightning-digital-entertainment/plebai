@@ -14,6 +14,7 @@ import { usePurposeStore } from './store-purposes';
 import { WelcomeModal } from '~/common/components/WelcomeModal';
 import { useUIStateStore } from '~/common/state/store-ui';
 import { DetailModal } from '~/common/components/DetailModal';
+import AddIcon from '@mui/icons-material/Add';
 
 
 // Constants for tile sizes / grid width - breakpoints need to be computed here to work around
@@ -238,7 +239,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
       <Box sx={{ maxWidth: bpMaxWidth }}>
 
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 2, mb: 1, mt:4 }}>
-           <Button onClick={function (){}} sx={{position: 'left'}} variant="outlined"  color='neutral'> Add Agent</Button>
+           <Button onClick={function (){}} sx={{position: 'left'}} variant="outlined"  color='neutral'> <AddIcon/> Create Agent</Button>
     
           <Button variant="outlined" color='neutral' size='sm' onClick={toggleEditMode}>
             {editMode ? 'Done' : 'Edit'}
@@ -269,13 +270,13 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
                   <Checkbox
                     label={<Typography level='body2'>show</Typography>}
                     checked={!hiddenPurposeIDs.includes(spId)} onChange={() => toggleHiddenPurposeId(spId)}
-                    sx={{ alignSelf: 'flex-start' }}
+                    sx={{ alignSelf: 'flex-start', mb:-3 }}
                   />
                 )}
                 
                 <Avatar  alt=""
                         src={SystemPurposes[spId as SystemPurposeId]?.symbol} 
-                        sx={{ width: tileSx, height: tileSx, mt: 1, }}/>
+                        sx={{ width: tileSx, height: tileSx,  }}/>
 
                   {SystemPurposes[spId as SystemPurposeId]?.title}
                   

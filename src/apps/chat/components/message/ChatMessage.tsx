@@ -388,12 +388,12 @@ export function ChatMessage(props: { message: DMessage, isBottom: boolean, onMes
             </MenuItem>
           )}
           <ListDivider />
-          {fromAssistant && (
+          {/*fromAssistant && (
             <MenuItem onClick={handleMenuRunAgain}>
               <ListItemDecorator><ReplayIcon /></ListItemDecorator>
               Retry
             </MenuItem>
-          )}
+          )*/}
           {/*fromUser && (
             <MenuItem onClick={handleMenuRunAgain}>
               <ListItemDecorator><FastForwardIcon /></ListItemDecorator>

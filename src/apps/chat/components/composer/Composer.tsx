@@ -742,7 +742,7 @@ export function Composer(props: {
 
         <NoWebLnModal
           open={openNoWebLnModal} onClose={handleNoWeblnClose}
-          confirmationText={'To pay using sats, you need to enable WebLn. Please visit https://getalby.com  to get started'}
+          confirmationText={'To pay using sats, you need to enable WebLn. Please visit <a> https://getalby.com </a>  to get started'}
         />
 
       </Grid>

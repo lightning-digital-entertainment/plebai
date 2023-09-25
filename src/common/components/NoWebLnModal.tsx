@@ -1,7 +1,8 @@
 import * as React from 'react';
 
-import { Box, Button, Divider, Modal, ModalDialog, Typography } from '@mui/joy';
+import { Box, Button, Divider, Link, Modal, ModalDialog, Typography } from '@mui/joy';
 import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
+import Image from 'next/image';
 
 
 /**
@@ -11,15 +12,25 @@ import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
 export function NoWebLnModal(props: { open: boolean, onClose: () => void, confirmationText: string }) {
   return (
     <Modal open={props.open} onClose={props.onClose}>
-      <ModalDialog variant='outlined' color='neutral'>
+      <ModalDialog variant='outlined' color='neutral'  sx={{
+            minWidth: { xs: 180, sm: 250, md: 300, lg: 350 },
+            maxWidth: 700,
+            alignItems: 'center', display: 'flex', flexDirection: 'column', gap: 3,
+          }}>
+
         <Typography component='h2' startDecorator={<WarningRoundedIcon />}>
           Error
         </Typography>
         <Divider sx={{ my: 2 }} />
         <Typography>
-          {props.confirmationText}
+          {'To pay using SATS, you need to enable lightning wallet on your browser.'} 
+          
         </Typography>
-        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', mt: 2 }}>
+
+        <Image src='/icons/alby-logo.png' alt='App Logo' width={250} height={88} />
+     
+        <Link href='https://getalby.com/'> https://getalby.com/ </Link> 
+        <Box sx={{ mt: 'auto', display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'space-between' }}>
           <Button variant='solid' color='danger' onClick={props.onClose}>
             Close
           </Button>

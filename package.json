@@ -37,6 +37,7 @@
     "prismjs": "^1.29.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-dropzone": "^14.2.3",
     "react-markdown": "^8.0.7",
     "react-native-webln": "^0.1.11",
     "react-native-webview": "^13.2.2",

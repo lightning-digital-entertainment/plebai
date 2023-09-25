@@ -49,6 +49,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   const [filteredIDs, setFilteredIDs] = React.useState<SystemPurposeId[] | null>(null);
   const [editMode, setEditMode] = React.useState(false);
   const [detailModal, setDetailModal] = React.useState(false);
+  const [addModal, setaddModal] = React.useState(false);
 
   const { setChatLLMId } = useModelsStore(state => ({
     setChatLLMId: state.setChatLLMId,
@@ -125,6 +126,9 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   };
 
   const onDetailClose = () => {setDetailModal(false)};
+  const onAddClose = () => {setaddModal(false)};
+  const onAddOpen = () => {setaddModal(true)};
+
 
   const handleCustomSystemMessageChange = (v: React.ChangeEvent<HTMLTextAreaElement>): void => {
     // TODO: persist this change? Right now it's reset every time.
@@ -206,9 +210,9 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
 
         </Box>              
    
-       </DetailModal>:''}
+    </DetailModal>:''}
    
-    
+    {addModal? <DetailModal title={'Create New Agent'} open={addModal} onClose={onAddClose}><Divider /></DetailModal>:''}
    
 
     <Stack direction='column' sx={{ minHeight: '60vh', justifyContent: 'center', alignItems: 'center' }}>
@@ -239,7 +243,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
       <Box sx={{ maxWidth: bpMaxWidth }}>
 
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 2, mb: 1, mt:4 }}>
-           <Button onClick={function (){}} sx={{position: 'left'}} variant="outlined"  color='neutral'> <AddIcon/> Create Agent</Button>
+           <Button onClick={onAddOpen} sx={{position: 'left'}} variant="outlined"  color='neutral' > <AddIcon/> Create Agent</Button>
     
           <Button variant="outlined" color='neutral' size='sm' onClick={toggleEditMode}>
             {editMode ? 'Done' : 'Edit'}
@@ -296,7 +300,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
             '&:hover > button': { opacity: 1 },
             }} >
 
-NOTE: PlebAI exclusively utilizes open-source large language models and is not biased to any particular ideology. We do not use closed source OpenAI or Anthropic models. You can have unprotected and unfiltered conversations without bias.
+{"NOTE: PlebAI exclusively utilizes open-source large language models and is not biased to any particular ideology. We do not use closed source OpenAI or Anthropic models. You can have unprotected and unfiltered conversations without bias. No terms and conditions to accept. Be civil and don't break the law. "}
             </Typography>
 
         

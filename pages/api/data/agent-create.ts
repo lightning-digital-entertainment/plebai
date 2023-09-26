@@ -6,12 +6,12 @@ export default async function handler(req: NextRequest) {
     try {
         const input = await req.json();
         console.log('inside agents');
-        const { fingerPrint } = requestInputSchema.parse(input);
+        console.log(input);
         const { headers, url } = requestApiAccess( `/v1/data/agent/create`);
         const response = await fetch(url, { headers, method: 'POST', body: JSON.stringify(input) })
         const body = await response.json()
     
-
+        
         return new NextResponse(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json'} });
 
 

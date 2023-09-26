@@ -220,15 +220,26 @@ export function Composer(props: {
     const response =  await fetch('/api/data/agents', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({fingerPrint: appFingerPrint})
+      body: JSON.stringify({fingerPrint: appFingerPrint?appFingerPrint:''})
     })
-    const jsonData = await response.json();
-    console.log(jsonData);
-    SystemPurposes = jsonData.SystemPurposes;
+    try {
 
-    return SystemPurposes
+      const jsonData = await response.json();
+      console.log(jsonData);
+      SystemPurposes = jsonData.SystemPurposes;
+      setAgentUpdate(0)
+      return SystemPurposes
+      
+    } catch (error) {
+      console.log(error)
+    }
 
-  }, [appFingerPrint]);
+   
+
+    
+    
+
+  }, [appFingerPrint, setAgentUpdate]);
 
     
   
@@ -241,7 +252,7 @@ export function Composer(props: {
   React.useEffect(() => {
     if (agentUpdate !== 0) {
       agentData()
-      setAgentUpdate(0)
+      
 
     }
     
@@ -259,7 +270,7 @@ export function Composer(props: {
   const historyTokens = conversationTokenCount;
   const responseTokens = chatLLM?.options?.llmResponseTokens || 0;
   const remainingTokens = tokenLimit - directTokens - historyTokens - responseTokens;
-  console.log('props.systemPurpose: ',props.systemPurpose)
+  //console.log('props.systemPurpose: ',props.systemPurpose)
   const purposeTitle: string = SystemPurposes[props.systemPurpose as SystemPurposeId]?.title?SystemPurposes[props.systemPurpose as SystemPurposeId].title:''
   const paySats: number = purposeTitle==='Gen Image AI (Sats) '?100000:purposeTitle==='Youtube Chat (Sats)'?100000:Math.round(Math.floor(chatLLM?.id.startsWith('openai-gpt-4')?(responseTokens+directTokens)*200:(responseTokens+directTokens)*50)/ 1000) * 1000;
   const purposeModel: string = SystemPurposes[props.systemPurpose as SystemPurposeId]?.chatLLM?SystemPurposes[props.systemPurpose as SystemPurposeId].chatLLM:'';

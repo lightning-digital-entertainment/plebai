@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { shallow } from 'zustand/shallow';
 
-import { Avatar, Box, Button, Option, Checkbox, Divider, Grid, IconButton, Input, Select, Stack, Switch, Textarea, Typography, useTheme, Alert } from '@mui/joy';
+import { Avatar, Box, Button, Option, Checkbox, Divider, Grid, IconButton, Input, Select, Stack, Switch, Textarea, Typography, useTheme, Alert, CircularProgress } from '@mui/joy';
 import ClearIcon from '@mui/icons-material/Clear';
 import SearchIcon from '@mui/icons-material/Search';
 import Image from "next/image";
@@ -61,6 +61,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   const [addModal, setaddModal] = React.useState(false);
   const [updateRefresh, setUpdaterefresh] = React.useState(true);
   const [addImageUrl, setAddImageUrl] =React.useState('');
+  const [imageProgress, setImageProgress] = React.useState(false);
   const [addAgentName, setAddAgentName] =React.useState('');
   const [checked, setChecked] = React.useState<boolean>(false);
   const [addAgentDescription, setAddAgentDescription] =React.useState('');
@@ -81,7 +82,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   
 
   React.useEffect(() => {
-    if (updateRefresh) {
+    if (updateRefresh || Object.keys(SystemPurposes).length<2) {
     
       setAgentUpdate(Math.floor(Date.now() / 1000))
       setUpdaterefresh(false)
@@ -133,7 +134,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
 
   const uploadImage = async ({ imageFile }: Image) => {
         console.log(imageFile)
-   
+        setImageProgress(true);
         if (imageFile.type === 'image/png' || imageFile.type === 'image/jpg' || imageFile.type === 'image/jpeg') {
 
           let input:any;
@@ -161,6 +162,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
             if (response) {
               const responseBody = await response.json()
               setAddImageUrl(responseBody.url);
+              setImageProgress(false);
 
             }
 
@@ -207,7 +209,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
       handleSearchClear();
   };
 
-  const handleCreateAgent = () => {
+  const handleCreateAgent = async () => {
     
       if (addImageUrl.length < 2 || addAgentName.length < 5 || countWordsInString(addAgentDescription) < 25 || 
       countWordsInString(addAgentPrompt) <25 || countWordsInString(addAgentStarterPrompt1) < 10 ||
@@ -217,7 +219,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
 
       } else {
         setErrorAlert(false) 
-        setAgentUpdate(Math.floor(Date.now() / 1000));
+        //setAgentUpdate(Math.floor(Date.now() / 1000));
         const agentDetails = {
           title: addAgentName,
           description: addAgentDescription,
@@ -233,6 +235,35 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
         }
 
         console.log(agentDetails);
+
+        const idData = (appFingerPrint ? appFingerPrint : '') + Math.floor(Date.now() / 1000).toString();
+
+
+        const result = await fetch('/api/data/agent-create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({[idData]: agentDetails})
+        })
+
+        const jsonResult = await result.json();
+
+        console.log(jsonResult.result);
+
+        setUpdaterefresh(true);
+
+        setAddImageUrl('');
+        setAddAgentName('');
+        setChecked(false);
+        setAddAgentDescription('');
+        setAddAgentPrompt('');
+        setAddAgentStarterPrompt1('');
+        setAddAgentStarterPrompt2('');
+        setAddAgentStarterPrompt3('');
+
+        do {} while (agentUpdate != 0);
+
+        setaddModal(false);
+        
       }
       
 
@@ -256,6 +287,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   const onDetailClose = () => {setDetailModal(false)};
   const onAddClose = () => {setaddModal(false); setErrorAlert(false)};
   const onAddOpen = () => {setaddModal(true)};
+  const onStartupModalClose = () => {if (Object.keys(SystemPurposes).length<2) setUpdaterefresh(true); }
 
 
   const handleCustomSystemMessageChange = (v: React.ChangeEvent<HTMLTextAreaElement>): void => {
@@ -282,7 +314,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
 
   return <>
 
-    {Object.keys(SystemPurposes).length<2? <WelcomeModal title={<>Welcome to  <b>PlebAI</b> <br></br></>} open={true} onClose={closeModelsSetup} ><Divider /></WelcomeModal>:''}
+    {Object.keys(SystemPurposes).length<2? <WelcomeModal title={<>Welcome to  <b>PlebAI</b> <br></br></>} open={true} onClose={onStartupModalClose} ><Divider /></WelcomeModal>:''}
     {detailModal? <DetailModal title={SystemPurposes[systemPurposeId as SystemPurposeId]?.title} open={detailModal} onClose={onDetailClose}>
       
        <Divider />
@@ -347,10 +379,12 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
 
               <div {...getRootProps()} className="drag_drop_wrapper">
                 <input hidden {...getInputProps()} />
+
+                {imageProgress? <CircularProgress variant="solid" />:
     
                 <Avatar  alt=""
                         src={addImageUrl?addImageUrl:'/icons/drag-and-drop2.png'} 
-                        sx={{ width: detailAvatarSx, height: detailAvatarSx, mt: 1, }}></Avatar>
+                        sx={{ width: detailAvatarSx, height: detailAvatarSx, mt: 1, }}></Avatar>}
 
        
                 

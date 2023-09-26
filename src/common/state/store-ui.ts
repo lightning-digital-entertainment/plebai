@@ -48,6 +48,9 @@ interface UIPreferencesStore {
   preferredLanguage: string;
   setPreferredLanguage: (preferredLanguage: string) => void;
 
+  agentUpdate: number;
+  setAgentUpdate: (agentUpdate: number) => void;
+
   centerMode: 'narrow' | 'wide' | 'full';
   setCenterMode: (centerMode: 'narrow' | 'wide' | 'full') => void;
 
@@ -75,6 +78,9 @@ export const useUIPreferencesStore = create<UIPreferencesStore>()(
       preferredLanguage: (typeof navigator !== 'undefined') && navigator.language || 'en-US',
       setPreferredLanguage: (preferredLanguage: string) => set({ preferredLanguage }),
 
+      agentUpdate: 1,
+      setAgentUpdate: (agentUpdate: number) => set({ agentUpdate }),
+
       centerMode: 'wide',
       setCenterMode: (centerMode: 'narrow' | 'wide' | 'full') => set({ centerMode }),
 
@@ -96,6 +102,6 @@ export const useUIPreferencesStore = create<UIPreferencesStore>()(
     }),
     {
       name: 'app-ui',
-      version: 3,
+      version: 4,
     }),
 );

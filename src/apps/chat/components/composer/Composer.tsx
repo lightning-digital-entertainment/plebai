@@ -41,6 +41,7 @@ import { verifyOutputSchema } from '~/modules/current/verify.router';
 import { NoWebLnModal } from '~/common/components/NoWebLnModal';
 import { Invoice } from "alby-tools";
 import { SystemPurposeData } from '~/modules/data/request.router';
+import { staticGenerationAsyncStorage } from 'next/dist/client/components/static-generation-async-storage';
 
 
 
@@ -193,9 +194,14 @@ export function Composer(props: {
   const [openNoWebLnModal, setOpenNoWebLnModal] = React.useState(false);
   const attachmentFileInputRef = React.useRef<HTMLInputElement>(null);
 
+  const appFingerPrint = localStorage.getItem('appFingerPrint');
+
   // external state
   const theme = useTheme();
   const enterToSend = useUIPreferencesStore(state => state.enterToSend);
+
+  const {agentUpdate, setAgentUpdate} = useUIPreferencesStore(state => ({agentUpdate: state.agentUpdate, setAgentUpdate: state.setAgentUpdate,}));
+
   const { sentMessages, appendSentMessage, clearSentMessages, startupText, setStartupText } = useComposerStore();
   const { assistantTyping, tokenCount: conversationTokenCount, stopTyping, setTokenCount, setConversationCount, conversationCount } = useChatStore(state => {
   const conversation = state.conversations.find(conversation => conversation.id === props.conversationId);
@@ -214,7 +220,7 @@ export function Composer(props: {
     const response =  await fetch('/api/data/agents', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({fingerPrint: 'appFingerPrint' })
+      body: JSON.stringify({fingerPrint: appFingerPrint})
     })
     const jsonData = await response.json();
     console.log(jsonData);
@@ -222,7 +228,7 @@ export function Composer(props: {
 
     return SystemPurposes
 
-  }, []);
+  }, [appFingerPrint]);
 
     
   
@@ -233,12 +239,17 @@ export function Composer(props: {
 
   // Effect: load initial text if queued up (e.g. by /share)
   React.useEffect(() => {
-    agentData()
+    if (agentUpdate !== 0) {
+      agentData()
+      setAgentUpdate(0)
+
+    }
+    
     if (startupText) {   
       setStartupText(null);
       setComposeText(startupText);
     }
-  }, [startupText, setStartupText, agentData]);
+  }, [startupText, setStartupText, agentData, agentUpdate, setAgentUpdate]);
 
   // derived state
   const tokenLimit = chatLLM?.contextTokens || 0;

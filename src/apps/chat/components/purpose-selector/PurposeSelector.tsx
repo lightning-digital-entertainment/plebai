@@ -327,7 +327,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
               mt: 0,
             }} >
         {selectedPurpose? <div style={{ fontSize: '1rem' }}>  LLM Type:  {selectedPurpose.llmRouter}  </div> : ''}
-        {selectedPurpose? <div style={{ fontSize: '1rem' }}>  Price:  {selectedPurpose.satsPay} SATS for {selectedPurpose.convoCount} conversations   </div> : ''}
+        {selectedPurpose? <div style={{ fontSize: '1rem' }}>  Price:  First {selectedPurpose.convoCount} conversations are FREE. Then {selectedPurpose.satsPay} SATS  </div> : ''}
         </Typography>
 
       <Typography level='body1' color='neutral' sx={{
@@ -544,7 +544,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
               {errorAlert && < Typography level='body2' color='danger' sx={{
                        
                       }} >
-                      Fields are not filled out correctly. Please complete all inputs. 
+                      Description and System prompt should have minimum 25 words. Starter prompts should have 10 words each. Please complete all inputs. 
               </Typography>}
 
               <Button onClick={handleCreateAgent} sx={{position: 'center'}} variant="outlined"  color='neutral' >  Create Agent</Button>

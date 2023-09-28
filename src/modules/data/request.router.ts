@@ -25,6 +25,7 @@ export const requestOutputSchema = z.object({
     maxToken: number;
     paid: boolean;
     chatruns: number;
+    newAgent: string;
   }
 
   export type requestInputSchema = z.infer<typeof requestInputSchema>;  

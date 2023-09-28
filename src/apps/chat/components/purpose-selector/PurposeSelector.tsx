@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { shallow } from 'zustand/shallow';
 
-import { Avatar, Box, Button, Option, Checkbox, Divider, Grid, IconButton, Input, Select, Stack, Switch, Textarea, Typography, useTheme, Alert, CircularProgress } from '@mui/joy';
+import { Avatar, Box, Button, Option, Checkbox, Divider, Grid, IconButton, Input, Select, Stack, Switch, Textarea, Typography, useTheme, Alert, CircularProgress, Badge } from '@mui/joy';
 import ClearIcon from '@mui/icons-material/Clear';
 import ForumIcon from '@mui/icons-material/Forum';
+import StarRateIcon from '@mui/icons-material/StarRate';
 import SearchIcon from '@mui/icons-material/Search';
 import Image from "next/image";
 import { useChatStore } from '~/common/state/store-chats';
@@ -124,7 +125,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   if (!systemPurposeId || !setSystemPurposeId)
     return null;
 
-    
+
 
   const handleSearchClear = () => {
     setSearchQuery('');
@@ -601,6 +602,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
         <Grid container spacing={tileSpacing} rowSpacing={2} sx={{ justifyContent: 'center' }}>
           {SystemPurposes && purposeIDs.map((spId) => (
             <Grid key={spId} spacing={0.5}>
+              
               <Button
                 variant={(!editMode && systemPurposeId === spId) ? 'solid' : 'soft'}
                 color={(!editMode && systemPurposeId === spId) ? 'info' : SystemPurposes[spId as SystemPurposeId]?.highlighted ? 'warning' : 'neutral'}
@@ -624,29 +626,31 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
                     sx={{ alignSelf: 'flex-start', mb:-3 }}
                   />
                 )}
-                
-                <Avatar  alt=""
+                   <Badge  invisible = {SystemPurposes[spId as SystemPurposeId].newAgent === 'false'} badgeContent={'New'} color="primary">
+                         <Avatar  alt=""
                         src={SystemPurposes[spId as SystemPurposeId]?.symbol} 
                         sx={{ width: tileSx, height: tileSx,  }}/>
+                    </Badge>
+              
                   {SystemPurposes[spId as SystemPurposeId]?.title} 
-
+                
                   <Typography level='body3' color='neutral' sx={{
-              mt: -2,
-               alignItems: 'center',
-              justifyContent: 'center',
-            '&:hover > button': { opacity: 1 },
-            }} >
-              {SystemPurposes[spId as SystemPurposeId]?.chatruns } <ForumIcon/>
+                        mt: -2,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      '&:hover > button': { opacity: 1 },
+                      }} >
+                        {SystemPurposes[spId as SystemPurposeId]?.chatruns } <ForumIcon/> 
+                       
+                                       </Typography>
 
-            </Typography>
 
-                  
 
-                  
+                       
               
               </Button>
-          
-            </Grid>
+              
+                          </Grid>
           ))}
         </Grid>
 

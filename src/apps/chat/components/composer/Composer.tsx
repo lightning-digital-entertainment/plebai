@@ -80,6 +80,7 @@ export let SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
     temperature: 0.5,
     satsPay: 50,
     paid: false,
+    chatruns: 55
   },
 
 };

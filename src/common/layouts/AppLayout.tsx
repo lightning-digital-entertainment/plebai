@@ -27,29 +27,8 @@ export function AppLayout(props: {
   const { centerMode, agentUpdate} = useUIPreferencesStore(state => ({ centerMode: isPwa() ? 'full' : state.centerMode, agentUpdate: state.agentUpdate, }), shallow);
 
 
-  
-
-  // usage counter, for progressive disclosure of features
-  // noinspection JSUnusedLocalSymbols
   const usageCount = useAppStateStore(state => state.usageCount);
   
-  //const appFingerPrint = localStorage.getItem('appFingerPrint');
-
-  //console.log(appFingerPrint);
-
-  
-  /*
-  const agentData = fetch('/api/data/agents', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({fingerPrint: 'appFingerPrint' })
-  }).then((response) => response.json())
-  .then((jsonData) => {
-   SystemPurposes = jsonData.SystemPurposes;
-   console.log(SystemPurposes);
-  });
-  */
-
   return (
     // Global NoSSR wrapper: the overall Container could have hydration issues when using localStorage and non-default maxWidth
     <NoSSR>

@@ -9,6 +9,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { DConversation, useChatStore } from '~/common/state/store-chats';
 import { InlineTextarea } from '~/common/components/InlineTextarea';
 import { SystemPurposes } from '../../../../apps/chat/components/composer/Composer';
+import { useApplicationBarStore } from '~/common/layouts/appbar/store-applicationbar';
 
 
 const DEBUG_CONVERSATION_IDs = false;
@@ -53,7 +54,15 @@ export function ConversationItem(props: {
   if (!cState) return null;
   const { isNew, assistantTyping, setUserTitle, systemPurposeId, title } = cState;
 
-  const handleActivate = () => props.conversationActivate(props.conversationId);
+  const closeAppMenu = () => useApplicationBarStore.getState().setAppMenuAnchor(null);
+
+  const handleActivate = () => {
+    
+    
+    props.conversationActivate(props.conversationId);
+    closeAppMenu();
+
+  }
 
   const handleEditBegin = () => setIsEditingTitle(true);
 

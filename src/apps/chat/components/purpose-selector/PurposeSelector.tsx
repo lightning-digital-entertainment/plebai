@@ -180,10 +180,8 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
 
   };
 
-
-
-  const handleSearchOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
+  const executeFilter = (data:string) => {
+    const query = data;
     if (!query)
       return handleSearchClear();
     setSearchQuery(query);
@@ -194,16 +192,32 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
       .filter(key => {
         const purpose = SystemPurposes[key as SystemPurposeId];
         return purpose.title.toLowerCase().includes(query.toLowerCase())
-          || (typeof purpose.description === 'string' && purpose.description.toLowerCase().includes(query.toLowerCase()));
+          || (typeof purpose.placeHolder === 'string' && purpose.placeHolder.toLowerCase().includes(query.toLowerCase()));
       });
     setFilteredIDs(ids as SystemPurposeId[]);
 
     console.log("fileter: ", filteredIDs)
 
 
-    // If there's a search term, activate the first item
-    if (ids.length && !ids.includes(systemPurposeId))
-      handlePurposeChanged(ids[0] as SystemPurposeId);
+
+  }
+
+  const handleSearchOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    executeFilter(e.target.value);
+  };
+
+  const handleTagsImageOnChange = () => {
+    executeFilter('image');
+  };
+
+  const handleTagsRolePlayOnChange = () => {
+    executeFilter('RolePlay');
+  };
+  const handleTagsTechnicalOnChange = () => {
+    executeFilter('technical');
+  };
+  const handleTagsAssistantOnChange = () => {
+    executeFilter('assistant');
   };
 
   const handleSearchOnKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
@@ -586,13 +600,23 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
           
         </Box>}
 
-       
+        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 2, mb: 1, mt:4 }}>
+           
+
+           <Button onClick={handleTagsImageOnChange} sx={{position: 'center'}} size="sm" variant="solid"  color='neutral' > Image Generation</Button>
+           <Button onClick={handleTagsRolePlayOnChange} sx={{position: 'center'}} size="sm" variant="solid"  color='neutral' > RolePlay</Button>
+           <Button onClick={handleTagsTechnicalOnChange} sx={{position: 'center'}} size="sm" variant="solid"  color='neutral' > Technical</Button>
+           <Button onClick={handleTagsAssistantOnChange} sx={{position: 'center'}} size="sm" variant="solid"  color='neutral' > Assistant</Button>
+
+          
+        </Box>
+
 
       <Box sx={{ maxWidth: bpMaxWidth }}>
 
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 2, mb: 1, mt:4 }}>
            <Button onClick={onAddOpen} sx={{position: 'left'}} variant="outlined"  color='neutral' > <AddIcon/> Create Agent</Button>
-    
+
           <Button variant="outlined" color='neutral' size='sm' onClick={toggleEditMode}>
             {editMode ? 'Done' : 'Edit'}
           </Button>

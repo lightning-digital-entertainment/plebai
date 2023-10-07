@@ -343,7 +343,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
               mt: 0,
             }} >
         {selectedPurpose? <div style={{ fontSize: '1rem' }}>  LLM Type:  {selectedPurpose.llmRouter}  </div> : ''}
-        {selectedPurpose? <div style={{ fontSize: '1rem' }}>  Price:  First {selectedPurpose.convoCount} conversations are FREE. Then {selectedPurpose.satsPay} SATS  </div> : ''}
+        {selectedPurpose? <div style={{ fontSize: '1rem' }}>  Price: {selectedPurpose.paid?selectedPurpose.satsPay + ' SATS':  selectedPurpose.convoCount + ' conversations are FREE. Then ' + selectedPurpose.satsPay +  ' SATS' } </div> : ''}
         </Typography>
 
       <Typography level='body1' color='neutral' sx={{

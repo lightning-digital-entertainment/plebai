@@ -31,6 +31,7 @@ import { useUIPreferencesStore } from '~/common/state/store-ui';
 import { RenderCode } from './RenderCode';
 import { RenderHtml } from './RenderHtml';
 import { RenderImage } from './RenderImage';
+import { RenderVideo } from './RenderVideo';
 import { RenderMarkdown } from './RenderMarkdown';
 import { RenderText } from './RenderText';
 import { parseBlocks } from './Block';
@@ -314,6 +315,8 @@ export function ChatMessage(props: { message: DMessage, isBottom: boolean, onMes
               ? <RenderHtml key={'html-' + index} htmlBlock={block} sx={cssCode} />
               : block.type === 'code'
                 ? <RenderCode key={'code-' + index} codeBlock={block} sx={cssCode} />
+                : block.type === 'video'
+                ? <RenderVideo key={'video-' + index} videoBlock={block} allowRunAgain={props.isBottom} onRunAgain={handleMenuRunAgain} />
                 : block.type === 'image'
                   ? <RenderImage key={'image-' + index} imageBlock={block} allowRunAgain={props.isBottom} onRunAgain={handleMenuRunAgain} />
                   : renderMarkdown

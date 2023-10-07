@@ -14,10 +14,11 @@ import 'prismjs/components/prism-typescript';
 import 'prismjs/themes/prism.css';
 
 
-export type Block = TextBlock | CodeBlock | ImageBlock | HtmlBlock;
+export type Block = TextBlock | CodeBlock | ImageBlock | VideoBlock | HtmlBlock;
 export type TextBlock = { type: 'text'; content: string; };
 export type CodeBlock = { type: 'code'; content: string; language: string | null; complete: boolean; code: string; };
 export type ImageBlock = { type: 'image'; url: string; };
+export type VideoBlock = { type: 'video'; url: string; };
 export type HtmlBlock = { type: 'html'; html: string; };
 
 
@@ -28,8 +29,13 @@ export const parseBlocks = (forceText: boolean, text: string): Block[] => {
   if (forceText)
     return [{ type: 'text', content: text }];
   //console.log(text);
-  
-  if (text.startsWith('https://i.current.fyi/'))
+
+  const extension = text.split('.').pop() || '';
+
+  if (extension.toLowerCase() === 'mp4') 
+    return [{ type: 'video', url: text.trim() }];
+
+  if (text.startsWith('https://i.current.fyi/') || text.startsWith('https://serve-model-sd-outputs.s3.amazonaws.com/'))
     return [{ type: 'image', url: text.trim() }];
 
   if (text.startsWith('<!DOCTYPE html'))

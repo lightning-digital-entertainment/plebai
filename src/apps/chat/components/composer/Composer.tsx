@@ -81,7 +81,8 @@ export let SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
     satsPay: 50,
     paid: false,
     chatruns: 55,
-    newAgent: "false"
+    newAgent: "false",
+    nip05:''
   },
 
 };

@@ -26,6 +26,7 @@ export const requestOutputSchema = z.object({
     paid: boolean;
     chatruns: number;
     newAgent: string;
+    nip05:string;
   }
 
   export type requestInputSchema = z.infer<typeof requestInputSchema>;  

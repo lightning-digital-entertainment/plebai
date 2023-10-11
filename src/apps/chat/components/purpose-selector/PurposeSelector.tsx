@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { shallow } from 'zustand/shallow';
 
-import { Avatar, Box, Button, Option, Checkbox, Divider, Grid, IconButton, Input, Select, Stack, Switch, Textarea, Typography, useTheme, Alert, CircularProgress, Badge } from '@mui/joy';
+import { Avatar, Box, Button, Option, Checkbox, Divider, Grid, IconButton, Input, Select, Stack, Switch, Textarea, Typography, useTheme, Alert, CircularProgress, Badge, Link } from '@mui/joy';
 import ClearIcon from '@mui/icons-material/Clear';
 import ForumIcon from '@mui/icons-material/Forum';
 import StarRateIcon from '@mui/icons-material/StarRate';
@@ -340,10 +340,11 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
                         sx={{ width: detailAvatarSx, height: detailAvatarSx, mt: 1, }}/>
 
       <Typography level='body1' color='neutral' sx={{
-              mt: 0, ml:2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, justifyContent: 'center',
+              mt: 0, ml:10, mr:10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, justifyContent: 'center',
             }} >
         {selectedPurpose? <div style={{ fontSize: '1.5rem' }}>   {selectedPurpose.title}  </div> : ''}
         {selectedPurpose? <div style={{ fontSize: '1rem' }}>  Price: {selectedPurpose.paid?selectedPurpose.satsPay + ' SATS':  selectedPurpose.convoCount + ' conversations are FREE. Then ' + selectedPurpose.satsPay +  ' SATS' } </div> : ''}
+        {selectedPurpose? <Link href={'https://plebai.com/nostr/' + selectedPurpose.nip05} > {'Nostr profile: ' + selectedPurpose.nip05}  </Link> : ''}
         {selectedPurpose? <div style={{ fontSize: '1rem' }}>  {selectedPurpose.placeHolder}   </div> : ''}
         </Typography>
 
@@ -352,7 +353,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
         <Box sx={{ mb: -1, display: 'flex', flexDirection: 'column', alignItems: 'left', justifyContent: 'left' }}>
 
                   <Typography level='body1' color='neutral' sx={{
-                        mt: 2,
+                         mt: 2, display: 'flex', flexDirection: 'column',
                         alignItems: 'center', gap: 1,
                       }} >
                       Start with these suggested prompts
@@ -370,7 +371,8 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
                         (selectedExample
                           ? <>
                             
-                            <Button style={{justifyContent: "flex-start"}} variant='outlined'  color='neutral' size='md' onClick={() => props.runExample(selectedExample)}>{truncateStringWithDots(selectedExample) }</Button>
+                            <Button sx={{
+                        mt: 2,}} style={{justifyContent: "flex-start"}} variant='outlined'  color='primary'  size='md' onClick={() => props.runExample(selectedExample)}>{truncateStringWithDots(selectedExample) }</Button>
                           
                             <br></br>
                           

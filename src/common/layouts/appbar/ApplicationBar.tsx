@@ -103,7 +103,7 @@ export function ApplicationBar(props: { sx?: SxProps }) {
                             flexDirection: 'row', flexWrap: 'wrap'
                             }} >
                             Join our community on 
-                            <Link color='primary' sx={{ml:1}} href='https://discord.gg/5nFRyc2X'> Discord <DiscordIcon sx={{ ml: 1, color: '' }} /> </Link> 
+                            <Link color='primary' sx={{ml:1}} href='https://discord.gg/DfSZpqUKYG'> Discord <DiscordIcon sx={{ ml: 1, color: '' }} /> </Link> 
             </Typography>
          
             

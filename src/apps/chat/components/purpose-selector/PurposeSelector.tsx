@@ -331,40 +331,37 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   return <>
 
     {Object.keys(SystemPurposes).length<2? <WelcomeModal title={<>Welcome to  <b>PlebAI</b> <br></br></>} open={true} onClose={onStartupModalClose} ><Divider /></WelcomeModal>:''}
-    {detailModal? <DetailModal title={SystemPurposes[systemPurposeId as SystemPurposeId]?.title} open={detailModal} onClose={onDetailClose}>
+    {detailModal? <DetailModal title='' open={detailModal} onClose={onDetailClose}>
       
-       <Divider />
+    
     
        <Avatar  alt=""
                         src={SystemPurposes[systemPurposeId as SystemPurposeId]?.symbol} 
                         sx={{ width: detailAvatarSx, height: detailAvatarSx, mt: 1, }}/>
 
       <Typography level='body1' color='neutral' sx={{
-              mt: 0,
+              mt: 0, ml:2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, justifyContent: 'center',
             }} >
-        {selectedPurpose? <div style={{ fontSize: '1rem' }}>  LLM Type:  {selectedPurpose.llmRouter}  </div> : ''}
+        {selectedPurpose? <div style={{ fontSize: '1.5rem' }}>   {selectedPurpose.title}  </div> : ''}
         {selectedPurpose? <div style={{ fontSize: '1rem' }}>  Price: {selectedPurpose.paid?selectedPurpose.satsPay + ' SATS':  selectedPurpose.convoCount + ' conversations are FREE. Then ' + selectedPurpose.satsPay +  ' SATS' } </div> : ''}
+        {selectedPurpose? <div style={{ fontSize: '1rem' }}>  {selectedPurpose.placeHolder}   </div> : ''}
         </Typography>
 
-      <Typography level='body1' color='neutral' sx={{
-              mt: 0,
-            }} >
-          {selectedPurpose? <div style={{ fontSize: '1rem' }}>  {selectedPurpose.placeHolder}  <br /> </div> : ''}
-        </Typography>
+    
 
         <Box sx={{ mb: -1, display: 'flex', flexDirection: 'column', alignItems: 'left', justifyContent: 'left' }}>
 
                   <Typography level='body1' color='neutral' sx={{
                         mt: 2,
-                        alignItems: 'left', gap: 1,
+                        alignItems: 'center', gap: 1,
                       }} >
                       Start with these suggested prompts
                   </Typography>
 
                   <Typography level='body2' color='neutral' sx={{
                         mt: 2,
-                        alignItems: 'left', gap: 1,
-                        justifyContent: 'left',
+                        alignItems: 'center', gap: 1,
+                        justifyContent: 'center',
                       '&:hover > button': { opacity: 1 },
                       }} >
                     

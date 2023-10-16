@@ -71,6 +71,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   const [addAgentStarterPrompt1, setAddAgentStarterPrompt1] =React.useState('');
   const [addAgentStarterPrompt2, setAddAgentStarterPrompt2] =React.useState('');
   const [addAgentStarterPrompt3, setAddAgentStarterPrompt3] =React.useState('');
+  const [addAgentCommissionAddress, setaddAgentCommissionAddress] =React.useState('');
   const [errorAlert, setErrorAlert] = React.useState(false);
 
   const { setChatLLMId } = useModelsStore(state => ({
@@ -192,7 +193,8 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
       .filter(key => {
         const purpose = SystemPurposes[key as SystemPurposeId];
         return purpose.title.toLowerCase().includes(query.toLowerCase())
-          || (typeof purpose.placeHolder === 'string' && purpose.placeHolder.toLowerCase().includes(query.toLowerCase()));
+          || (typeof purpose.placeHolder === 'string' && purpose.placeHolder.toLowerCase().includes(query.toLowerCase()))
+          || (typeof purpose.category === 'string' && purpose.category.toLowerCase().includes(query.toLowerCase()));
       });
     setFilteredIDs(ids as SystemPurposeId[]);
 
@@ -207,17 +209,17 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   };
 
   const handleTagsImageOnChange = () => {
-    executeFilter('image');
+    executeFilter('Image Generation');
   };
 
   const handleTagsRolePlayOnChange = () => {
-    executeFilter('RolePlay');
+    executeFilter('Role Play');
   };
   const handleTagsTechnicalOnChange = () => {
-    executeFilter('technical');
+    executeFilter('Technical');
   };
   const handleTagsAssistantOnChange = () => {
-    executeFilter('assistant');
+    executeFilter('Assistant');
   };
 
   const handleSearchOnKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
@@ -247,7 +249,8 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
           private: checked?false:true,
           status: 'active',
           createdBy: appFingerPrint ,
-          updatedBy: appFingerPrint 
+          updatedBy: appFingerPrint,
+          commissionAddress: addAgentCommissionAddress
         }
 
         console.log(agentDetails);
@@ -551,10 +554,27 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
                   fontSize: '16px',
                   lineHeight: 1.75,
                 }} >
-
+                </Textarea>
+                <Textarea variant='outlined' color={'neutral'}
+                        autoFocus
+                        minRows={1} maxRows={10}
+                        placeholder={"Input lightning address for 10% commission split. ..john@getalby.com"}
+                        value={addAgentCommissionAddress}
+                        onChange={(e) => setaddAgentCommissionAddress(e.target.value)}
+                        sx={{
+                          '&::before': {
+                            outline: '0.5px solid var(--Textarea-focusedHighlight)',
+                          },
+                        
+                          minWidth : addModalWidthSx,
+                          background: theme.vars.palette.background.level2,
+                          fontSize: '16px',
+                          lineHeight: 1.75,
+                        }} >
+                  </Textarea>
                         
 
-              </Textarea>
+           
 
               {errorAlert && < Typography level='body2' color='danger' sx={{
                        

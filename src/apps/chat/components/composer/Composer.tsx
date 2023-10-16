@@ -82,7 +82,8 @@ export let SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
     paid: false,
     chatruns: 55,
     newAgent: "false",
-    nip05:''
+    nip05:'',
+    category:''
   },
 
 };
@@ -307,7 +308,8 @@ export function Composer(props: {
                     const response = await fetch('/api/current/request', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({'amtinsats': SystemPurposes[props.systemPurpose as SystemPurposeId].satsPay*1000 })
+                      body: JSON.stringify({'amtinsats': SystemPurposes[props.systemPurpose as SystemPurposeId].satsPay*1000,
+                                              'nip05': SystemPurposes[props.systemPurpose as SystemPurposeId].nip05?SystemPurposes[props.systemPurpose as SystemPurposeId].nip05:'plebai@getcurrent.io' })
                     });
                     
                     const payResponse  = await response.json();

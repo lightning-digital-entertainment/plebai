@@ -5,9 +5,10 @@ export default async function handler(req: NextRequest) {
 
     try {
         const input = await req.json();
-        const { amtinsats } = requestInputSchema.parse(input);
+        const { amtinsats, nip05 } = requestInputSchema.parse(input);
         console.log('sats amount: %o',  amtinsats);
-        const { headers, url } = requestApiAccess( `/process-static-charges/plebai?amount=${amtinsats}`);
+        console.log('nip05', nip05);
+        const { headers, url } = requestApiAccess(amtinsats, nip05 );
         const response = await fetch(url, { headers, method: 'GET' })
         const body = await response.json()
     

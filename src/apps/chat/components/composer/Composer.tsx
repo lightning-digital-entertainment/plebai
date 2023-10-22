@@ -265,6 +265,7 @@ export function Composer(props: {
       setStartupText(null);
       setComposeText(startupText);
     }
+
   }, [startupText, setStartupText, agentData, agentUpdate, setAgentUpdate]);
 
   // derived state
@@ -313,8 +314,9 @@ export function Composer(props: {
                     setQrCodeText(pr);
                     setOpenNoWebLnModal(true);
                     let settle=false;
+                    let count=0;
                     do {
-
+                      count++;
                       const verifyResponse = await fetch('/api/current/verify', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -331,6 +333,8 @@ export function Composer(props: {
                         setOpenNoWebLnModal(false);
                         settle=true;
                       }
+                      if (count>180) settle=true;
+                      console.log(count);
 
                     } while (!settle)  
                     
@@ -371,7 +375,7 @@ export function Composer(props: {
                   } catch (error) {
 
                     console.log('webln catch: %o', error)
-                    setOpenNoWebLnModal(true);
+                    //setOpenNoWebLnModal(true);
                     
                   }
                   

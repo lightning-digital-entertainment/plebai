@@ -197,6 +197,7 @@ export function Composer(props: {
   const [confirmClearSent, setConfirmClearSent] = React.useState(false);
   const [openNoWebLnModal, setOpenNoWebLnModal] = React.useState(false);
   const attachmentFileInputRef = React.useRef<HTMLInputElement>(null);
+  const [qrCodeText, setQrCodeText] = React.useState('');
 
   const appFingerPrint = localStorage.getItem('appFingerPrint');
 
@@ -298,22 +299,49 @@ export function Composer(props: {
 
       Wallet_Service.getWebln()
             .then(async webln => {
+
+                const response = await fetch('/api/current/request', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({'amtinsats': SystemPurposes[props.systemPurpose as SystemPurposeId].satsPay*1000,
+                                          'nip05': SystemPurposes[props.systemPurpose as SystemPurposeId].nip05?SystemPurposes[props.systemPurpose as SystemPurposeId].nip05:'plebai@getcurrent.io' })
+                });
+                const payResponse  = await response.json();
+                const { pr, verify } = requestOutputSchema.parse(payResponse);
                 if (!webln) {
                     console.log('no webln detected')
+                    setQrCodeText(pr);
                     setOpenNoWebLnModal(true);
+                    let settle=false;
+                    do {
+
+                      const verifyResponse = await fetch('/api/current/verify', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({'verifyUrl': verify })
+                      });
+                      const verifyResponseParsed  = await verifyResponse.json();
+                      const { preimage, settled } = verifyOutputSchema.parse(verifyResponseParsed);
+                      console.log('preimage from verify url: %o', preimage)
+                      
+                      if (text.length && props.conversationId && settled) {
+                        setComposeText('');
+                        props.onSendMessage(sendModeId, props.conversationId, text);
+                        appendSentMessage(text);
+                        setOpenNoWebLnModal(false);
+                        settle=true;
+                      }
+
+                    } while (!settle)  
+                    
                 } else {
                   try {
 
                     console.log('webln found')
-                    const response = await fetch('/api/current/request', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({'amtinsats': SystemPurposes[props.systemPurpose as SystemPurposeId].satsPay*1000,
-                                              'nip05': SystemPurposes[props.systemPurpose as SystemPurposeId].nip05?SystemPurposes[props.systemPurpose as SystemPurposeId].nip05:'plebai@getcurrent.io' })
-                    });
                     
-                    const payResponse  = await response.json();
-                    const { pr, verify } = requestOutputSchema.parse(payResponse);
+                    
+                    
+                    
                     const weblnResponse = await webln.sendPayment(pr);
                     let settle=false;
                     if (weblnResponse) {
@@ -768,8 +796,8 @@ export function Composer(props: {
         />
 
         <NoWebLnModal
-          open={openNoWebLnModal} onClose={handleNoWeblnClose}
-          confirmationText={'To pay using sats, you need to enable WebLn. Please visit <a> https://getalby.com </a>  to get started'}
+          open={openNoWebLnModal} onClose={handleNoWeblnClose}  qrText= {qrCodeText}
+          
         />
 
       </Grid>

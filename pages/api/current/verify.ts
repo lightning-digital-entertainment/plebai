@@ -11,7 +11,7 @@ export default async function handler(req: NextRequest) {
    
         const { headers, url } = verifyApiAccess( verifyUrl);
         console.log('verify Url: %o', url)
-        await sleep(500);
+        await sleep(1000);
         const response = await fetch(url, { headers, method: 'GET' })
         const body = await response.json()
     

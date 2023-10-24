@@ -16,6 +16,12 @@ import ReplayIcon from '@mui/icons-material/Replay';
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 
+import ThumbsUpOutlinedIcon from '@mui/icons-material/ThumbUpAltOutlined';
+import ThumbsUpFilledIcon from '@mui/icons-material/ThumbUpSharp';
+
+import ThumbsDownOutlinedIcon from '@mui/icons-material/ThumbDownAltOutlined';
+import ThumbsDownFilledIcon from '@mui/icons-material/ThumbDownSharp';
+
 import { canUseElevenLabs, speakText } from '~/modules/elevenlabs/elevenlabs.client';
 import { canUseProdia } from '~/modules/prodia/prodia.client';
 
@@ -35,6 +41,8 @@ import { RenderVideo } from './RenderVideo';
 import { RenderMarkdown } from './RenderMarkdown';
 import { RenderText } from './RenderText';
 import { parseBlocks } from './Block';
+import { RenderQuestions } from './RenderQuestions';
+import { useComposerStore } from '../composer/store-composer';
 
 
 export function messageBackground(theme: Theme, messageRole: DMessage['role'], wasEdited: boolean, unknownAssistantIssue: boolean): string {
@@ -165,6 +173,10 @@ export function ChatMessage(props: { message: DMessage, isBottom: boolean, onMes
   const [isEditing, setIsEditing] = React.useState(false);
   const [isImagining, setIsImagining] = React.useState(false);
   const [isSpeaking, setIsSpeaking] = React.useState(false);
+  const {  startupText, setStartupText } = useComposerStore();
+
+  const [isThumbsUpToggled, setIsThumbsUpToggled] = React.useState(false);
+  const [isThumbsDownToggled, setIsThumbsDownToggled] = React.useState(false);
 
   // external state
   const theme = useTheme();
@@ -178,6 +190,32 @@ export function ChatMessage(props: { message: DMessage, isBottom: boolean, onMes
   const isSpeakable = canUseElevenLabs();
 
   const closeOperationsMenu = () => setMenuAnchor(null);
+
+  const toggleThumbsUp = async () => {   
+    setIsThumbsUpToggled(!isThumbsUpToggled);
+    const response = await fetch('/api/data/feedBack', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 'message_id': props.message.id, 'feedback_type': 'thumbsup'})
+    });
+
+    console.log(response)
+   
+    
+  };
+
+  const toggleThumbsDown = async () => {      
+    setIsThumbsDownToggled(!isThumbsDownToggled);
+    if (isThumbsUpToggled && !isThumbsDownToggled) setIsThumbsUpToggled(false);
+      const response = await fetch('/api/data/feedBack', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 'message_id': props.message.id, 'feedback_type': 'thumbsdown'})
+      });
+
+      console.log(response)
+    
+  };
 
   const handleMenuCopy = (e: React.MouseEvent) => {
     copyToClipboard(messageText);
@@ -311,19 +349,47 @@ export function ChatMessage(props: { message: DMessage, isBottom: boolean, onMes
           )}
 
           {!errorMessage && parseBlocks(fromSystem, collapsedText).map((block, index) =>
-            block.type === 'html'
+
+          block.type === 'question'
+          ? <RenderQuestions key={'Questions:- '} messageId = {props.message.id} questionBlock={block} runExample={function (example: string): void {
+              setStartupText(example);
+            } }  />
+            : block.type === 'html'
               ? <RenderHtml key={'html-' + index} htmlBlock={block} sx={cssCode} />
               : block.type === 'code'
                 ? <RenderCode key={'code-' + index} codeBlock={block} sx={cssCode} />
-                : block.type === 'video'
+                
+  
+              : block.type === 'video'
                 ? <RenderVideo key={'video-' + index} videoBlock={block} allowRunAgain={props.isBottom} onRunAgain={handleMenuRunAgain} />
+            
                 : block.type === 'image'
-                  ? <RenderImage key={'image-' + index} imageBlock={block} allowRunAgain={props.isBottom} onRunAgain={handleMenuRunAgain} />
+                  ? <RenderImage key={'image-' + index} imageBlock={block} allowRunAgain={props.isBottom} onRunAgain={handleMenuRunAgain} />   
                   : renderMarkdown
                     ? <RenderMarkdown key={'text-md-' + index} textBlock={block} />
                     : <RenderText key={'text-' + index} textBlock={block} />,
+                    
+                    
           )}
 
+          {fromAssistant && !isEditing &&  !messageTyping && (  
+
+                  <Box  sx={{
+                    display: 'flex', mt: 4, mb:2, mx: 1, alignItems: 'right', justifyContent: 'flex-end', flexDirection: 'row'
+                  }} >
+                        <Typography level='body1' color='neutral'  sx={{mt: 1, mx: 0.5 }}>
+                        Do you like the response? 
+                        </Typography>
+                        <IconButton variant='plain' color='neutral'  onClick={toggleThumbsUp} sx={{}}>
+                          {isThumbsUpToggled? <ThumbsUpFilledIcon />: <ThumbsUpOutlinedIcon />}
+                        </IconButton>
+
+                        <IconButton variant='plain' color='neutral' onClick={toggleThumbsDown} sx={{}}>
+                        {isThumbsDownToggled? <ThumbsDownFilledIcon />: <ThumbsDownOutlinedIcon />}
+                        </IconButton>
+                    
+                  </Box> 
+          )}
           {errorMessage && (
             <Tooltip title={<Typography sx={{ maxWidth: 800 }}>{collapsedText}</Typography>} variant='soft'>
               <Alert variant='soft' color='warning' sx={{ mt: 1 }}><Typography>{errorMessage}</Typography></Alert>

@@ -20,6 +20,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { useDropzone } from "react-dropzone";
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import { useCallback } from 'react';
+import { useComposerStore } from '../composer/store-composer';
 
 // Constants for tile sizes / grid width - breakpoints need to be computed here to work around
 // the "flex box cannot shrink over wrapped content" issue
@@ -73,6 +74,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   const [addAgentStarterPrompt3, setAddAgentStarterPrompt3] =React.useState('');
   const [addAgentCommissionAddress, setaddAgentCommissionAddress] =React.useState('');
   const [errorAlert, setErrorAlert] = React.useState(false);
+  const {  startupText, setStartupText } = useComposerStore();
 
   const { setChatLLMId } = useModelsStore(state => ({
     setChatLLMId: state.setChatLLMId,
@@ -303,6 +305,13 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
     }  
   };
 
+  const onSetExample = (messageText: string) => {
+
+    setStartupText(messageText);
+    setDetailModal(false);
+
+  }
+
   const onDetailClose = () => {setDetailModal(false)};
   const onAddClose = () => {setaddModal(false); setErrorAlert(false)};
   const onAddOpen = () => {setaddModal(true)};
@@ -375,7 +384,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
                           ? <>
                             
                             <Button sx={{
-                        mt: 2,}} style={{justifyContent: "flex-start"}} variant='outlined'  color='primary'  size='md' onClick={() => props.runExample(selectedExample)}>{truncateStringWithDots(selectedExample) }</Button>
+                        mt: 2,}} style={{justifyContent: "flex-start"}} variant='outlined'  color='primary'  size='md' onClick={() => onSetExample(selectedExample)}>{truncateStringWithDots(selectedExample) }</Button>
                           
                             <br></br>
                           

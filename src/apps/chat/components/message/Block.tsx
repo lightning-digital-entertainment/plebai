@@ -14,18 +14,22 @@ import 'prismjs/components/prism-typescript';
 import 'prismjs/themes/prism.css';
 
 
-export type Block = TextBlock | CodeBlock | ImageBlock | VideoBlock | HtmlBlock;
+export type Block = TextBlock | CodeBlock | ImageBlock | VideoBlock | HtmlBlock | QuestionBlock;
 export type TextBlock = { type: 'text'; content: string; };
 export type CodeBlock = { type: 'code'; content: string; language: string | null; complete: boolean; code: string; };
 export type ImageBlock = { type: 'image'; url: string; };
 export type VideoBlock = { type: 'video'; url: string; };
 export type HtmlBlock = { type: 'html'; html: string; };
+export type QuestionBlock = { type: 'question'; question: string; };
 
 
 /**
  * TODO: expensive function, especially as it's not been used in incremental fashion
  */
 export const parseBlocks = (forceText: boolean, text: string): Block[] => {
+  if (text.includes('Questions:- '))
+  return [{ type: 'question', question: text }];  
+
   if (forceText)
     return [{ type: 'text', content: text }];
   //console.log(text);

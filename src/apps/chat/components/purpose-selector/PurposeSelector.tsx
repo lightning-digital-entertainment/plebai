@@ -21,6 +21,7 @@ import { useDropzone } from "react-dropzone";
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import { useCallback } from 'react';
 import { useComposerStore } from '../composer/store-composer';
+import { SamplePrompts } from './SamplePrompts';
 
 // Constants for tile sizes / grid width - breakpoints need to be computed here to work around
 // the "flex box cannot shrink over wrapped content" issue
@@ -61,6 +62,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   const [filteredIDs, setFilteredIDs] = React.useState<SystemPurposeId[] | null>(null);
   const [editMode, setEditMode] = React.useState(false);
   const [detailModal, setDetailModal] = React.useState(false);
+  const [samplePromptModal, setsamplePromptModal] = React.useState(false);
   const [addModal, setaddModal] = React.useState(false);
   const [updateRefresh, setUpdaterefresh] = React.useState(true);
   const [addImageUrl, setAddImageUrl] =React.useState('');
@@ -316,8 +318,13 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   const onAddClose = () => {setaddModal(false); setErrorAlert(false)};
   const onAddOpen = () => {setaddModal(true)};
   const onStartupModalClose = () => {if (Object.keys(SystemPurposes).length<2) setUpdaterefresh(true); }
+  const onClosePromptView = () => {setsamplePromptModal(false);};
+  const handlePromptView  = () => {
 
-
+    setDetailModal(false);
+    setsamplePromptModal(true);
+    
+  } 
   const handleCustomSystemMessageChange = (v: React.ChangeEvent<HTMLTextAreaElement>): void => {
     // TODO: persist this change? Right now it's reset every time.
     //       maybe we shall have a "save" button just save on a state to persist between sessions
@@ -360,44 +367,15 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
         {selectedPurpose? <div style={{ fontSize: '1rem' }}>  {selectedPurpose.placeHolder}   </div> : ''}
         </Typography>
 
-    
+         <Button onClick={handlePromptView} sx={{position: 'center'}} variant="soft"  color='neutral' >  {selectedPurpose?.paid?'View  Sample Images':'View Sample Prompts'}</Button>
 
-        <Box sx={{ mb: -1, display: 'flex', flexDirection: 'column', alignItems: 'left', justifyContent: 'left' }}>
 
-                  <Typography level='body1' color='neutral' sx={{
-                         mt: 2, display: 'flex', flexDirection: 'column',
-                        alignItems: 'center', gap: 1,
-                      }} >
-                      Start with these suggested prompts
-                  </Typography>
-
-                  <Typography level='body2' color='neutral' sx={{
-                        mt: 2,
-                        alignItems: 'center', gap: 1,
-                        justifyContent: 'center',
-                      '&:hover > button': { opacity: 1 },
-                      }} >
-                    
-                    {selectedPurpose?.examples?.map((selectedExample) => (
-                      
-                        (selectedExample
-                          ? <>
-                            
-                            <Button sx={{
-                        mt: 2,}} style={{justifyContent: "flex-start"}} variant='outlined'  color='primary'  size='md' onClick={() => onSetExample(selectedExample)}>{truncateStringWithDots(selectedExample) }</Button>
-                          
-                            <br></br>
-                          
-                          </>
-                          : selectedPurpose.description
-                        )
-                    ))}
-                    
-                  </Typography>   
-
-        </Box>              
+        
+              
    
     </DetailModal>:''}
+
+    {samplePromptModal && <SamplePrompts agentId={systemPurposeId} open={samplePromptModal} onClose={onClosePromptView} total={selectedPurpose?.chatruns?selectedPurpose?.chatruns:0} genImage={selectedPurpose?.paid?selectedPurpose?.paid:false} />}
    
     {addModal? <DetailModal title={'Create New Agent'} open={addModal} onClose={onAddClose}><Divider />
     
@@ -715,7 +693,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
             '&:hover > button': { opacity: 1 },
             }} >
 
-{"NOTE: PlebAI exclusively utilizes open-source large language models and is not biased to any particular ideology. We do not use closed source OpenAI or Anthropic models. You can have unprotected and unfiltered conversations without bias. No terms and conditions to accept. Be civil and don't break the law. "}
+{"NOTE: PlebAI exclusively utilizes open-source large language models and does not favor any particular ideology. We do not use closed-source models from OpenAI or Anthropic. You can engage in unbiased conversations without filters. However, prompts are visible to other users. DO NOT input any private or personally identifiable information. There are no terms and conditions to accept. Remain civil and abide by the law. "}
             </Typography>
 
         

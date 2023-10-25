@@ -10,7 +10,7 @@ let nextConfig = {
   },
   webpack(config, { isServer, dev }) {
     // @mui/joy: anything material gets redirected to Joy
-    config.resolve.alias['@mui/material'] = '@mui/joy';
+    //config.resolve.alias['@mui/material'] = '@mui/joy';
 
     // @dqbd/tiktoken: enable asynchronous WebAssembly
     config.experiments = {

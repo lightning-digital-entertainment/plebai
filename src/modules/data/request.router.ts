@@ -5,6 +5,30 @@ export const requestInputSchema = z.object({
     fingerPrint: z.string()
   });
 
+export const requestPromptSchema = z.object({
+    id: z.string(),
+    limit: z.number(),
+    offset: z.number()
+
+});  
+
+export const responsePromptSchema = z.object({
+  message_id: z.string(),
+  agent_type: z.string(),
+  user_message: z.string(),
+  response: z.string()
+
+}); 
+
+export type ResponsePromptData = {
+
+  message_id: string;
+  agent_type: string;
+  user_message:string;
+  response: string;
+
+}
+
 export const requestOutputSchema = z.object({
   SystemPurposes: z.string()
 });

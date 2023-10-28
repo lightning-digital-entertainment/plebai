@@ -6,7 +6,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import ForumIcon from '@mui/icons-material/Forum';
 import StarRateIcon from '@mui/icons-material/StarRate';
 import SearchIcon from '@mui/icons-material/Search';
-import Image from "next/image";
+
 import { useChatStore } from '~/common/state/store-chats';
 import { useUIPreferencesStore } from '~/common/state/store-ui';
 
@@ -17,11 +17,12 @@ import { WelcomeModal } from '~/common/components/WelcomeModal';
 import { useUIStateStore } from '~/common/state/store-ui';
 import { DetailModal } from '~/common/components/DetailModal';
 import AddIcon from '@mui/icons-material/Add';
-import { useDropzone } from "react-dropzone";
+
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import { useCallback } from 'react';
 import { useComposerStore } from '../composer/store-composer';
 import { SamplePrompts } from './SamplePrompts';
+import { Addmodal } from './AddModal';
 
 // Constants for tile sizes / grid width - breakpoints need to be computed here to work around
 // the "flex box cannot shrink over wrapped content" issue
@@ -34,7 +35,7 @@ const tileSpacing = 2;
 const tileSx = { xs: 42, md: 96, xl: 96 };
 const detailAvatarSx = { xs: 62, md: 122, xl: 130 };
 const searchWidthSx = { xs: 220, md: 422, xl: 630 };
-const addModalWidthSx = { xs: 220, md: 422, xl: 630 };
+
 const bpMaxWidth = Object.entries(bpTileSize).reduce((acc, [key, value], index) => {
   acc[key] = tileCols[index] * (value + 8 * tileSpacing) - 8 * tileSpacing;
   return acc;
@@ -48,9 +49,7 @@ const bpTileGap = { xs: 2, md: 3 };
 const getRandomElement = <T, >(array: T[]): T | undefined =>
   array.length > 0 ? array[Math.floor(Math.random() * array.length)] : undefined;
 
-type Image = {
-    imageFile: Blob;
-};  
+ 
 
 
 /**
@@ -65,17 +64,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   const [samplePromptModal, setsamplePromptModal] = React.useState(false);
   const [addModal, setaddModal] = React.useState(false);
   const [updateRefresh, setUpdaterefresh] = React.useState(true);
-  const [addImageUrl, setAddImageUrl] =React.useState('');
-  const [imageProgress, setImageProgress] = React.useState(false);
-  const [addAgentName, setAddAgentName] =React.useState('');
-  const [checked, setChecked] = React.useState<boolean>(false);
-  const [addAgentDescription, setAddAgentDescription] =React.useState('');
-  const [addAgentPrompt, setAddAgentPrompt] =React.useState('');
-  const [addAgentStarterPrompt1, setAddAgentStarterPrompt1] =React.useState('');
-  const [addAgentStarterPrompt2, setAddAgentStarterPrompt2] =React.useState('');
-  const [addAgentStarterPrompt3, setAddAgentStarterPrompt3] =React.useState('');
-  const [addAgentCommissionAddress, setaddAgentCommissionAddress] =React.useState('');
-  const [errorAlert, setErrorAlert] = React.useState(false);
+  
   const {  startupText, setStartupText } = useComposerStore();
 
   const { setChatLLMId } = useModelsStore(state => ({
@@ -97,20 +86,8 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   }, [updateRefresh, setAgentUpdate]); 
 
 
-  const onDrop = useCallback((acceptedFiles: any[]) => {
-    // Upload files to storage
-    const file = acceptedFiles[0];
-    uploadImage({ imageFile: file });
-  }, []);
-
-  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
-    
-    //accept: "image/*",
-    maxFiles: 1,
-    noClick: true,
-    noKeyboard: true,
-    onDrop,
-  });
+  
+  
 
   // external state
   const theme = useTheme();
@@ -139,51 +116,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
 
   
 
-  const uploadImage = async ({ imageFile }: Image) => {
-        console.log(imageFile)
-        setImageProgress(true);
-        if (imageFile.type === 'image/png' || imageFile.type === 'image/jpg' || imageFile.type === 'image/jpeg') {
-
-          let input:any;
-          
-          const reader = new FileReader()
-          
-          reader.onabort = () => console.log('file reading was aborted')
-          reader.onerror = () => console.log('file reading has failed')
-          reader.onload = async () => {
-            input = {input: reader.result,
-                     type: imageFile.name.split(".").pop()
-                    
-                    }
-            console.log(imageFile.name.split(".").pop())
-            const response = await fetch(`/api/data/upload`, {
-              method: 'POST',
-              body: JSON.stringify(input),
-              headers: {
-                'content-type' : 'application/json'
-            },
-          });
-
-            
-
-            if (response) {
-              const responseBody = await response.json()
-              setAddImageUrl(responseBody.url);
-              setImageProgress(false);
-
-            }
-
-
-            
-
-          } 
-          
-            reader.readAsDataURL(imageFile)
-            console.log(input);
-        }
-
-
-  };
+  
 
   const executeFilter = (data:string) => {
     const query = data;
@@ -231,68 +164,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
       handleSearchClear();
   };
 
-  const handleCreateAgent = async () => {
-    
-      if (addImageUrl.length < 2 || addAgentName.length < 5 || countWordsInString(addAgentDescription) < 25 || 
-      countWordsInString(addAgentPrompt) <25 || countWordsInString(addAgentStarterPrompt1) < 10 ||
-       countWordsInString(addAgentStarterPrompt2) <10 || countWordsInString(addAgentStarterPrompt3) <10)
-      {
-        setErrorAlert(true) 
-
-      } else {
-        setErrorAlert(false) 
-        //setAgentUpdate(Math.floor(Date.now() / 1000));
-        const agentDetails = {
-          title: addAgentName,
-          description: addAgentDescription,
-          systemMessage: addAgentPrompt,
-          symbol: addImageUrl,
-          examples: [addAgentStarterPrompt1, addAgentStarterPrompt2, addAgentStarterPrompt3],
-          placeHolder: addAgentDescription,
-          chatLLM: "llama-2-7b-chat-hf",
-          private: checked?false:true,
-          status: 'active',
-          createdBy: appFingerPrint ,
-          updatedBy: appFingerPrint,
-          commissionAddress: addAgentCommissionAddress
-        }
-
-        console.log(agentDetails);
-
-        const idData = (appFingerPrint ? appFingerPrint : '') + Math.floor(Date.now() / 1000).toString();
-
-
-        const result = await fetch('/api/data/agent-create', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({[idData]: agentDetails})
-        })
-
-        const jsonResult = await result.json();
-
-        console.log(jsonResult.result);
-
-        setUpdaterefresh(true);
-
-        setAddImageUrl('');
-        setAddAgentName('');
-        setChecked(false);
-        setAddAgentDescription('');
-        setAddAgentPrompt('');
-        setAddAgentStarterPrompt1('');
-        setAddAgentStarterPrompt2('');
-        setAddAgentStarterPrompt3('');
-
-        do {} while (agentUpdate != 0);
-
-        setaddModal(false);
-        
-      }
-      
-
-      
-
-  }
+  
 
 
   const toggleEditMode = () => setEditMode(!editMode);
@@ -315,8 +187,12 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   }
 
   const onDetailClose = () => {setDetailModal(false)};
-  const onAddClose = () => {setaddModal(false); setErrorAlert(false)};
-  const onAddOpen = () => {setaddModal(true)};
+  const onAddClose = () => {setaddModal(false); }; //setErrorAlert(false)
+  const onAddOpen = () => {
+    
+    setaddModal(true)
+  
+  };
   const onStartupModalClose = () => {if (Object.keys(SystemPurposes).length<2) setUpdaterefresh(true); }
   const onClosePromptView = () => {setsamplePromptModal(false);};
   const handlePromptView  = () => {
@@ -325,6 +201,14 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
     setsamplePromptModal(true);
     
   } 
+
+  const onCloseAddModal = () => {
+    setUpdaterefresh(true);
+    do {} while (agentUpdate != 0);
+  
+    setaddModal(false);
+    
+  }
   const handleCustomSystemMessageChange = (v: React.ChangeEvent<HTMLTextAreaElement>): void => {
     // TODO: persist this change? Right now it's reset every time.
     //       maybe we shall have a "save" button just save on a state to persist between sessions
@@ -377,210 +261,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
 
     {samplePromptModal && <SamplePrompts agentId={systemPurposeId} open={samplePromptModal} onClose={onClosePromptView} total={selectedPurpose?.chatruns?selectedPurpose?.chatruns:0} genImage={selectedPurpose?.paid?selectedPurpose?.paid:false} />}
    
-    {addModal? <DetailModal title={'Create New Agent'} open={addModal} onClose={onAddClose}><Divider />
-    
-          <div className="dropzone">
-               
-
-              <div {...getRootProps()} className="drag_drop_wrapper">
-                <input hidden {...getInputProps()} />
-
-                {imageProgress? <CircularProgress variant="solid" />:
-    
-                <Avatar  alt=""
-                        src={addImageUrl?addImageUrl:'/icons/drag-and-drop2.png'} 
-                        sx={{ width: detailAvatarSx, height: detailAvatarSx, mt: 1, }}></Avatar>}
-
-       
-                
-              </div>
-          </div>     
-
-              <Switch
-                    checked={checked}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                      setChecked(event.target.checked)
-                    }
-                    color={checked ? 'success' : 'neutral'}
-                    variant={checked ? 'solid' : 'outlined'}
-                    endDecorator={checked ? 'Public (Anyone can use) ' : 'Private (Only you can use)'}
-                    slotProps={{
-                      endDecorator: {
-                        sx: {
-                          minWidth: 24,
-                        },
-                      },
-                    }}
-                />
-                 
-
-              <Textarea variant='outlined' color={'neutral'}
-                autoFocus
-                minRows={1} maxRows={1}
-                placeholder={"Name (Agent Smith) ..max 15 chars"}
-                value={addAgentName}
-                onChange={(e) => {e.target.value.length<16?setAddAgentName(e.target.value):''}}
-                sx={{
-                  '&::before': {
-                    outline: '0.5px solid var(--Textarea-focusedHighlight)',
-                  },
-                  mt: 2,
-                  minWidth : addModalWidthSx,
-                  background: theme.vars.palette.background.level2,
-                  fontSize: '16px',
-                  lineHeight: 1.75,
-                }} >
-
-                        
-
-              </Textarea>
-
-            
-
-              <Textarea variant='outlined' color={'neutral'}
-                autoFocus
-                minRows={3} maxRows={10}
-                placeholder={"Description (Agent Smith is a travel agent who expertly guides users to the best travel destinations tailored to their preferences.) ..min 25 words"}
-                value={addAgentDescription}
-                onChange={(e) => setAddAgentDescription(e.target.value)}
-                sx={{
-                  '&::before': {
-                    outline: '0.5px solid var(--Textarea-focusedHighlight)',
-                  },
-                  mt: 0.5,
-                  minWidth : addModalWidthSx,
-                  background: theme.vars.palette.background.level2,
-                  fontSize: '16px',
-                  lineHeight: 1.75,
-                }} >
-
-                        
-
-              </Textarea>
-
-              <Textarea variant='outlined' color={'neutral'}
-                autoFocus
-                minRows={3} maxRows={10}
-                placeholder={"System Prompt (Hello traveler! I'm Agent Smith, your virtual travel assistant. Share your travel desires, and I'll craft the ideal journey for you. Where do you wish to explore next?) ..min 25 words"}
-                value={addAgentPrompt}
-                onChange={(e) => setAddAgentPrompt(e.target.value)}
-                sx={{
-                  '&::before': {
-                    outline: '0.5px solid var(--Textarea-focusedHighlight)',
-                  },
-                  mt: 0.5,
-                  minWidth : addModalWidthSx,
-                  background: theme.vars.palette.background.level2,
-                  fontSize: '16px',
-                  lineHeight: 1.75,
-                }} >
-
-                        
-
-              </Textarea>
-
-              <Typography level='body2' color='neutral' sx={{
-                       
-                      }} >
-                      Starter Prompts
-                  </Typography>
-
-              <Textarea variant='outlined' color={'neutral'}
-                autoFocus
-                minRows={1} maxRows={10}
-                placeholder={"(Agent Smith, what are the top trending destinations this year?) ..min 10 words" }
-                value={addAgentStarterPrompt1}
-                onChange={(e) => setAddAgentStarterPrompt1(e.target.value)}
-                sx={{
-                  '&::before': {
-                    outline: '0.5px solid var(--Textarea-focusedHighlight)',
-                  },
-                  mt: 0.1,
-                  minWidth : addModalWidthSx,
-                  background: theme.vars.palette.background.level2,
-                  fontSize: '16px',
-                  lineHeight: 1.75,
-                }} >
-
-                        
-
-              </Textarea>
-              <Textarea variant='outlined' color={'neutral'}
-                autoFocus
-                minRows={1} maxRows={10}
-                placeholder={"(Can you recommend a relaxing beach destination for a week-long vacation?) ..min 10 words"}
-                value={addAgentStarterPrompt2}
-                onChange={(e) => setAddAgentStarterPrompt2(e.target.value)}
-                sx={{
-                  '&::before': {
-                    outline: '0.5px solid var(--Textarea-focusedHighlight)',
-                  },
-                
-                  minWidth : addModalWidthSx,
-                  background: theme.vars.palette.background.level2,
-                  fontSize: '16px',
-                  lineHeight: 1.75,
-                }} >
-
-                        
-
-              </Textarea>
-              <Textarea variant='outlined' color={'neutral'}
-                autoFocus
-                minRows={1} maxRows={10}
-                placeholder={"(I'm interested in historical sites; where should I consider traveling next?) ..min 10 words"}
-                value={addAgentStarterPrompt3}
-                onChange={(e) => setAddAgentStarterPrompt3(e.target.value)}
-                sx={{
-                  '&::before': {
-                    outline: '0.5px solid var(--Textarea-focusedHighlight)',
-                  },
-                
-                  minWidth : addModalWidthSx,
-                  background: theme.vars.palette.background.level2,
-                  fontSize: '16px',
-                  lineHeight: 1.75,
-                }} >
-                </Textarea>
-                <Textarea variant='outlined' color={'neutral'}
-                        autoFocus
-                        minRows={1} maxRows={10}
-                        placeholder={"Input lightning address for 10% commission split. ..john@getalby.com"}
-                        value={addAgentCommissionAddress}
-                        onChange={(e) => setaddAgentCommissionAddress(e.target.value)}
-                        sx={{
-                          '&::before': {
-                            outline: '0.5px solid var(--Textarea-focusedHighlight)',
-                          },
-                        
-                          minWidth : addModalWidthSx,
-                          background: theme.vars.palette.background.level2,
-                          fontSize: '16px',
-                          lineHeight: 1.75,
-                        }} >
-                  </Textarea>
-                        
-
-           
-
-              {errorAlert && < Typography level='body2' color='danger' sx={{
-                       
-                      }} >
-                      Description and System prompt should have minimum 25 words. Starter prompts should have 10 words each. Please complete all inputs. 
-              </Typography>}
-
-              <Button onClick={handleCreateAgent} sx={{position: 'center'}} variant="outlined"  color='neutral' >  Create Agent</Button>
-
-              <Typography level='body2' color='neutral' sx={{
-                       
-                      }} >
-                      * All fields are mandatory
-              </Typography>
-
-             
-    
-    
-    </DetailModal>:''}
+    {addModal && <Addmodal agentId={''} open={addModal} onClose={onCloseAddModal}  ></Addmodal>}
    
 
     <Stack direction='column' sx={{ minHeight: '60vh', justifyContent: 'center', alignItems: 'center' }}>
@@ -703,14 +384,4 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
     </Stack>
 
   </>;
-}
-
-
-function countWordsInString(content: string): number {
-  // Read the file content
-
-  // Split content by spaces and filter out non-words
-  const words = content.split(/\s+/).filter(word => /\S/.test(word));
-
-  return words.length;
 }

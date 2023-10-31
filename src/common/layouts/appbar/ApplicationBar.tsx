@@ -99,7 +99,7 @@ export function ApplicationBar(props: { sx?: SxProps }) {
       <Box sx={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', my: 'auto' }}>
             
             {centerItems}
-            <Typography level='body1' color='primary' sx={{
+            <Typography level='body-sm' color='primary' sx={{
                             flexDirection: 'row', flexWrap: 'wrap'
                             }} >
                             Join our community on 

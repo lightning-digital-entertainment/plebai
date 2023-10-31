@@ -86,7 +86,7 @@ export function ChatMessageSelectable(props: { message: DMessage, isBottom: bool
         {avatarEl}
       </Box>
 
-      <Typography level='body2' sx={{ minWidth: 64 }}>
+      <Typography level='body-sm' sx={{ minWidth: 64 }}>
         {messageRole}
       </Typography>
 
@@ -94,7 +94,7 @@ export function ChatMessageSelectable(props: { message: DMessage, isBottom: bool
         <TokenBadge directTokens={messageTokenCount} tokenLimit={props.remainingTokens} inline />
       </Box>
 
-      <Typography level='body1' sx={{ flexGrow: 1, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+      <Typography level='body-lg' sx={{ flexGrow: 1, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
         {messageText}
       </Typography>
 

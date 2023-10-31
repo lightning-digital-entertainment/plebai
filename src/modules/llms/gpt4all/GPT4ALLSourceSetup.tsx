@@ -43,7 +43,7 @@ export function GPT4ALLAISourceSetup(props: { sourceId: DModelSourceId }) {
 
     <FormInputKey
       required noKey
-      label='Server URL' rightLabel={<Link level='body2' href='https://github.com/go-skynet/LocalAI' target='_blank'>Learn more</Link>}
+      label='Server URL' rightLabel={<Link level='body-sm' href='https://github.com/go-skynet/LocalAI' target='_blank'>Learn more</Link>}
       placeholder='e.g., http://107.21.5.87:8222'
       value={hostUrl} onChange={value => updateSetup({ hostUrl: value })}
     />

@@ -327,7 +327,7 @@ export function ChatMessage(props: { message: DMessage, isBottom: boolean, onMes
 
         {fromAssistant && (
           <Tooltip title={messageOriginLLM || 'unk-model'} variant='solid'>
-            <Typography level='body2' sx={{
+            <Typography level='body-sm' sx={{
               fontSize: { xs: 'xs', sm: 'sm' }, fontWeight: 500,
               ...(messageTyping ? { animation: `${cssRainbowColorKeyframes} 5s linear infinite` } : {}),
             }}>
@@ -345,7 +345,7 @@ export function ChatMessage(props: { message: DMessage, isBottom: boolean, onMes
         <Box sx={{ ...cssBlock, flexGrow: 0 }} onDoubleClick={handleMenuEdit}>
 
           {fromSystem && wasEdited && (
-            <Typography level='body2' color='warning' sx={{ mt: 1, mx: 1.5 }}>modified by user - auto-update disabled</Typography>
+            <Typography level='body-sm' color='warning' sx={{ mt: 1, mx: 1.5 }}>modified by user - auto-update disabled</Typography>
           )}
 
           {!errorMessage && parseBlocks(fromSystem, collapsedText).map((block, index) =>
@@ -377,7 +377,7 @@ export function ChatMessage(props: { message: DMessage, isBottom: boolean, onMes
                   <Box  sx={{
                     display: 'flex', mt: 4, mb:2, mx: 1, alignItems: 'right', justifyContent: 'flex-end', flexDirection: 'row'
                   }} >
-                        <Typography level='body1' color='neutral'  sx={{mt: 1, mx: 0.5 }}>
+                        <Typography level='body-sm' color='neutral'  sx={{mt: 1, mx: 0.5 }}>
                         Do you like the response? 
                         </Typography>
                         <IconButton variant='plain' color='neutral'  onClick={toggleThumbsUp} sx={{}}>

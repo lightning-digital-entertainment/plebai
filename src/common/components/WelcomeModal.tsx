@@ -30,13 +30,13 @@ export function WelcomeModal(props: { title: string | React.JSX.Element, open: b
           {props.children}
 
           <Box sx={{ mb: -1, display: 'flex', flexDirection: 'column', alignItems: 'left', justifyContent: 'space-between' }}>
-              <Typography level='body1' color='neutral' sx={{mb: 2}} ><CheckCircleRoundedIcon />  {' No Email or Signups Required'} </Typography>
-              <Typography level='body1' color='neutral' sx={{mb: 2}} ><CheckCircleRoundedIcon sx={{ }}  />  {' Only use Open source LLMs'}</Typography>
-              <Typography level='body1' color='neutral' sx={{mb: 2}} ><CheckCircleRoundedIcon sx={{ }}  />  {' No Ads or trackers'}</Typography>
-              <Typography level='body1' color='neutral' sx={{mb: 2}} ><CheckCircleRoundedIcon sx={{ }}  />  {' Chat history stored on the browser'}</Typography>
-              <Typography level='body1' color='neutral' sx={{mb: 2}} ><CheckCircleRoundedIcon sx={{ }}  />  {' Free to try any agent'}</Typography>
-              <Typography level='body1' color='neutral' sx={{mb: 2}} ><CheckCircleRoundedIcon sx={{ }}  />  {' Pay with SATS using Alby Wallet'}</Typography>
-              <Typography level='body1' color='neutral' sx={{mb: 2}} ><CheckCircleRoundedIcon sx={{ }}  />  {" No T&C to accept.But don't spam "}</Typography>
+              <Typography level='body-lg' color='neutral' sx={{mb: 2}} ><CheckCircleRoundedIcon />  {' No Email or Signups Required'} </Typography>
+              <Typography level='body-lg' color='neutral' sx={{mb: 2}} ><CheckCircleRoundedIcon sx={{ }}  />  {' Only use Open source LLMs'}</Typography>
+              <Typography level='body-lg' color='neutral' sx={{mb: 2}} ><CheckCircleRoundedIcon sx={{ }}  />  {' No Ads or trackers'}</Typography>
+              <Typography level='body-lg' color='neutral' sx={{mb: 2}} ><CheckCircleRoundedIcon sx={{ }}  />  {' Chat history stored on the browser'}</Typography>
+              <Typography level='body-lg' color='neutral' sx={{mb: 2}} ><CheckCircleRoundedIcon sx={{ }}  />  {' Free to try any agent'}</Typography>
+              <Typography level='body-lg' color='neutral' sx={{mb: 2}} ><CheckCircleRoundedIcon sx={{ }}  />  {' Pay with SATS using Alby Wallet'}</Typography>
+              <Typography level='body-lg' color='neutral' sx={{mb: 2}} ><CheckCircleRoundedIcon sx={{ }}  />  {" No T&C to accept.But don't spam "}</Typography>
            </Box>
         
 

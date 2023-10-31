@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { shallow } from 'zustand/shallow';
 
-import { Avatar, Box, Button, Option, Checkbox, Divider, Grid, IconButton, Input, Select, Stack, Switch, Textarea, Typography, useTheme, Alert, CircularProgress, Badge, Link } from '@mui/joy';
+import { Avatar, Box, Button, Option, Checkbox, Divider, Grid, IconButton, Input, Select, Stack, Switch, Textarea, Typography, useTheme, Alert, CircularProgress, Badge, Link, ListItem } from '@mui/joy';
 import ClearIcon from '@mui/icons-material/Clear';
 import ForumIcon from '@mui/icons-material/Forum';
 import StarRateIcon from '@mui/icons-material/StarRate';
@@ -23,18 +23,28 @@ import { useCallback } from 'react';
 import { useComposerStore } from '../composer/store-composer';
 import { SamplePrompts } from './SamplePrompts';
 import { Addmodal } from './AddModal';
+import { CardMedia } from '@mui/material';
+import Menu from '@mui/joy/Menu';
+import MenuButton from '@mui/joy/MenuButton';
+import MenuItem from '@mui/joy/MenuItem';
+import Dropdown from '@mui/joy/Dropdown';
+import EditIcon from '@mui/icons-material/Edit';
+
+
 
 // Constants for tile sizes / grid width - breakpoints need to be computed here to work around
 // the "flex box cannot shrink over wrapped content" issue
 //
 // Absolutely dislike this workaround, but it's the only way I found to make it work
 
-const bpTileSize = { xs: 128, md: 180, xl: 180 };
+const bpTileSize = { xs: 96, md: 160, xl: 160 };
 const tileCols = [3, 5, 6];
 const tileSpacing = 2;
 const tileSx = { xs: 42, md: 96, xl: 96 };
 const detailAvatarSx = { xs: 62, md: 122, xl: 130 };
 const searchWidthSx = { xs: 220, md: 422, xl: 630 };
+const tileHSx = { xs: 42, md: 126, xl: 156 };
+const tileWSx =  { xs: 42, md: 126, xl: 156 };
 
 const bpMaxWidth = Object.entries(bpTileSize).reduce((acc, [key, value], index) => {
   acc[key] = tileCols[index] * (value + 8 * tileSpacing) - 8 * tileSpacing;
@@ -64,6 +74,8 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   const [samplePromptModal, setsamplePromptModal] = React.useState(false);
   const [addModal, setaddModal] = React.useState(false);
   const [updateRefresh, setUpdaterefresh] = React.useState(true);
+  const [showCreateSelect, setShowCreateSelect] = React.useState(false);
+  const [agentId, setAgentId] = React.useState<string>('new');
   
   const {  startupText, setStartupText } = useComposerStore();
 
@@ -202,13 +214,32 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
     
   } 
 
+  const handleEditButton = (agentId: string) => {
+
+        setAgentId(agentId);
+        setaddModal(true);
+
+
+  }
+
   const onCloseAddModal = () => {
     setUpdaterefresh(true);
     do {} while (agentUpdate != 0);
   
     setaddModal(false);
+    setAgentId('new');
     
   }
+
+  const createSelect = () => {
+    return ["Create Text Agent", "Create Image Agent"];
+  };
+
+  const createSelection = (city: string): void => {
+    console.log(city);
+  };
+
+
   const handleCustomSystemMessageChange = (v: React.ChangeEvent<HTMLTextAreaElement>): void => {
     // TODO: persist this change? Right now it's reset every time.
     //       maybe we shall have a "save" button just save on a state to persist between sessions
@@ -223,6 +254,9 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
     return input;
   }
 
+  const toggleDropDown = () => {
+    setShowCreateSelect(!showCreateSelect);
+  };
 
   // we show them all if the filter is clear (null)
   const unfilteredPurposeIDs = (filteredIDs && showPurposeFinder) ? filteredIDs : Object.keys(SystemPurposes);
@@ -236,16 +270,23 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
     {Object.keys(SystemPurposes).length<2? <WelcomeModal title={<>Welcome to  <b>PlebAI</b> <br></br></>} open={true} onClose={onStartupModalClose} ><Divider /></WelcomeModal>:''}
     {detailModal? <DetailModal title='' open={detailModal} onClose={onDetailClose}>
       
-    
-    
-       <Avatar  alt=""
+      <Avatar  alt=""
                         src={SystemPurposes[systemPurposeId as SystemPurposeId]?.symbol} 
                         sx={{ width: detailAvatarSx, height: detailAvatarSx, mt: 1, }}/>
+      <Box sx={{
+               display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1, justifyContent: 'center',
+            }}>
+        <Typography level='body-lg' color='neutral' sx={{
+              mt: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, justifyContent: 'center',
+            }} ></Typography>
+        {selectedPurpose? <div style={{ fontSize: '1.5rem' }}>   {selectedPurpose.title}  </div> : ''}
 
-      <Typography level='body1' color='neutral' sx={{
+       {SystemPurposes[systemPurposeId as SystemPurposeId]?.createdBy===appFingerPrint && <Button sx={{mt: 0}} onClick={() => handleEditButton(systemPurposeId)} variant="soft"  color='neutral'> <EditIcon/> </Button>}                 
+      </Box>
+      <Typography level='body-lg' color='neutral' sx={{
               mt: 0, ml:10, mr:10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, justifyContent: 'center',
             }} >
-        {selectedPurpose? <div style={{ fontSize: '1.5rem' }}>   {selectedPurpose.title}  </div> : ''}
+       
         {selectedPurpose? <div style={{ fontSize: '1rem' }}>  Price: {selectedPurpose.paid?selectedPurpose.satsPay + ' SATS':  selectedPurpose.convoCount + ' conversations are FREE. Then ' + selectedPurpose.satsPay +  ' SATS' } </div> : ''}
         {selectedPurpose? <Link href={'https://plebai.com/nostr/' + selectedPurpose.nip05} > {'Nostr profile: ' + selectedPurpose.nip05}  </Link> : ''}
         {selectedPurpose? <div style={{ fontSize: '1rem' }}>  {selectedPurpose.placeHolder}   </div> : ''}
@@ -261,7 +302,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
 
     {samplePromptModal && <SamplePrompts agentId={systemPurposeId} open={samplePromptModal} onClose={onClosePromptView} total={selectedPurpose?.chatruns?selectedPurpose?.chatruns:0} genImage={selectedPurpose?.paid?selectedPurpose?.paid:false} />}
    
-    {addModal && <Addmodal agentId={''} open={addModal} onClose={onCloseAddModal}  ></Addmodal>}
+    {addModal && <Addmodal agentId={agentId} open={addModal} onClose={onCloseAddModal}  ></Addmodal>}
    
 
     <Stack direction='column' sx={{ minHeight: '60vh', justifyContent: 'center', alignItems: 'center' }}>
@@ -302,13 +343,46 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
       <Box sx={{ maxWidth: bpMaxWidth }}>
 
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 2, mb: 1, mt:4 }}>
-           <Button onClick={onAddOpen} sx={{position: 'left'}} variant="outlined"  color='neutral' > <AddIcon/> Create Agent</Button>
+           
+
+           <Dropdown>
+            <MenuButton>
+            <AddIcon/> Create Agent
+            </MenuButton>
+            <Menu>
+              <MenuItem onClick={onAddOpen}>
+                Text AI agent
+              </MenuItem>
+              <MenuItem>
+                Image AI agent
+              </MenuItem>
+            
+            </Menu>
+          </Dropdown>
+
 
           <Button variant="outlined" color='neutral' size='sm' onClick={toggleEditMode}>
             {editMode ? 'Done' : 'Edit'}
           </Button>
           
         </Box>
+
+       
+        {showCreateSelect && (
+                  <ListItem
+                  variant='solid' color='neutral'
+                  sx={{
+                    mb: -1, // absorb the bottom margin of the list
+                    mt: 1,
+                    
+                    background: theme.palette.neutral.solidActiveBg,
+                    display: 'flex', flexDirection: 'column', gap: 1,
+                    justifyContent: 'left',alignItems: 'left'
+                  }}>
+                   <Button onClick={toggleDropDown} sx={{position: 'left'}} variant="outlined"  color='neutral' > <AddIcon/> Create Text Agent</Button>
+                   <Button onClick={toggleDropDown} sx={{position: 'left'}} variant="outlined"  color='neutral' > <AddIcon/> Create Image Agent</Button>
+                </ListItem>
+              )}
         
         <Grid container spacing={tileSpacing} rowSpacing={2} sx={{ justifyContent: 'center' }}>
           {SystemPurposes && purposeIDs.map((spId) => (
@@ -316,7 +390,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
               
               <Button
                 variant={(!editMode && systemPurposeId === spId) ? 'solid' : 'soft'}
-                color={(!editMode && systemPurposeId === spId) ? 'info' : SystemPurposes[spId as SystemPurposeId]?.highlighted ? 'warning' : 'neutral'}
+                color={(!editMode && systemPurposeId === spId) ? 'primary' : SystemPurposes[spId as SystemPurposeId]?.highlighted ? 'warning' : 'neutral'}
                 onClick={() => !editMode && handlePurposeChanged(spId as SystemPurposeId)}
                 sx={{
                   flexDirection: 'column',
@@ -332,20 +406,38 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
               >
                 {editMode && (
                   <Checkbox
-                    label={<Typography level='body2'>show</Typography>}
+                    label={<Typography level='body-sm'>show</Typography>}
                     checked={!hiddenPurposeIDs.includes(spId)} onChange={() => toggleHiddenPurposeId(spId)}
                     sx={{ alignSelf: 'flex-start', mb:-3 }}
                   />
                 )}
-                   <Badge  invisible = {SystemPurposes[spId as SystemPurposeId].newAgent === 'false'} badgeContent={'New'} color="primary">
-                         <Avatar  alt=""
-                        src={SystemPurposes[spId as SystemPurposeId]?.symbol} 
-                        sx={{ width: tileSx, height: tileSx,  }}/>
-                    </Badge>
+                  <Badge  invisible = {SystemPurposes[spId as SystemPurposeId].newAgent === 'false'} badgeContent={'New'} color="primary">
+                        <Typography level='body-sm' color='neutral' sx={{
+                              mt: 1,
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            '&:hover > button': { opacity: 1 },
+                            }} > 
+                            {SystemPurposes[spId as SystemPurposeId]?.title} 
+                            
+                            </Typography>
+                      </Badge>
+                   
+                   <CardMedia alt=""
+                              
+                              component="img"
+                              height="128"
+                              src={SystemPurposes[spId as SystemPurposeId]?.symbol} 
+                              sx={{ mt: -2, width: tileSx, height: tileSx  }}/>
+                         
+                         
+                   
+
+                    
               
-                  {SystemPurposes[spId as SystemPurposeId]?.title} 
+                  
                 
-                  <Typography level='body3' color='neutral' sx={{
+                  <Typography level='body-xs' color='neutral' sx={{
                         mt: -2,
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -367,7 +459,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
 
       
 
-        <Typography level='body2' color='neutral' sx={{
+        <Typography level='body-sm' color='neutral' sx={{
               mt: 2,
                alignItems: 'left', gap: 1,
               justifyContent: 'left',

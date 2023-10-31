@@ -65,7 +65,7 @@ export function ConversationItems(props: {
   return <>
 
     {/*<ListItem>*/}
-    {/*  <Typography level='body2'>*/}
+    {/*  <Typography level='body-sm'>*/}
     {/*    Active chats*/}
     {/*  </Typography>*/}
     {/*</ListItem>*/}
@@ -105,7 +105,7 @@ export function ConversationItems(props: {
     </MenuItem>
 
     {/*<ListItem>*/}
-    {/*  <Typography level='body2'>*/}
+    {/*  <Typography level='body-sm'>*/}
     {/*    Scratchpad*/}
     {/*  </Typography>*/}
     {/*</ListItem>*/}

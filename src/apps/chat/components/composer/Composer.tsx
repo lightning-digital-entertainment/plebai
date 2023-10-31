@@ -83,7 +83,9 @@ export let SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
     chatruns: 55,
     newAgent: "false",
     nip05:'',
-    category:''
+    category:'',
+    createdBy:'',
+    commissionAddress:''
   },
 
 };
@@ -723,7 +725,7 @@ export function Composer(props: {
             {assistantTyping
                 ? (
                   <Button
-                    variant='soft' color={isReAct ? 'info' : 'neutral'} disabled={!props.conversationId}
+                    variant='soft' color={isReAct ? 'primary' : 'neutral'} disabled={!props.conversationId}
                     onClick={handleStopClicked}
                     endDecorator={<StopOutlinedIcon />}
                     sx={{ position: 'absolute', top: 0, right: 0, margin: 1, mb: 0.5 }}
@@ -732,7 +734,7 @@ export function Composer(props: {
                   </Button>
                 ) : (
                   <Button
-                    variant='plain' color={isReAct ? 'info' : 'neutral'} disabled={!props.conversationId || !chatLLM}
+                    variant='plain' color={isReAct ? 'primary' : 'neutral'} disabled={!props.conversationId || !chatLLM}
                     onClick={handleSendClicked}  
                     endDecorator={isReAct ? <PsychologyIcon /> : <SendIcon />}
                     sx={{ position: 'absolute', top: 0, right: 0, margin: 1 }}
@@ -759,7 +761,7 @@ export function Composer(props: {
               onDragOver={handleOverlayDragOver}
               onDrop={handleOverlayDrop}>
               <PanToolIcon sx={{ width: 40, height: 40, pointerEvents: 'none' }} />
-              <Typography level='body2' sx={{ pointerEvents: 'none' }}>
+              <Typography level='body-sm' sx={{ pointerEvents: 'none' }}>
                 I will hold on to this for you
               </Typography>
             </Card>

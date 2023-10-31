@@ -154,7 +154,7 @@ return (
 
                 <Box sx={{ mb: -1, display: 'flex', flexDirection: 'row', justifyContent: 'space-between',  gap: 2, mt:4 }}>
                             <Button disabled={offsetCount<=12}  onClick={handlePrevious} sx={{ mr: -1}} variant="soft"  color='primary'> {'<'} </Button>
-                            <Typography level='body2' color='neutral' sx={{
+                            <Typography level='body-sm' color='neutral' sx={{
                                             mt: 2,
                                             alignItems: 'left', gap: 1,
                                             justifyContent: 'left',

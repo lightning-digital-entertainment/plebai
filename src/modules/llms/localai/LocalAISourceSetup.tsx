@@ -44,7 +44,7 @@ export function LocalAISourceSetup(props: { sourceId: DModelSourceId }) {
 
     <FormInputKey
       required noKey
-      label='Server URL' rightLabel={<Link level='body2' href='https://github.com/go-skynet/LocalAI' target='_blank'>Learn more</Link>}
+      label='Server URL' rightLabel={<Link level='body-sm' href='https://github.com/go-skynet/LocalAI' target='_blank'>Learn more</Link>}
       placeholder='e.g., http://127.0.0.1:8080'
       value={hostUrl} onChange={value => updateSetup({ hostUrl: value })}
     />

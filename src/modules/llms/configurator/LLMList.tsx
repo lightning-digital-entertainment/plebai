@@ -30,7 +30,7 @@ export function LLMList() {
     const groupLabel = llm._source.label;
     if (!singleOrigin && groupLabel !== lastGroupLabel) {
       lastGroupLabel = groupLabel;
-      items.push(<Typography key={'lab-' + labelsCount++} level='body2' sx={{ my: 1 }}>{groupLabel}</Typography>);
+      items.push(<Typography key={'lab-' + labelsCount++} level='body-sm' sx={{ my: 1 }}>{groupLabel}</Typography>);
     }
 
     // for safety, ensure the vendor exists

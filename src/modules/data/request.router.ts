@@ -52,6 +52,8 @@ export const requestOutputSchema = z.object({
     newAgent: string;
     nip05:string;
     category:string;
+    createdBy:string;
+    commissionAddress:string;
   }
 
   export type requestInputSchema = z.infer<typeof requestInputSchema>;  

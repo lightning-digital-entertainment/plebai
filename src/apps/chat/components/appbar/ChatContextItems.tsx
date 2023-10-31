@@ -58,7 +58,7 @@ export function ChatContextItems(props: {
   return <>
 
     <ListItem sticky>
-      <Typography level='body2'>
+      <Typography level='body-sm'>
         Conversation
       </Typography>
     </ListItem>

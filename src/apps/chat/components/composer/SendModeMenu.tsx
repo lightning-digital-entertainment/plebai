@@ -39,7 +39,7 @@ export const SendModeMenu = (props: { anchorEl: HTMLAnchorElement, sendMode: Sen
           <Radio checked={key === props.sendMode} />
           <Box>
             <Typography>{data.label}</Typography>
-            <Typography level='body2'>{data.description}</Typography>
+            <Typography level='body-sm'>{data.description}</Typography>
           </Box>
         </Box>
       </MenuItem>)}

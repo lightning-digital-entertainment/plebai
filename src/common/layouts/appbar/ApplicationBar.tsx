@@ -102,7 +102,7 @@ export function ApplicationBar(props: { sx?: SxProps }) {
             <Typography level='body-sm' color='primary' sx={{
                             flexDirection: 'row', flexWrap: 'wrap'
                             }} >
-                            Join our community on 
+                            Create your own AI agent and get paid. To find out more, join our 
                             <Link color='primary' sx={{ml:1}} href='https://discord.gg/DfSZpqUKYG'> Discord <DiscordIcon sx={{ ml: 1, color: '' }} /> </Link> 
             </Typography>
          

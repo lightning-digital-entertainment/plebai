@@ -26,7 +26,7 @@ export const RenderQuestions = (props: { messageId: string, questionBlock: Quest
         {splitString[0]}
       </Typography>  
 
-      < Typography level='body-lg' color='neutral' sx={{
+      < Typography level='body-sm' color='neutral' sx={{
             mt: 2, 
           }} >
             { <> Choose suggested questions to continue. </> }

@@ -6,10 +6,16 @@ import { theme } from "~/common/theme"
 import { useDropzone } from "react-dropzone";
 import Image from "next/image";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import Link from "next/link";
 
 type Image = {
     imageFile: Blob;
 }; 
+
+type Model = {
+    model_name: string;
+    model_type: string;
+};
 
 
 const detailAvatarSx = { xs: 62, md: 122, xl: 130 };
@@ -17,7 +23,9 @@ const addModalWidthSx = { xs: 220, md: 422, xl: 630 };
 
 const usernameRegex = /^[a-zA-Z0-9 ]{4,32}$/;
 
-export function Addmodal(props: { agentId: string, open: boolean,  onClose: () => void }) {
+
+
+export function AddImagemodal(props: { agentId: string, open: boolean,  onClose: () => void }) {
 
     const [addImageUrl, setAddImageUrl] =React.useState('');
     const [imageProgress, setImageProgress] = React.useState(false);
@@ -25,9 +33,17 @@ export function Addmodal(props: { agentId: string, open: boolean,  onClose: () =
     const [checked, setChecked] = React.useState<boolean>(false);
     const [addAgentDescription, setAddAgentDescription] =React.useState('');
     const [addAgentPrompt, setAddAgentPrompt] =React.useState('');
+    const [addImageHeight, setAddImageheight] = React.useState(1024);
+    const [addImageWidth, setAddImageWidth] = React.useState(1024);
+    const [addImageSize, setAddImageSize] = React.useState('Square');
+    const [addModelId, setAddModelId] = React.useState('epiCPhotoGasm');
+    const [addLora, setAddLora] = React.useState('');
+    const [addModels, setAddModels] = React.useState<Model[]>([]);
+    const [addLoraStrength, setAddLoraStrength] = React.useState('0.5');
+
     const [addCategory, setAddCatagory] = React.useState('Assistant');
-    const [addPrice, setAddPrice] = React.useState(50);
-    const [addConvoCount, setAddConvoCount] = React.useState(3);
+    const [addPrice, setAddPrice] = React.useState<string>('50');
+   
     const [addllmRouter, setAddLlmRouter] = React.useState('meta-llama/llama-2-13b-chat');
 
     const [addAgentCommissionAddress, setaddAgentCommissionAddress] =React.useState('');
@@ -49,22 +65,46 @@ export function Addmodal(props: { agentId: string, open: boolean,  onClose: () =
         setAddAgentName(agentData.title)
         setChecked(agentData.private?false:true)
         setAddAgentDescription(agentData.placeHolder)
-        setAddAgentPrompt(agentData.systemMessage)
         setAddCatagory(agentData.category)
-        setAddPrice(agentData.satsPay)
-        setAddConvoCount(agentData.convoCount)
+        setAddPrice(agentData.satsPay+'')
         setAddLlmRouter(agentData.llmRouter)
         setaddAgentCommissionAddress(agentData.commissionAddress)
+        if (parseInt(agentData.image_height) === parseInt(agentData.iamge_width)) setAddImageSize('Square')
+        if (parseInt(agentData.image_height) > parseInt(agentData.image_width)) setAddImageSize('Portrait')
+        if (parseInt(agentData.image_height) < parseInt(agentData.image_width)) setAddImageSize('Landscape')
+        if (agentData.lora) {
+            const { value, strength } = parseLoraString(agentData.lora);
+            console.log(value,strength);
+            setAddLora(value?value:'');
+            setAddLoraStrength(strength?strength+'':'0.5');
+        }
+        setAddModelId(agentData.modelid);
+
 
     }, [props.agentId]);
 
+   
+    const loadModels = React.useCallback(async () => {
+
+        const response = await fetch('/api/data/getmodels', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: props.agentId})
+        });
+    
+        const jsonData = await response.json();
+        setAddModels(jsonData.getModelData);
+    
+    }, [props.agentId]);
     
 
     React.useEffect(() => {
         console.log(props.agentId);
         if (props.agentId && props.agentId !== 'new') loadAgentData();
+        
+        loadModels();
 
-    },[loadAgentData, props.agentId])
+    },[loadAgentData, loadModels, props.agentId])
 
     const uploadImage = async ({ imageFile }: Image) => {
         console.log(imageFile)
@@ -129,36 +169,49 @@ export function Addmodal(props: { agentId: string, open: boolean,  onClose: () =
         onDrop,
       });
 
-      const handleCategory = (
-        
+      
+      const handlePrice = (
+        event: React.SyntheticEvent | null,
+        newValue: string| null,
+      ) => {
+        setAddPrice(newValue?newValue:'50');
+        console.log(`You chose "${newValue}"`);
+      };
+
+      const handleModelIdChange = (
+        event: React.SyntheticEvent | null,
+        newValue: string| null,
+      ) => {
+        setAddModelId(newValue?newValue:'');
+        console.log(`You chose "${newValue}"`);
+      };
+
+      const handleLoraChange = (
+        event: React.SyntheticEvent | null,
+        newValue: string| null,
+      ) => {
+        setAddLora(newValue?newValue:'');
+        console.log(`You chose "${newValue}"`);
+      };
+
+      const handleLoraStrength = (
+        event: React.SyntheticEvent | null,
+        newValue: string| null,
+      ) => {
+        setAddLoraStrength(newValue?newValue:'');
+        console.log(`You chose "${newValue}"`);
+      };
+
+      const handleSize = (
         event: React.SyntheticEvent | null,
         newValue: string | null,
       ) => {
-        setAddCatagory(newValue?newValue:'');
-        console.log(`You chose "${newValue}"`);
-        if (newValue ==='Role Play')setAddLlmRouter('undi95/remm-slerp-l2-13b');
-        if (newValue ==='Technical')setAddLlmRouter('meta-llama/codellama-34b-instruct');
-        if (newValue ==='Assistant')setAddLlmRouter('meta-llama/llama-2-13b-chat');
-
-        console.log(addCategory);
-        console.log('llmrouter: ', addllmRouter);
+        if (newValue === 'Portrait') {setAddImageheight(1024); setAddImageWidth(768)}
+        if (newValue === 'Landscape') {setAddImageheight(768); setAddImageWidth(1024)}
+        setAddImageSize(newValue?newValue:'');
       };
 
-      const handlePrice = (
-        event: React.SyntheticEvent | null,
-        newValue: number | null,
-      ) => {
-        setAddPrice(newValue?newValue:50);
-        console.log(`You chose "${newValue}"`);
-      };
-
-      const handleConvocount = (
-        event: React.SyntheticEvent | null,
-        newValue: number | null,
-      ) => {
-        setAddConvoCount(newValue?newValue:3);
-        console.log(`You chose "${newValue}"`);
-      };
+      
 
       const handleAddAgent = async (name: string) => {
 
@@ -192,32 +245,38 @@ export function Addmodal(props: { agentId: string, open: boolean,  onClose: () =
 
       }
 
-
       const handleCreateAgent = async () => {
 
-        const agentDetails = {
-          title: addAgentName,
-          description: addAgentDescription,
-          systemMessage: addAgentPrompt,
-          symbol: addImageUrl,         
-          placeHolder: addAgentDescription,
-          chatLLM: 'llama-2-7b-chat-hf',
-          private: checked?false:true,
-          status: 'active',
-          createdBy: appFingerPrint ,
-          updatedBy: appFingerPrint,
-          commissionAddress: addAgentCommissionAddress,
-          paid: false,
-          convoCount: addConvoCount,
-          satsPay: addPrice,
-          category: addCategory,
-          llmRouter:addllmRouter,
-          id:''
-
-        }
+        
 
         if (props.agentId !== 'new') {
-            agentDetails.id = props.agentId;
+
+            const agentDetails = {
+                title: addAgentName,
+                description: addAgentDescription,
+                systemmessage: addAgentPrompt,
+                symbol: addImageUrl,         
+                placeholder: addAgentDescription,
+                chatllm: 'llama-2-7b-chat-hf',
+                private: checked?false:true,
+                status: 'active',
+                updatedby: appFingerPrint,
+                commissionaddress: addAgentCommissionAddress,
+                paid: true,
+                convoCount: 0,
+                satsPay: parseInt(addPrice),
+                category: 'Image Generation',
+                llmRouter:addModelId,
+                genimage:true,
+                modelid: addModelId,
+                image_width: addImageWidth,
+                image_height: addImageHeight,
+                lora: (addLora?'<lora:'+addLora+':'+addLoraStrength+'>':' '),
+                id:props.agentId,
+                req_type:'randomseed'
+      
+            }
+          
 
             const result = await fetch('/api/data/agent-update', {
               method: 'POST',
@@ -232,20 +291,45 @@ export function Addmodal(props: { agentId: string, open: boolean,  onClose: () =
             setAddAgentName('');
             setChecked(false);
             setAddAgentDescription('');
-            setAddAgentPrompt('');
+            
 
           
         }
     
         else  {
 
-          if (addAgentName === '' || !addAgentName.match(usernameRegex) || addImageUrl.length < 2 || addAgentName.length < 5 || countWordsInString(addAgentDescription) < 25 || 
-                countWordsInString(addAgentPrompt) <25 || addCategory === '' )
+          if (addAgentName === '' || !addAgentName.match(usernameRegex) || addImageUrl.length < 2 || addAgentName.length < 5 || countWordsInString(addAgentDescription) < 25 )
                 {
                   setErrorAlert(true) 
           
                 } else {
                   setErrorAlert(false);
+
+                  const agentDetails = {
+                    title: addAgentName,
+                    description: addAgentDescription,
+                    systemMessage: addAgentPrompt,
+                    symbol: addImageUrl,         
+                    placeHolder: addAgentDescription,
+                    chatLLM: 'llama-2-7b-chat-hf',
+                    private: checked?false:true,
+                    status: 'active',
+                    createdBy: appFingerPrint ,
+                    updatedBy: appFingerPrint,
+                    commissionAddress: addAgentCommissionAddress,
+                    paid: true,
+                    convoCount: 0,
+                    satsPay: addPrice,
+                    llmRouter:addllmRouter,
+                    genimage:true,
+                    modelid: addModelId,
+                    category: 'Image Generation',
+                    image_width: addImageWidth,
+                    image_height: addImageHeight,
+                    lora: (addLora?'<lora:'+addLora+':'+addLoraStrength+'>':' '),
+                    reqType:'randomseed'
+          
+                  }
                 
                   console.log('creating agent...');
                   console.log(agentDetails);
@@ -270,7 +354,7 @@ export function Addmodal(props: { agentId: string, open: boolean,  onClose: () =
                     setAddAgentName('');
                     setChecked(false);
                     setAddAgentDescription('');
-                    setAddAgentPrompt('');
+                    
 
           
           
@@ -289,7 +373,7 @@ export function Addmodal(props: { agentId: string, open: boolean,  onClose: () =
     }  
 
     return (
-        <DetailModal title={'Create New Agent'} open={props.open} onClose={props.onClose}><Divider />
+        <DetailModal title={props.agentId==='new'?'Create New Agent':'Update Agent'} open={props.open} onClose={props.onClose}><Divider />
     
           <div className="dropzone">
                
@@ -326,19 +410,6 @@ export function Addmodal(props: { agentId: string, open: boolean,  onClose: () =
                 />
 
 
-                <Select indicator={<KeyboardArrowDownIcon />} value={addCategory} onChange={handleCategory}>
-                      <Option value="Assistant">
-                              Assistant
-                      </Option>
-                      <Option value="Role Play">
-                              Role Play
-                      </Option>
-                      <Option value="Technical">
-                              Technical
-                      </Option>
-
-                </Select>
-
               <Textarea variant='outlined' color={'neutral'}
                 autoFocus
                 minRows={1} maxRows={1}
@@ -366,7 +437,7 @@ export function Addmodal(props: { agentId: string, open: boolean,  onClose: () =
               <Textarea variant='outlined' color={'neutral'}
                 autoFocus
                 minRows={3} maxRows={10}
-                placeholder={"Description (Agent Smith is a travel agent who expertly guides users to the best travel destinations tailored to their preferences.) ..min 25 words"}
+                placeholder={"Description (Image generation to the next level with simple prompts such as superman, readhead woman, and get realistic images. Elevate image generation with simple prompts like superman, readhead woman, and more.) ..min 25 words"}
                 value={addAgentDescription}
                 onChange={(e) => setAddAgentDescription(e.target.value)}
                 sx={{
@@ -385,28 +456,24 @@ export function Addmodal(props: { agentId: string, open: boolean,  onClose: () =
               </Textarea>
 
               <Textarea variant='outlined' color={'neutral'}
-                autoFocus
-                minRows={3} maxRows={10}
-                placeholder={"System Prompt (Hello traveler! I'm Agent Smith, your virtual travel assistant. Share your travel desires, and I'll craft the ideal journey for you. Where do you wish to explore next?) ..min 25 words"}
-                value={addAgentPrompt}
-                onChange={(e) => setAddAgentPrompt(e.target.value)}
-                sx={{
-                  '&::before': {
-                    outline: '0.5px solid var(--Textarea-focusedHighlight)',
-                  },
-                  mt: 0.5,
-                  minWidth : addModalWidthSx,
-                  background: theme.vars.palette.background.level2,
-                  fontSize: '16px',
-                  lineHeight: 1.75,
-                }} >
-
+                        autoFocus
+                        minRows={1} maxRows={10}
+                        placeholder={"System Prompt: Optional data such as sunny and beach"}
+                        value={addAgentPrompt}
+                        onChange={(e) => setAddAgentPrompt(e.target.value)}
+                        sx={{
+                          '&::before': {
+                            outline: '0.5px solid var(--Textarea-focusedHighlight)',
+                          },
                         
+                          minWidth : addModalWidthSx,
+                          background: theme.vars.palette.background.level2,
+                          fontSize: '16px',
+                          lineHeight: 1.75,
+                        }} >
+                </Textarea>
 
-              </Textarea>
-
-             
-                <Textarea variant='outlined' color={'neutral'}
+              <Textarea variant='outlined' color={'neutral'}
                         autoFocus
                         minRows={1} maxRows={10}
                         placeholder={"Input lightning address for 10% commission split. ..john@getalby.com"}
@@ -423,6 +490,110 @@ export function Addmodal(props: { agentId: string, open: boolean,  onClose: () =
                           lineHeight: 1.75,
                         }} >
                 </Textarea>
+
+                <Box sx={{
+                    mb: -1, // absorb the bottom margin of the list
+                    mt: 1,
+                    
+                 
+                    display: 'flex', flexDirection: 'row', gap: 1,
+                    justifyContent: 'left',alignItems: 'left'
+                  }}>
+                <Typography sx={{
+                    mb: -1, // absorb the bottom margin of the list
+                    mt: 1,}}>
+
+                  Size: 
+                </Typography>
+
+                <Select value={addImageSize} onChange={handleSize}>
+                            <Option value="Square">
+                                    Square
+                            </Option>
+                            <Option value="Portrait">
+                                    Portrait
+                            </Option>
+                            <Option value="Landscape">
+                                    Landscape
+                            </Option>
+                </Select>
+                </Box>
+
+                <Box sx={{
+                    mb: -1, // absorb the bottom margin of the list
+                    mt: 1,
+                    
+                 
+                    display: 'flex', flexDirection: 'row', gap: 1,
+                    justifyContent: 'left',alignItems: 'left'
+                  }}>
+                <Typography sx={{
+                    mb: -1, // absorb the bottom margin of the list
+                    mt: 1,}}>
+
+                  Model: 
+                </Typography>
+                <Select placeholder="Pick a Model..." value={addModelId} onChange={handleModelIdChange} sx={{ minWidth: 140 }}>
+                    {addModels && addModels.map((model: Model) => (
+                       model.model_type==='Checkpoint' && <Option key={model.model_name} value={model.model_name}>
+                            {model.model_name}
+                        </Option>
+                    ))}
+                </Select>
+                   
+                </Box>
+
+                <Box sx={{
+                    mb: -1, // absorb the bottom margin of the list
+                    mt: 1,
+                    
+                 
+                    display: 'flex', flexDirection: 'row', gap: 1,
+                    justifyContent: 'left',alignItems: 'left'
+                  }}>
+                <Typography sx={{
+                    mb: -1, // absorb the bottom margin of the list
+                    mt: 1,}}>
+
+                  Lora: 
+                </Typography>
+
+                <Select placeholder="Pick a Lora..." value={addLora} onChange={handleLoraChange} sx={{ minWidth: 140 }}>
+                    {addModels && addModels.map((model: Model) => (
+                       model.model_type==='Lora' && <Option key={model.model_name} value={model.model_name}>
+                            {model.model_name}
+                        </Option>
+                    ))}
+                </Select>
+
+                <Typography sx={{
+                    mb: -1, // absorb the bottom margin of the list
+                    mt: 1,}}>
+
+                  Strength: 
+                </Typography>
+
+                <Select value={addLoraStrength} onChange={handleLoraStrength}>
+                            <Option value="0.5">
+                                    0.5
+                            </Option>
+                            <Option value="0.7">
+                                    0.6
+                            </Option>
+                            <Option value="0.7">
+                                    0.7
+                            </Option>
+                            <Option value="0.8">
+                                    0.8
+                            </Option>
+                            <Option value="1.0">
+                                   1.0
+                            </Option>
+                        </Select>
+
+
+                </Box>
+              
                         
 
               <Box sx={{
@@ -439,7 +610,7 @@ export function Addmodal(props: { agentId: string, open: boolean,  onClose: () =
 
                   Price: 
                 </Typography>
-              <Select placeholder="50" onChange={handlePrice}>
+              <Select value={addPrice} onChange={handlePrice}>
                       <Option value="50">
                               50
                       </Option>
@@ -457,29 +628,9 @@ export function Addmodal(props: { agentId: string, open: boolean,  onClose: () =
                     mb: -1, // absorb the bottom margin of the list
                     mt: 1,}}>
 
-                  SATS per
+                  SATS per Image
                 </Typography>   
 
-                <Select placeholder="3" onChange={handleConvocount}>
-                    <Option value="3">
-                             3
-                      </Option>
-                      <Option value="4">
-                             4
-                      </Option>
-                      <Option value="5">
-                              5
-                      </Option>
-                      <Option value="6">
-                              6
-                      </Option>
-                </Select>
-                <Typography sx={{
-                    mb: -1, // absorb the bottom margin of the list
-                    mt: 1,}}>
-
-                  Conversations
-                </Typography>   
 
               </Box>
 
@@ -489,12 +640,12 @@ export function Addmodal(props: { agentId: string, open: boolean,  onClose: () =
                       Agent Name should be unique without special characters. Description and System prompt should have minimum 25 words. Please complete all inputs. 
               </Typography>}
 
-              <Button onClick={handleCreateAgent} sx={{position: 'center'}} variant="outlined"  color='neutral' > {props.agentId?'Update': 'Create Agent'} </Button>
+              <Button onClick={handleCreateAgent} sx={{position: 'center'}} variant="solid"  color='neutral' > {props.agentId==='new'? 'Create Agent':'Update'} </Button>
 
               <Typography level='body-sm' color='neutral' sx={{
                        
                       }} >
-                      * All fields are mandatory
+                      For more info on Models & Lora, please go to <Link href={"https://civitai.com"}> Civitai.com </Link>
               </Typography>
 
              
@@ -515,4 +666,26 @@ function countWordsInString(content: string): number {
     const words = content.split(/\s+/).filter(word => /\S/.test(word));
   
     return words.length;
+  }
+
+  interface LoraData {
+    value: string | null;
+    strength: number | null;
+  }
+  
+  function parseLoraString(input: string): LoraData {
+    const pattern = /<lora:([\w-]+):([\d.]+)>/;
+    const match = input.match(pattern);
+  
+    if (match) {
+        return {
+          value: match[1],
+          strength: parseFloat(match[2]),
+        };
+    } else {
+      return {
+        value: null,
+        strength: 0,
+      };
+    }
   }

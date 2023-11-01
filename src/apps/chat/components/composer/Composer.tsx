@@ -85,7 +85,8 @@ export let SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
     nip05:'',
     category:'',
     createdBy:'',
-    commissionAddress:''
+    commissionAddress:'',
+    restricted:false
   },
 
 };
@@ -694,7 +695,7 @@ export function Composer(props: {
                 variant='outlined' color={isReAct ? 'neutral' : 'neutral'}
                 autoFocus
                 minRows={1} maxRows={12}
-                placeholder={"Tell me what's on your mind..."}
+                placeholder={"Type a text or image prompt for " + purposeTitle}
                 value={composeText}
                 onChange={(e) => setComposeText(e.target.value)}
                 onDragEnter={handleTextareaDragEnter}

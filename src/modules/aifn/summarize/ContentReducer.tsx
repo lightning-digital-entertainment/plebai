@@ -82,7 +82,7 @@ export function ContentReducer(props: {
 
         <ModalClose />
 
-        <Typography level='h5'>Content Reducer (preview)</Typography>
+        <Typography level='h4'>Content Reducer (preview)</Typography>
 
         <Divider sx={{ my: 2 }} />
 
@@ -158,7 +158,7 @@ export function ContentReducer(props: {
               <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
                 <CircularProgress />
                 <Typography level='body-sm' sx={{ mt: 1 }}>Reduction in progress.</Typography>
-                <Typography level='body3'>This can take a few minutes</Typography>
+                <Typography level='body-sm'>This can take a few minutes</Typography>
               </Box>
             )}
 

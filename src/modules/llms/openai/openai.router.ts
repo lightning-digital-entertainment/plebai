@@ -28,6 +28,7 @@ const modelSchema = z.object({
   llmRouter: z.string().optional(),
   convoCount: z.number().min(0).max(100000).optional(),
   appFingerPrint: z.string().optional(),
+  restricted: z.boolean().optional()
 });
 
 const historySchema = z.array(z.object({

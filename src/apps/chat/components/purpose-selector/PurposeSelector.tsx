@@ -22,7 +22,8 @@ import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import { useCallback } from 'react';
 import { useComposerStore } from '../composer/store-composer';
 import { SamplePrompts } from './SamplePrompts';
-import { Addmodal } from './AddModal';
+import { AddTextmodal } from './AddTextModal';
+import { AddImagemodal } from './AddImageModal';
 import { CardMedia } from '@mui/material';
 import Menu from '@mui/joy/Menu';
 import MenuButton from '@mui/joy/MenuButton';
@@ -72,10 +73,12 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   const [editMode, setEditMode] = React.useState(false);
   const [detailModal, setDetailModal] = React.useState(false);
   const [samplePromptModal, setsamplePromptModal] = React.useState(false);
-  const [addModal, setaddModal] = React.useState(false);
+  const [addTextModal, setaddTextModal] = React.useState(false);
+  const [addImageModal, setaddImageModal] = React.useState(false);
   const [updateRefresh, setUpdaterefresh] = React.useState(true);
   const [showCreateSelect, setShowCreateSelect] = React.useState(false);
   const [agentId, setAgentId] = React.useState<string>('new');
+  const [restricted, setRestricted] = React.useState(localStorage.getItem('restricted')==='true'?true:false)
   
   const {  startupText, setStartupText } = useComposerStore();
 
@@ -127,7 +130,18 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   };
 
   
-
+  const handleRestrictChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    
+        console.log(event.target.checked);
+        if (event.target.checked) {
+          setRestricted(true);
+          localStorage.setItem('restricted', "true")
+        } else {
+          setRestricted(false);
+          localStorage.setItem('restricted', "false")
+        } 
+        executeFilter('');
+      };
   
 
   const executeFilter = (data:string) => {
@@ -141,9 +155,9 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
       .filter(key => SystemPurposes.hasOwnProperty(key))
       .filter(key => {
         const purpose = SystemPurposes[key as SystemPurposeId];
-        return purpose.title.toLowerCase().includes(query.toLowerCase())
+        return  ( purpose.restricted === null || purpose.restricted === restricted) && (purpose.title.toLowerCase().includes(query.toLowerCase())
           || (typeof purpose.placeHolder === 'string' && purpose.placeHolder.toLowerCase().includes(query.toLowerCase()))
-          || (typeof purpose.category === 'string' && purpose.category.toLowerCase().includes(query.toLowerCase()));
+          || (typeof purpose.category === 'string' && purpose.category.toLowerCase().includes(query.toLowerCase())));
       });
     setFilteredIDs(ids as SystemPurposeId[]);
 
@@ -199,12 +213,8 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   }
 
   const onDetailClose = () => {setDetailModal(false)};
-  const onAddClose = () => {setaddModal(false); }; //setErrorAlert(false)
-  const onAddOpen = () => {
-    
-    setaddModal(true)
-  
-  };
+  const onAddTextOpen = () => {setaddTextModal(true)};
+  const onAddImageOpen = () => {setaddImageModal(true)};
   const onStartupModalClose = () => {if (Object.keys(SystemPurposes).length<2) setUpdaterefresh(true); }
   const onClosePromptView = () => {setsamplePromptModal(false);};
   const handlePromptView  = () => {
@@ -214,19 +224,45 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
     
   } 
 
-  const handleEditButton = (agentId: string) => {
+  const handleEditButton = (agentId: string, category: string) => {
+
+        if (category === 'Image Generation') {
+          handleEditImageButton(agentId);
+        } else {
+          handleEditTextButton(agentId);
+        }
+  }
+
+  const handleEditImageButton = (agentId: string) => {
 
         setAgentId(agentId);
-        setaddModal(true);
+        setaddImageModal(true);
 
 
   }
 
-  const onCloseAddModal = () => {
+  const handleEditTextButton = (agentId: string) => {
+
+    setAgentId(agentId);
+    setaddTextModal(true);
+
+
+}
+
+  const onCloseAddImageModal = () => {
     setUpdaterefresh(true);
     do {} while (agentUpdate != 0);
   
-    setaddModal(false);
+    setaddImageModal(false);
+    setAgentId('new');
+    
+  }
+
+  const onCloseAddTextModal = () => {
+    setUpdaterefresh(true);
+    do {} while (agentUpdate != 0);
+  
+    setaddTextModal(false);
     setAgentId('new');
     
   }
@@ -260,7 +296,9 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
 
   // we show them all if the filter is clear (null)
   const unfilteredPurposeIDs = (filteredIDs && showPurposeFinder) ? filteredIDs : Object.keys(SystemPurposes);
-  const purposeIDs = editMode ? unfilteredPurposeIDs : unfilteredPurposeIDs.filter(id => !hiddenPurposeIDs.includes(id));
+  const purposeIDs = editMode ? unfilteredPurposeIDs : unfilteredPurposeIDs.filter(id => !hiddenPurposeIDs.includes(id)).filter(key => {
+    const purpose = SystemPurposes[key as SystemPurposeId];
+    return  ( purpose.restricted === null || purpose.restricted === restricted)});
 
   const selectedPurpose = purposeIDs.length ? (SystemPurposes[systemPurposeId] ?? null) : null;
   const selectedExample = selectedPurpose?.examples && getRandomElement(selectedPurpose.examples) || null;
@@ -281,7 +319,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
             }} ></Typography>
         {selectedPurpose? <div style={{ fontSize: '1.5rem' }}>   {selectedPurpose.title}  </div> : ''}
 
-       {SystemPurposes[systemPurposeId as SystemPurposeId]?.createdBy===appFingerPrint && <Button sx={{mt: 0}} onClick={() => handleEditButton(systemPurposeId)} variant="soft"  color='neutral'> <EditIcon/> </Button>}                 
+       {SystemPurposes[systemPurposeId as SystemPurposeId]?.createdBy===appFingerPrint && <Button sx={{mt: 0}} onClick={() => handleEditButton(systemPurposeId, SystemPurposes[systemPurposeId as SystemPurposeId]?.category)} variant="soft"  color='neutral'> <EditIcon/> </Button>}                 
       </Box>
       <Typography level='body-lg' color='neutral' sx={{
               mt: 0, ml:10, mr:10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, justifyContent: 'center',
@@ -302,12 +340,13 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
 
     {samplePromptModal && <SamplePrompts agentId={systemPurposeId} open={samplePromptModal} onClose={onClosePromptView} total={selectedPurpose?.chatruns?selectedPurpose?.chatruns:0} genImage={selectedPurpose?.paid?selectedPurpose?.paid:false} />}
    
-    {addModal && <Addmodal agentId={agentId} open={addModal} onClose={onCloseAddModal}  ></Addmodal>}
+    {addTextModal && <AddTextmodal agentId={agentId} open={addTextModal} onClose={onCloseAddTextModal}  ></AddTextmodal>}
+    {addImageModal && <AddImagemodal agentId={agentId} open={addImageModal} onClose={onCloseAddImageModal}  ></AddImagemodal>}
    
 
     <Stack direction='column' sx={{ minHeight: '60vh', justifyContent: 'center', alignItems: 'center' }}>
 
-        {showPurposeFinder && <Box sx={{  mt: 4, minWidth: searchWidthSx, justifyContent: 'center', alignItems: 'center' }}>
+        {showPurposeFinder && <Box sx={{  mt: 2, minWidth: searchWidthSx, justifyContent: 'center', alignItems: 'center' }}>
           <Input
             
             variant='outlined' color='neutral'
@@ -328,11 +367,11 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
           
         </Box>}
 
-        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 2, mb: 1, mt:4 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 2, mb: 0, mt:4 }}>
            
 
            <Button onClick={handleTagsImageOnChange} sx={{position: 'center'}} size="sm" variant="solid"  color='neutral' > Image Generation</Button>
-           <Button onClick={handleTagsRolePlayOnChange} sx={{position: 'center'}} size="sm" variant="solid"  color='neutral' > RolePlay</Button>
+           <Button onClick={handleTagsRolePlayOnChange} sx={{position: 'center'}} size="sm" variant="solid"  color='neutral' > Role Play</Button>
            <Button onClick={handleTagsTechnicalOnChange} sx={{position: 'center'}} size="sm" variant="solid"  color='neutral' > Technical</Button>
            <Button onClick={handleTagsAssistantOnChange} sx={{position: 'center'}} size="sm" variant="solid"  color='neutral' > Assistant</Button>
 
@@ -342,28 +381,31 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
 
       <Box sx={{ maxWidth: bpMaxWidth }}>
 
-        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 2, mb: 1, mt:4 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between',gap: 2, mb: 4, mt:0 }}>
            
 
            <Dropdown>
-            <MenuButton>
+            <MenuButton sx={{ justifyContent: 'left'}}>
             <AddIcon/> Create Agent
             </MenuButton>
             <Menu>
-              <MenuItem onClick={onAddOpen}>
+              <MenuItem onClick={onAddTextOpen}>
                 Text AI agent
               </MenuItem>
-              <MenuItem>
+              <MenuItem onClick={onAddImageOpen}>
                 Image AI agent
               </MenuItem>
             
             </Menu>
           </Dropdown>
+          <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', justifyContent: 'right', gap: 2, mb: 1, mt:4 }}>
 
-
-          <Button variant="outlined" color='neutral' size='sm' onClick={toggleEditMode}>
-            {editMode ? 'Done' : 'Edit'}
+          <Checkbox sx={{ justifyContent: 'right'}} checked={restricted} onChange = {handleRestrictChange} label="Over 18+" size="sm" />
+          <Button sx={{ justifyContent: 'right'}} variant="outlined" color='neutral' size='sm' onClick={toggleEditMode}>
+            {editMode ? 'Done' : 'Hide'}
           </Button>
+            </Box>
+         
           
         </Box>
 
@@ -386,15 +428,17 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
         
         <Grid container spacing={tileSpacing} rowSpacing={2} sx={{ justifyContent: 'center' }}>
           {SystemPurposes && purposeIDs.map((spId) => (
+            
             <Grid key={spId} spacing={0.5}>
               
-              <Button
+               <Button
                 variant={(!editMode && systemPurposeId === spId) ? 'solid' : 'soft'}
                 color={(!editMode && systemPurposeId === spId) ? 'primary' : SystemPurposes[spId as SystemPurposeId]?.highlighted ? 'warning' : 'neutral'}
                 onClick={() => !editMode && handlePurposeChanged(spId as SystemPurposeId)}
                 sx={{
                   flexDirection: 'column',
                   fontWeight: 500,
+                  
                   gap: bpTileGap,
                   height: bpTileSize,
                   width: bpTileSize,
@@ -429,12 +473,6 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
                               height="128"
                               src={SystemPurposes[spId as SystemPurposeId]?.symbol} 
                               sx={{ mt: -2, width: tileSx, height: tileSx  }}/>
-                         
-                         
-                   
-
-                    
-              
                   
                 
                   <Typography level='body-xs' color='neutral' sx={{
@@ -445,11 +483,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
                       }} >
                         {SystemPurposes[spId as SystemPurposeId]?.chatruns } <ForumIcon/> 
                        
-                                       </Typography>
-
-
-
-                       
+                  </Typography>
               
               </Button>
               

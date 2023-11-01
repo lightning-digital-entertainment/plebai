@@ -21,7 +21,7 @@ export function DetailModal(props: { title: string | React.JSX.Element, open: bo
             }}>
 
           <Box sx={{ mb: -1, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Typography level='h6'>
+            <Typography level='body-lg'>
               {props.title}
               <ModalClose sx={{ position: 'right', mr: -1 }} />
             </Typography>

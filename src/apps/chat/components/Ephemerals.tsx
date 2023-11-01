@@ -138,7 +138,7 @@ export function Ephemerals(props: { conversationId: string | null, sx?: SxProps 
 
   return (
     <Sheet
-      variant='soft' color='info' invertedColors
+      variant='soft' color='primary' invertedColors
       sx={{
         border: `4px dashed ${theme.vars.palette.divider}`,
         boxShadow: `inset 0 0 12px ${theme.vars.palette.background.popup}`,

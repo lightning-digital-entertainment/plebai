@@ -21,7 +21,7 @@ export function PublishedModal(props: { onClose: () => void, response: Published
     <Modal open={props.open} onClose={props.onClose}>
       <ModalDialog variant='outlined' color='neutral' sx={{ maxWidth: '100vw' }}>
 
-        <Typography level='h5'>
+        <Typography level='body-lg'>
           Your conversation is live!
         </Typography>
 

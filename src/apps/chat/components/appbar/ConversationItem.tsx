@@ -8,7 +8,8 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 import { DConversation, useChatStore } from '~/common/state/store-chats';
 import { InlineTextarea } from '~/common/components/InlineTextarea';
-import { SystemPurposes } from '../../../../data';
+import { SystemPurposes } from '../../../../apps/chat/components/composer/Composer';
+import { useApplicationBarStore } from '~/common/layouts/appbar/store-applicationbar';
 
 
 const DEBUG_CONVERSATION_IDs = false;
@@ -53,7 +54,15 @@ export function ConversationItem(props: {
   if (!cState) return null;
   const { isNew, assistantTyping, setUserTitle, systemPurposeId, title } = cState;
 
-  const handleActivate = () => props.conversationActivate(props.conversationId);
+  const closeAppMenu = () => useApplicationBarStore.getState().setAppMenuAnchor(null);
+
+  const handleActivate = () => {
+    
+    
+    props.conversationActivate(props.conversationId);
+    closeAppMenu();
+
+  }
 
   const handleEditBegin = () => setIsEditingTitle(true);
 
@@ -74,7 +83,8 @@ export function ConversationItem(props: {
 
   const handleDeleteCancel = () => setDeleteArmed(false);
 
-  const textSymbol = SystemPurposes[systemPurposeId]?.symbol || '❓';
+  const textSymbol = SystemPurposes[systemPurposeId]?.symbol || '';
+  const aiTitle = SystemPurposes[systemPurposeId]?.title || '';
   const buttonSx: SxProps = { ml: 1, ...(props.isActive ? { color: 'white' } : {}) };
 
   return (
@@ -92,7 +102,7 @@ export function ConversationItem(props: {
       {props.showSymbols && <ListItemDecorator>
         {assistantTyping
           ? (
-            <Avatar
+            <Avatar 
               alt='typing' variant='plain'
               src='https://i.giphy.com/media/jJxaUysjzO9ri/giphy.webp'
               sx={{
@@ -102,9 +112,11 @@ export function ConversationItem(props: {
               }}
             />
           ) : (
-            <Typography sx={{ fontSize: '18px' }}>
-              {isNew ? '' : textSymbol}
-            </Typography>
+            
+            <Avatar  alt=""
+                src={textSymbol} 
+               sx={{ width: `${24}px`, height: `${24}px`, mt: 1, }}/>
+           
           )}
       </ListItemDecorator>}
 
@@ -112,7 +124,8 @@ export function ConversationItem(props: {
       {!isEditingTitle ? (
 
         <Box onDoubleClick={handleEditBegin} sx={{ flexGrow: 1 }}>
-          {DEBUG_CONVERSATION_IDs ? props.conversationId.slice(0, 10) : title}{assistantTyping && '...'}
+          
+          {DEBUG_CONVERSATION_IDs ? props.conversationId.slice(0, 10) : aiTitle + ' - ' + title}{assistantTyping && '...' }
         </Box>
 
       ) : (
@@ -121,15 +134,7 @@ export function ConversationItem(props: {
 
       )}
 
-      {/* Edit */}
-      {/*<IconButton*/}
-      {/*  variant='plain' color='neutral'*/}
-      {/*  onClick={() => props.onEditTitle(props.conversationId)}*/}
-      {/*  sx={{*/}
-      {/*    opacity: 0, transition: 'opacity 0.3s', ml: 'auto',*/}
-      {/*  }}>*/}
-      {/*  <EditIcon />*/}
-      {/*</IconButton>*/}
+
 
       {/* Delete Arming */}
       {!props.isSingle && !deleteArmed && (

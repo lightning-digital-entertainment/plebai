@@ -15,10 +15,11 @@ import PsychologyIcon from '@mui/icons-material/Psychology';
 import StopOutlinedIcon from '@mui/icons-material/StopOutlined';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
-import { SystemPurposeId, SystemPurposes } from '../../../../data';
+
 import { ContentReducer } from '~/modules/aifn/summarize/ContentReducer';
 import { useChatLLM } from '~/modules/llms/store-llms';
-
+import HistoryIcon from '@mui/icons-material/History';
+import SendIcon from '@mui/icons-material/Send';
 import { ConfirmationModal } from '~/common/components/ConfirmationModal';
 import { countModelTokens } from '~/common/llm-util/token-counter';
 import { extractFilePathsWithCommonRadix } from '~/common/util/dropTextUtils';
@@ -39,6 +40,8 @@ import { requestOutputSchema } from '~/modules/current/request.router';
 import { verifyOutputSchema } from '~/modules/current/verify.router';
 import { NoWebLnModal } from '~/common/components/NoWebLnModal';
 import { Invoice } from "alby-tools";
+import { SystemPurposeData } from '~/modules/data/request.router';
+import { staticGenerationAsyncStorage } from 'next/dist/client/components/static-generation-async-storage';
 
 
 
@@ -57,6 +60,36 @@ const expandPromptTemplate = (template: string, dict: object) => (inputValue: st
   return expanded;
 };
 
+export type SystemPurposeId = string;
+
+export let defaultSystemPurposeId: any = '';
+
+export let SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
+
+  OrangePill: {
+    title: 'Orange Pill GPT',
+    description: '',
+    systemMessage: "How can individuals effectively promote Bitcoin adoption and understanding among their friends and family, especially beginners?",
+    symbol: 'https://i.current.fyi/current/app/orangepill.png',
+    examples: ['Explain bitcoin like I am 5 years old', 'How do you address the potential risks or downsides associated with Bitcoin?', 'What alternative approaches exist for educating others about Bitcoin? '],
+    placeHolder: "The Orange-Pilling Agent is a skilled and empathetic advocate for Bitcoin adoption. With a deep understanding of the bitcoin space and a passion for spreading awareness about Bitcoin's potential, This uses ReAct approach of thought and reasoning and uses internet for real time search. ",
+    chatLLM: 'llama-2-7b-chat-hf',
+    llmRouter: 'nousresearch/nous-hermes-llama2-13b',
+    convoCount: 5,
+    maxToken: 512,
+    temperature: 0.5,
+    satsPay: 50,
+    paid: false,
+    chatruns: 55,
+    newAgent: "false",
+    nip05:'',
+    category:'',
+    createdBy:'',
+    commissionAddress:'',
+    restricted:false
+  },
+
+};
 
 
 const attachFileLegend =
@@ -157,6 +190,7 @@ export function Composer(props: {
 }) {
   // state
   const [composeText, setComposeText] = React.useState('');
+  const [agentsData, setAgentsData] = React.useState('');
   const [sendModeId, setSendModeId] = React.useState<SendModeId>('immediate');
   const [isDragging, setIsDragging] = React.useState(false);
   const [reducerText, setReducerText] = React.useState('');
@@ -166,28 +200,76 @@ export function Composer(props: {
   const [confirmClearSent, setConfirmClearSent] = React.useState(false);
   const [openNoWebLnModal, setOpenNoWebLnModal] = React.useState(false);
   const attachmentFileInputRef = React.useRef<HTMLInputElement>(null);
+  const [qrCodeText, setQrCodeText] = React.useState('');
+
+  const appFingerPrint = localStorage.getItem('appFingerPrint');
 
   // external state
   const theme = useTheme();
   const enterToSend = useUIPreferencesStore(state => state.enterToSend);
+
+  const {agentUpdate, setAgentUpdate} = useUIPreferencesStore(state => ({agentUpdate: state.agentUpdate, setAgentUpdate: state.setAgentUpdate,}));
+
   const { sentMessages, appendSentMessage, clearSentMessages, startupText, setStartupText } = useComposerStore();
-  const { assistantTyping, tokenCount: conversationTokenCount, stopTyping } = useChatStore(state => {
-    const conversation = state.conversations.find(conversation => conversation.id === props.conversationId);
+  const { assistantTyping, tokenCount: conversationTokenCount, stopTyping, setTokenCount, setConversationCount, conversationCount } = useChatStore(state => {
+  const conversation = state.conversations.find(conversation => conversation.id === props.conversationId);
     return {
       assistantTyping: conversation ? !!conversation.abortController : false,
       tokenCount: conversation ? conversation.tokenCount : 0,
-      stopTyping: state.stopTyping,
+      stopTyping: state.stopTyping,  
+      setTokenCount: state.setTokenCount,
+      conversationCount: conversation ? conversation.conversationCount : 0,
+      setConversationCount: state.setConversationCount
     };
   }, shallow);
   const { chatLLMId, chatLLM } = useChatLLM();
 
+  const agentData = React.useCallback(async () => {
+    const response =  await fetch('/api/data/agents', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({fingerPrint: appFingerPrint?appFingerPrint:''})
+    })
+    try {
+
+      const jsonData = await response.json();
+      console.log(jsonData);
+      SystemPurposes = jsonData.SystemPurposes;
+      setAgentUpdate(0)
+      return SystemPurposes
+      
+    } catch (error) {
+      console.log(error)
+    }
+
+   
+
+    
+    
+
+  }, [appFingerPrint, setAgentUpdate]);
+
+    
+  
+    
+  
+
+ 
+
   // Effect: load initial text if queued up (e.g. by /share)
   React.useEffect(() => {
-    if (startupText) {
+    if (agentUpdate !== 0) {
+      agentData()
+      
+
+    }
+    
+    if (startupText) {   
       setStartupText(null);
       setComposeText(startupText);
     }
-  }, [startupText, setStartupText]);
+
+  }, [startupText, setStartupText, agentData, agentUpdate, setAgentUpdate]);
 
   // derived state
   const tokenLimit = chatLLM?.contextTokens || 0;
@@ -197,19 +279,23 @@ export function Composer(props: {
   const historyTokens = conversationTokenCount;
   const responseTokens = chatLLM?.options?.llmResponseTokens || 0;
   const remainingTokens = tokenLimit - directTokens - historyTokens - responseTokens;
-  const purposeTitle: string = SystemPurposes[props.systemPurpose as SystemPurposeId].title;
-  const paySats: number = purposeTitle==='Youtube Chat (Sats)'?100000:Math.round(Math.floor(chatLLM?.id.startsWith('openai-gpt-4')?(responseTokens+directTokens)*200:(responseTokens+directTokens)*50)/ 1000) * 1000;
-  const purposeModel: string = SystemPurposes[props.systemPurpose as SystemPurposeId].chatLLM;
+  //console.log('props.systemPurpose: ',props.systemPurpose)
+  const purposeTitle: string = SystemPurposes[props.systemPurpose as SystemPurposeId]?.title?SystemPurposes[props.systemPurpose as SystemPurposeId].title:''
+  const paySats: number = purposeTitle==='Gen Image AI (Sats) '?100000:purposeTitle==='Youtube Chat (Sats)'?100000:Math.round(Math.floor(chatLLM?.id.startsWith('openai-gpt-4')?(responseTokens+directTokens)*200:(responseTokens+directTokens)*50)/ 1000) * 1000;
+  const purposeModel: string = SystemPurposes[props.systemPurpose as SystemPurposeId]?.chatLLM?SystemPurposes[props.systemPurpose as SystemPurposeId].chatLLM:'';
 
   const handleSendClicked = () => {
     const text = (composeText || '').trim();
     console.log('inside handle clicked')
     console.log('Sats to be paid: %o', paySats);
     console.log('purpose Model: %o', purposeModel)
-    if (purposeModel === 'llama-2-7b-chat-hf' && purposeTitle !== 'Youtube Chat (Sats)') {
+    console.log('conversationTokenCount: %o',conversationTokenCount)
+    if ( conversationCount <  SystemPurposes[props.systemPurpose as SystemPurposeId].convoCount && !SystemPurposes[props.systemPurpose as SystemPurposeId].paid ) {
       if (text.length && props.conversationId) {
         setComposeText('');
+        setConversationCount(props.conversationId, conversationCount + 1);
         props.onSendMessage(sendModeId, props.conversationId, text);
+
         appendSentMessage(text);
       }
 
@@ -217,21 +303,52 @@ export function Composer(props: {
 
       Wallet_Service.getWebln()
             .then(async webln => {
+
+                const response = await fetch('/api/current/request', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({'amtinsats': SystemPurposes[props.systemPurpose as SystemPurposeId].satsPay*1000,
+                                          'nip05': SystemPurposes[props.systemPurpose as SystemPurposeId].nip05?SystemPurposes[props.systemPurpose as SystemPurposeId].nip05:'plebai@getcurrent.io' })
+                });
+                const payResponse  = await response.json();
+                const { pr, verify } = requestOutputSchema.parse(payResponse);
                 if (!webln) {
                     console.log('no webln detected')
+                    setQrCodeText(pr);
                     setOpenNoWebLnModal(true);
+                    let settle=false;
+                    let count=0;
+                    do {
+                      count++;
+                      const verifyResponse = await fetch('/api/current/verify', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({'verifyUrl': verify })
+                      });
+                      const verifyResponseParsed  = await verifyResponse.json();
+                      const { preimage, settled } = verifyOutputSchema.parse(verifyResponseParsed);
+                      console.log('preimage from verify url: %o', preimage)
+                      
+                      if (text.length && props.conversationId && settled) {
+                        setComposeText('');
+                        props.onSendMessage(sendModeId, props.conversationId, text);
+                        appendSentMessage(text);
+                        setOpenNoWebLnModal(false);
+                        settle=true;
+                      }
+                      if (count>180) settle=true;
+                      console.log(count);
+
+                    } while (!settle)  
+                    
                 } else {
                   try {
 
                     console.log('webln found')
-                    const response = await fetch('/api/current/request', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({'amtinsats': paySats })
-                    });
                     
-                    const payResponse  = await response.json();
-                    const { pr, verify } = requestOutputSchema.parse(payResponse);
+                    
+                    
+                    
                     const weblnResponse = await webln.sendPayment(pr);
                     let settle=false;
                     if (weblnResponse) {
@@ -243,27 +360,14 @@ export function Composer(props: {
                           settle = await invoice.isPaid();
 
                           if (text.length && props.conversationId && settle) {
+                            setConversationCount(props.conversationId, 1);
+                            console.log('tokenCount: ', props.conversationId)
+        
                             setComposeText('');
+                      
                             props.onSendMessage(sendModeId, props.conversationId, text);
                             appendSentMessage(text);
                           }
-
-                          /* Not wasting 2-3 seconds by going to node to check payment status. 
-                          const verifyResponse = await fetch('/api/current/verify', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({'verifyUrl': verify })
-                          });
-                          const verifyResponseParsed  = await verifyResponse.json();
-                          const { preimage, settled } = verifyOutputSchema.parse(verifyResponseParsed);
-                          console.log('preimage from verify url: %o', preimage)
-                          settle=settled;
-                          if (text.length && props.conversationId && preimage === weblnResponse.preimage && settled) {
-                            setComposeText('');
-                            props.onSendMessage(sendModeId, props.conversationId, text);
-                            appendSentMessage(text);
-                          }
-                          */
 
                         } while (!settle)
                         
@@ -274,7 +378,7 @@ export function Composer(props: {
                   } catch (error) {
 
                     console.log('webln catch: %o', error)
-                    setOpenNoWebLnModal(true);
+                    //setOpenNoWebLnModal(true);
                     
                   }
                   
@@ -386,6 +490,8 @@ export function Composer(props: {
     // this is needed to allow the same file to be selected again
     e.target.value = '';
   };
+
+  
 
 
   const handlePasteButtonClicked = async () => {
@@ -503,7 +609,7 @@ export function Composer(props: {
 
   // const prodiaApiKey = isValidProdiaApiKey(useSettingsStore(state => state.prodiaApiKey));
   // const isProdiaConfigured = !requireUserKeyProdia || prodiaApiKey; 
-  const textPlaceholder: string = SystemPurposes[props.systemPurpose as SystemPurposeId].placeHolder;
+  const textPlaceholder: string = SystemPurposes[props.systemPurpose as SystemPurposeId]?.placeHolder?SystemPurposes[props.systemPurpose as SystemPurposeId].placeHolder:'';
     
   const isReAct = sendModeId === 'react';
 
@@ -512,55 +618,84 @@ export function Composer(props: {
       <Grid container spacing={{ xs: 1, md: 2 }}>
 
         {/* Left pane (buttons and Textarea) */}
-        <Grid xs={12} md={9}><Stack direction='row' spacing={{ xs: 1, md: 2 }}>
+        <Grid xs={12} md={10}><Stack direction='row' spacing={{ xs: 1, md: 0, mb: 2 }}>
 
           {/* Vertical Buttons Bar */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 0, md: 2 } }}>
+          <Box sx={{ display: 'flex', flexDirection: 'row', gap: { xs: 0, md: 0 } }}>
 
             {/*<Typography level='body3' sx={{mb: 2}}>Context</Typography>*/}
 
             {isSpeechEnabled && <Box sx={hideOnDesktop}>
               <MicButton variant={micVariant} color={micColor} onClick={handleMicClicked} />
             </Box>}
-
-            <IconButton variant='plain' color='neutral' onClick={handleShowFilePicker} sx={{ ...hideOnDesktop }}>
+            {/* 
+            <IconButton variant='soft' color='neutral' onClick={handleShowFilePicker} sx={{ ...hideOnDesktop }}>
               <UploadFileIcon />
             </IconButton>
             <Tooltip
-              variant='solid' placement='top-start'
+              variant='soft' placement='top-start'
               title={attachFileLegend}>
-              <Button fullWidth variant='plain' color='neutral' onClick={handleShowFilePicker} startDecorator={<UploadFileIcon />}
+              <Button variant='plain' color='neutral' onClick={handleShowFilePicker} startDecorator={<UploadFileIcon />}
                       sx={{ ...hideOnMobile, justifyContent: 'flex-start' }}>
-                Attach
+               
               </Button>
             </Tooltip>
 
-            <IconButton variant='plain' color='neutral' onClick={handlePasteButtonClicked} sx={{ ...hideOnDesktop }}>
+            <IconButton variant='soft' color='neutral' onClick={handlePasteButtonClicked} sx={{ ...hideOnDesktop }}>
               <ContentPasteGoIcon />
             </IconButton>
             <Tooltip
-              variant='solid' placement='top-start'
+              variant='soft' placement='top-start'
               title={pasteClipboardLegend}>
               <Button fullWidth variant='plain' color='neutral' startDecorator={<ContentPasteGoIcon />} onClick={handlePasteButtonClicked}
                       sx={{ ...hideOnMobile, justifyContent: 'flex-start' }}>
-                
+              
               </Button>
             </Tooltip>
-
+            */}
             <input type='file' multiple hidden ref={attachmentFileInputRef} onChange={handleLoadAttachment} />
 
           </Box>
 
+          <Grid xs={1} md={2}>
+          <Stack spacing={2}>
+
+            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+
+              {/* [mobile-only] Sent messages arrow */}
+              {sentMessages.length > 0 && (
+                <IconButton disabled={!!sentMessagesAnchor} variant='plain' color='neutral' onClick={showSentMessages} sx={{ ...hideOnDesktop, mr: { xs: 1, md: 2 } }}>
+                  <HistoryIcon />
+                </IconButton>
+              )}
+
+              {/* Send / Stop */}
+             
+                            {/* [desktop-only] row with Sent Messages button */}
+                <Stack direction='row' spacing={1} sx={{ ...hideOnMobile, flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'flex-end' }}>
+                  {sentMessages.length > 0 && (
+                    <Button disabled={!!sentMessagesAnchor} variant='plain' color='neutral' startDecorator={<HistoryIcon />} onClick={showSentMessages}>
+                      
+                    </Button>
+                  )}
+                </Stack>
+            </Box>
+
+
+
+          </Stack>
+        </Grid>
+
           {/* Edit box, with Drop overlay */}
-          <Box sx={{ flexGrow: 1, position: 'relative' }}>
+          <Box sx={{ flexGrow: 2, position: 'relative' }}>
 
             <Box sx={{ position: 'relative' }}>
 
               <Textarea
-                variant='outlined' color={isReAct ? 'primary' : 'info'}
+                variant='outlined' color={isReAct ? 'neutral' : 'neutral'}
                 autoFocus
-                minRows={4} maxRows={12}
-                placeholder={'Type a message and press enter'}
+                minRows={1} maxRows={12}
+                placeholder={"Type a text or image prompt for " + purposeTitle}
                 value={composeText}
                 onChange={(e) => setComposeText(e.target.value)}
                 onDragEnter={handleTextareaDragEnter}
@@ -576,7 +711,10 @@ export function Composer(props: {
                   },
                 }}
                 sx={{
-                  background: theme.vars.palette.background.level1,
+                  '&::before': {
+                    outline: '0.5px solid var(--Textarea-focusedHighlight)',
+                  },
+                  background: theme.vars.palette.background.level2,
                   fontSize: '16px',
                   lineHeight: 1.75,
                 }} />
@@ -585,12 +723,34 @@ export function Composer(props: {
               */}
             </Box>
 
-            {isSpeechEnabled && <MicButton variant={micVariant} color={micColor} onClick={handleMicClicked} sx={{ ...hideOnMobile, position: 'absolute', top: 0, right: 0, margin: 1 }} />}
+            {assistantTyping
+                ? (
+                  <Button
+                    variant='soft' color={isReAct ? 'primary' : 'neutral'} disabled={!props.conversationId}
+                    onClick={handleStopClicked}
+                    endDecorator={<StopOutlinedIcon />}
+                    sx={{ position: 'absolute', top: 0, right: 0, margin: 1, mb: 0.5 }}
+                  >
+                    Stop
+                  </Button>
+                ) : (
+                  <Button
+                    variant='plain' color={isReAct ? 'primary' : 'neutral'} disabled={!props.conversationId || !chatLLM}
+                    onClick={handleSendClicked}  
+                    endDecorator={isReAct ? <PsychologyIcon /> : <SendIcon />}
+                    sx={{ position: 'absolute', top: 0, right: 0, margin: 1 }}
+                  >
+                    {isReAct ? 'ReAct' : ''}
+                  </Button>
+                )}
+
+
+            {/* isSpeechEnabled && <MicButton variant={micVariant} color={micColor} onClick={handleMicClicked} sx={{ ...hideOnMobile, position: 'absolute', top: 0, right: 0, margin: 1 }} />} */}
 
             {/* {!!tokenLimit && <TokenBadge directTokens={directTokens} indirectTokens={historyTokens + responseTokens} tokenLimit={tokenLimit} absoluteBottomRight />} */}
 
             <Card
-              color='info' invertedColors variant='soft'
+              color='neutral' invertedColors variant='soft'
               sx={{
                 display: isDragging ? 'flex' : 'none',
                 position: 'absolute', bottom: 0, left: 0, right: 0, top: 0,
@@ -602,7 +762,7 @@ export function Composer(props: {
               onDragOver={handleOverlayDragOver}
               onDrop={handleOverlayDrop}>
               <PanToolIcon sx={{ width: 40, height: 40, pointerEvents: 'none' }} />
-              <Typography level='body2' sx={{ pointerEvents: 'none' }}>
+              <Typography level='body-sm' sx={{ pointerEvents: 'none' }}>
                 I will hold on to this for you
               </Typography>
             </Card>
@@ -612,50 +772,7 @@ export function Composer(props: {
         </Stack></Grid>
 
         {/* Send pane */}
-        <Grid xs={12} md={3}>
-          <Stack spacing={2}>
 
-            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-
-              {/* [mobile-only] Sent messages arrow */}
-              {sentMessages.length > 0 && (
-                <IconButton disabled={!!sentMessagesAnchor} variant='plain' color='neutral' onClick={showSentMessages} sx={{ ...hideOnDesktop, mr: { xs: 1, md: 2 } }}>
-                  <KeyboardArrowUpIcon />
-                </IconButton>
-              )}
-
-              {/* Send / Stop */}
-              {assistantTyping
-                ? (
-                  <Button
-                    fullWidth variant='soft' color={isReAct ? 'primary' : 'info'} disabled={!props.conversationId}
-                    onClick={handleStopClicked}
-                    endDecorator={<StopOutlinedIcon />}
-                  >
-                    Stop
-                  </Button>
-                ) : (
-                  <Button
-                    fullWidth variant='solid' color={isReAct ? 'primary' : 'info'} disabled={!props.conversationId || !chatLLM}
-                    onClick={handleSendClicked} onDoubleClick={handleShowSendMode}
-                    endDecorator={isReAct ? <PsychologyIcon /> : <TelegramIcon />}
-                  >
-                    {isReAct ? 'ReAct' : 'Chat'}
-                  </Button>
-                )}
-            </Box>
-
-            {/* [desktop-only] row with Sent Messages button */}
-            <Stack direction='row' spacing={1} sx={{ ...hideOnMobile, flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'flex-end' }}>
-              {sentMessages.length > 0 && (
-                <Button disabled={!!sentMessagesAnchor} fullWidth variant='plain' color='neutral' startDecorator={<KeyboardArrowUpIcon />} onClick={showSentMessages}>
-                  History
-                </Button>
-              )}
-            </Stack>
-
-          </Stack>
-        </Grid>
 
 
         {/* Mode selector */}
@@ -686,11 +803,12 @@ export function Composer(props: {
         />
 
         <NoWebLnModal
-          open={openNoWebLnModal} onClose={handleNoWeblnClose}
-          confirmationText={'To pay using sats, you need to enable WebLn. Please visit https://getalby.com  to get started'}
+          open={openNoWebLnModal} onClose={handleNoWeblnClose}  qrText= {qrCodeText}
+          
         />
 
       </Grid>
     </Box>
   );
 }
+

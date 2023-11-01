@@ -58,16 +58,12 @@ export function ChatContextItems(props: {
   return <>
 
     <ListItem sticky>
-      <Typography level='body2'>
+      <Typography level='body-sm'>
         Conversation
       </Typography>
     </ListItem>
 
-    <MenuItem onClick={handleSystemMessagesToggle}>
-      <ListItemDecorator><SettingsSuggestIcon /></ListItemDecorator>
-      System message
-      <Switch checked={showSystemMessages} onChange={handleSystemMessagesToggle} sx={{ ml: 'auto' }} />
-    </MenuItem>
+  
 
     <ListDivider inset='startContent' />
 

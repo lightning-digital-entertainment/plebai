@@ -31,13 +31,13 @@ export const RenderImage = (props: { imageBlock: ImageBlock, allowRunAgain: bool
         display: 'flex', flexDirection: 'row', gap: 0.5,
         opacity: 0, transition: 'opacity 0.3s',
       }}>
-      {props.allowRunAgain && (
+      {/*props.allowRunAgain && (
         <Tooltip title='Draw again' variant='solid'>
           <IconButton variant='solid' color='neutral' onClick={props.onRunAgain}>
             <ReplayIcon />
           </IconButton>
         </Tooltip>
-      )}
+      )*/}
       <IconButton component={Link} href={props.imageBlock.url} target='_blank' variant='solid' color='neutral'>
         <ZoomOutMapIcon />
       </IconButton>

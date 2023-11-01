@@ -5,6 +5,7 @@ import { AppProps } from 'next/app';
 import { CacheProvider, EmotionCache } from '@emotion/react';
 import { CssBaseline, CssVarsProvider } from '@mui/joy';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
 import { apiQuery } from '~/modules/trpc/trpc.client';
 
@@ -22,6 +23,29 @@ export interface MyAppProps extends AppProps {
 
 function MyApp({ Component, emotionCache = clientSideEmotionCache, pageProps }: MyAppProps) {
   const [queryClient] = React.useState(() => new QueryClient());
+  
+
+
+  React.useEffect(() => {
+    const currentVersion:any = '0.0.3'; 
+
+    const setFp = async () => {
+      const fp = await FingerprintJS.load();
+
+      const { visitorId } = await fp.get();
+      localStorage.setItem('appFingerPrint', visitorId);
+      
+    };
+  
+    const storedVersion = localStorage.getItem('appVersion');
+    console.log('App version: ', storedVersion);
+    if (storedVersion !== currentVersion) {
+      console.log('Clear localStorage and update the stored version');
+      setFp();
+      localStorage.clear();
+      localStorage.setItem('appVersion', currentVersion);
+    }
+  }, []);
   return <>
     <CacheProvider value={emotionCache}>
       <Head>
@@ -30,7 +54,7 @@ function MyApp({ Component, emotionCache = clientSideEmotionCache, pageProps }: 
       </Head>
       {/* Rect-query provider */}
       <QueryClientProvider client={queryClient}>
-        <CssVarsProvider defaultMode='light' theme={theme}>
+        <CssVarsProvider defaultMode='dark' theme={theme}>
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
           <Component {...pageProps} />

@@ -65,7 +65,7 @@ export function ConversationItems(props: {
   return <>
 
     {/*<ListItem>*/}
-    {/*  <Typography level='body2'>*/}
+    {/*  <Typography level='body-sm'>*/}
     {/*    Active chats*/}
     {/*  </Typography>*/}
     {/*</ListItem>*/}
@@ -83,7 +83,7 @@ export function ConversationItems(props: {
         conversationId={conversationId}
         isActive={conversationId === props.conversationId}
         isSingle={singleChat}
-        showSymbols={showSymbols}
+        showSymbols={true}
         conversationActivate={handleConversationActivate}
         conversationDelete={handleConversationDelete}
       />)}
@@ -105,7 +105,7 @@ export function ConversationItems(props: {
     </MenuItem>
 
     {/*<ListItem>*/}
-    {/*  <Typography level='body2'>*/}
+    {/*  <Typography level='body-sm'>*/}
     {/*    Scratchpad*/}
     {/*  </Typography>*/}
     {/*</ListItem>*/}

@@ -6,7 +6,7 @@ import { DLLMId } from '~/modules/llms/llm.types';
 import { useModelsStore } from '~/modules/llms/store-llms';
 
 import { countModelTokens } from '../llm-util/token-counter';
-import { defaultSystemPurposeId, SystemPurposeId } from '../../data';
+import { defaultSystemPurposeId, SystemPurposeId } from 'src/apps/chat/components/composer/Composer';
 
 
 // configuration
@@ -26,6 +26,7 @@ export interface DConversation {
   userTitle?: string;
   autoTitle?: string;
   tokenCount: number;                 // f(messages, llmId)
+  conversationCount: number;
   created: number;                    // created timestamp
   updated: number | null;             // updated timestamp
   // Not persisted, used while in-memory, or temporarily by the UI
@@ -37,8 +38,9 @@ function createDConversation(systemPurposeId?: SystemPurposeId): DConversation {
   return {
     id: uuidv4(),
     messages: [],
-    systemPurposeId: systemPurposeId || defaultSystemPurposeId,
+    systemPurposeId: systemPurposeId || 'OrangePill',
     tokenCount: 0,
+    conversationCount: 0,
     created: Date.now(),
     updated: Date.now(),
     abortController: null,
@@ -69,7 +71,7 @@ export interface DMessage {
   originLLM?: string;               // only assistant - model that generated this message, goes beyond known models
 
   tokenCount: number;               // cache for token count, using the current Conversation model (0 = not yet calculated)
-
+  conversationCount: number;
   created: number;                  // created timestamp
   updated: number | null;           // updated timestamp
 }
@@ -83,6 +85,7 @@ export function createDMessage(role: DMessage['role'], text: string): DMessage {
     typing: false,
     role: role,
     tokenCount: 0,
+    conversationCount: 0,
     created: Date.now(),
     updated: null,
   };
@@ -132,6 +135,8 @@ export interface ChatStore {
   setSystemPurposeId: (conversationId: string, systemPurposeId: SystemPurposeId) => void;
   setAutoTitle: (conversationId: string, autoTitle: string) => void;
   setUserTitle: (conversationId: string, userTitle: string) => void;
+  setTokenCount: (conversationId: string, tokenCount: number) => void;
+  setConversationCount: (conversationId: string, ConversationCount: number) => void;
 
   appendEphemeral: (conversationId: string, devTool: DEphemeral) => void;
   deleteEphemeral: (conversationId: string, ephemeralId: string) => void;
@@ -317,6 +322,18 @@ export const useChatStore = create<ChatStore>()(devtools(
             userTitle,
           }),
 
+      setTokenCount: (conversationId: string, tokenCount: number) =>
+          get()._editConversation(conversationId,
+            {
+              tokenCount,
+            }),   
+       
+      setConversationCount: (conversationId: string, conversationCount: number) =>
+        get()._editConversation(conversationId,
+          {
+            conversationCount,
+          }),  
+
       appendEphemeral: (conversationId: string, ephemeral: DEphemeral) =>
         get()._editConversation(conversationId, conversation => {
           const ephemerals = [...conversation.ephemerals, ephemeral];
@@ -372,7 +389,7 @@ export const useChatStore = create<ChatStore>()(devtools(
       // version history:
       //  - 1: [2023-03-18] app launch, single chat
       //  - 2: [2023-04-10] multi-chat version - invalidating data to be sure
-      version: 2,
+      version: 3,
 
       // omit the transient property from the persisted state
       partialize: (state) => ({
@@ -467,6 +484,7 @@ export const restoreConversationFromJson = (json: string): DConversation | null 
       // ...(restored.userTitle && { userTitle: restored.userTitle }),
       // ...(restored.autoTitle && { autoTitle: restored.autoTitle }),
       tokenCount: restored.tokenCount || 0,
+      conversationCount: restored.conversationCount || 0,
       created: restored.created || Date.now(),
       updated: restored.updated || Date.now(),
       abortController: null,

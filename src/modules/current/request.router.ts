@@ -1,7 +1,10 @@
 import { z } from 'zod';
 
+
 export const requestInputSchema = z.object({
-    amtinsats: z.number()
+    amtinsats: z.number(),
+    nip05: z.string()
+
   });
 
   export const requestOutputSchema = z.object({
@@ -13,12 +16,15 @@ export const requestInputSchema = z.object({
   export type requestOutputSchema = z.infer<typeof requestOutputSchema>;  
 
 
-  export function requestApiAccess(apiPath: string): { headers: HeadersInit, url: string } {
+  export function requestApiAccess(amtinsats: number, nip05:string): { headers: HeadersInit, url: string } {
     // API key
+
+    const [username, hostname] = nip05.split('@');
    
+    const apiPath = `/process-static-charges/${username}?amount=${amtinsats}`
   
     // API host
-    let host = (process.env.CURRENT_API_HOST || '').trim();
+    let host = ('https://' +hostname).trim();
     
     return {
       headers: {

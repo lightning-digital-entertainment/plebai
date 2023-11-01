@@ -16,13 +16,19 @@ import ReplayIcon from '@mui/icons-material/Replay';
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 
+import ThumbsUpOutlinedIcon from '@mui/icons-material/ThumbUpAltOutlined';
+import ThumbsUpFilledIcon from '@mui/icons-material/ThumbUpSharp';
+
+import ThumbsDownOutlinedIcon from '@mui/icons-material/ThumbDownAltOutlined';
+import ThumbsDownFilledIcon from '@mui/icons-material/ThumbDownSharp';
+
 import { canUseElevenLabs, speakText } from '~/modules/elevenlabs/elevenlabs.client';
 import { canUseProdia } from '~/modules/prodia/prodia.client';
 
 import { DMessage } from '~/common/state/store-chats';
 import { InlineTextarea } from '~/common/components/InlineTextarea';
 import { Link } from '~/common/components/Link';
-import { SystemPurposeId, SystemPurposes } from '../../../../data';
+import { SystemPurposeId, SystemPurposes } from '../../../../apps/chat/components/composer/Composer';
 import { copyToClipboard } from '~/common/util/copyToClipboard';
 import { cssRainbowColorKeyframes } from '~/common/theme';
 import { prettyBaseModel } from '~/common/util/conversationToMarkdown';
@@ -31,9 +37,12 @@ import { useUIPreferencesStore } from '~/common/state/store-ui';
 import { RenderCode } from './RenderCode';
 import { RenderHtml } from './RenderHtml';
 import { RenderImage } from './RenderImage';
+import { RenderVideo } from './RenderVideo';
 import { RenderMarkdown } from './RenderMarkdown';
 import { RenderText } from './RenderText';
 import { parseBlocks } from './Block';
+import { RenderQuestions } from './RenderQuestions';
+import { useComposerStore } from '../composer/store-composer';
 
 
 export function messageBackground(theme: Theme, messageRole: DMessage['role'], wasEdited: boolean, unknownAssistantIssue: boolean): string {
@@ -76,15 +85,10 @@ export function makeAvatar(messageAvatar: string | null, messageRole: DMessage['
         return <PaletteOutlinedIcon sx={iconSx} />;
       const symbol = SystemPurposes[messagePurposeId as SystemPurposeId]?.symbol;
       if (symbol)
-        return <Box
-          sx={{
-            fontSize: '24px',
-            textAlign: 'center',
-            width: '100%', minWidth: `${iconSx.width}px`, lineHeight: `${iconSx.height}px`,
-          }}
-        >
-          {symbol}
-        </Box>;
+        return  <Avatar  alt=""
+        src={symbol} 
+        sx={{ width: `${iconSx.width}px`, height: `${iconSx.height}px`, mt: 1, }}/>
+        
       // default assistant avatar
       return <SmartToyOutlinedIcon sx={iconSx} />; // https://mui.com/static/images/avatar/2.jpg
 
@@ -169,6 +173,10 @@ export function ChatMessage(props: { message: DMessage, isBottom: boolean, onMes
   const [isEditing, setIsEditing] = React.useState(false);
   const [isImagining, setIsImagining] = React.useState(false);
   const [isSpeaking, setIsSpeaking] = React.useState(false);
+  const {  startupText, setStartupText } = useComposerStore();
+
+  const [isThumbsUpToggled, setIsThumbsUpToggled] = React.useState(false);
+  const [isThumbsDownToggled, setIsThumbsDownToggled] = React.useState(false);
 
   // external state
   const theme = useTheme();
@@ -182,6 +190,32 @@ export function ChatMessage(props: { message: DMessage, isBottom: boolean, onMes
   const isSpeakable = canUseElevenLabs();
 
   const closeOperationsMenu = () => setMenuAnchor(null);
+
+  const toggleThumbsUp = async () => {   
+    setIsThumbsUpToggled(!isThumbsUpToggled);
+    const response = await fetch('/api/data/feedBack', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 'message_id': props.message.id, 'feedback_type': 'thumbsup'})
+    });
+
+    console.log(response)
+   
+    
+  };
+
+  const toggleThumbsDown = async () => {      
+    setIsThumbsDownToggled(!isThumbsDownToggled);
+    if (isThumbsUpToggled && !isThumbsDownToggled) setIsThumbsUpToggled(false);
+      const response = await fetch('/api/data/feedBack', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 'message_id': props.message.id, 'feedback_type': 'thumbsdown'})
+      });
+
+      console.log(response)
+    
+  };
 
   const handleMenuCopy = (e: React.MouseEvent) => {
     copyToClipboard(messageText);
@@ -293,11 +327,11 @@ export function ChatMessage(props: { message: DMessage, isBottom: boolean, onMes
 
         {fromAssistant && (
           <Tooltip title={messageOriginLLM || 'unk-model'} variant='solid'>
-            <Typography level='body2' sx={{
+            <Typography level='body-sm' sx={{
               fontSize: { xs: 'xs', sm: 'sm' }, fontWeight: 500,
               ...(messageTyping ? { animation: `${cssRainbowColorKeyframes} 5s linear infinite` } : {}),
             }}>
-              {prettyBaseModel(messagePurposeId)}
+              {prettyBaseModel(SystemPurposes[messagePurposeId as SystemPurposeId]?.title)}
             </Typography>
           </Tooltip>
         )}
@@ -311,21 +345,51 @@ export function ChatMessage(props: { message: DMessage, isBottom: boolean, onMes
         <Box sx={{ ...cssBlock, flexGrow: 0 }} onDoubleClick={handleMenuEdit}>
 
           {fromSystem && wasEdited && (
-            <Typography level='body2' color='warning' sx={{ mt: 1, mx: 1.5 }}>modified by user - auto-update disabled</Typography>
+            <Typography level='body-sm' color='warning' sx={{ mt: 1, mx: 1.5 }}>modified by user - auto-update disabled</Typography>
           )}
 
           {!errorMessage && parseBlocks(fromSystem, collapsedText).map((block, index) =>
-            block.type === 'html'
+
+          block.type === 'question'
+          ? <RenderQuestions key={'Questions:- '} messageId = {props.message.id} questionBlock={block} runExample={function (example: string): void {
+              setStartupText(example);
+            } }  />
+            : block.type === 'html'
               ? <RenderHtml key={'html-' + index} htmlBlock={block} sx={cssCode} />
               : block.type === 'code'
                 ? <RenderCode key={'code-' + index} codeBlock={block} sx={cssCode} />
+                
+  
+              : block.type === 'video'
+                ? <RenderVideo key={'video-' + index} videoBlock={block} allowRunAgain={props.isBottom} onRunAgain={handleMenuRunAgain} />
+            
                 : block.type === 'image'
-                  ? <RenderImage key={'image-' + index} imageBlock={block} allowRunAgain={props.isBottom} onRunAgain={handleMenuRunAgain} />
+                  ? <RenderImage key={'image-' + index} imageBlock={block} allowRunAgain={props.isBottom} onRunAgain={handleMenuRunAgain} />   
                   : renderMarkdown
                     ? <RenderMarkdown key={'text-md-' + index} textBlock={block} />
                     : <RenderText key={'text-' + index} textBlock={block} />,
+                    
+                    
           )}
 
+          {fromAssistant && !isEditing &&  !messageTyping && (  
+
+                  <Box  sx={{
+                    display: 'flex', mt: 4, mb:2, mx: 1, alignItems: 'right', justifyContent: 'flex-end', flexDirection: 'row'
+                  }} >
+                        <Typography level='body-sm' color='neutral'  sx={{mt: 1, mx: 0.5 }}>
+                        Do you like the response? 
+                        </Typography>
+                        <IconButton variant='plain' color='neutral'  onClick={toggleThumbsUp} sx={{}}>
+                          {isThumbsUpToggled? <ThumbsUpFilledIcon />: <ThumbsUpOutlinedIcon />}
+                        </IconButton>
+
+                        <IconButton variant='plain' color='neutral' onClick={toggleThumbsDown} sx={{}}>
+                        {isThumbsDownToggled? <ThumbsDownFilledIcon />: <ThumbsDownOutlinedIcon />}
+                        </IconButton>
+                    
+                  </Box> 
+          )}
           {errorMessage && (
             <Tooltip title={<Typography sx={{ maxWidth: 800 }}>{collapsedText}</Typography>} variant='soft'>
               <Alert variant='soft' color='warning' sx={{ mt: 1 }}><Typography>{errorMessage}</Typography></Alert>
@@ -393,18 +457,18 @@ export function ChatMessage(props: { message: DMessage, isBottom: boolean, onMes
             </MenuItem>
           )}
           <ListDivider />
-          {fromAssistant && (
+          {/*fromAssistant && (
             <MenuItem onClick={handleMenuRunAgain}>
               <ListItemDecorator><ReplayIcon /></ListItemDecorator>
               Retry
             </MenuItem>
-          )}
-          {fromUser && (
+          )*/}
+          {/*fromUser && (
             <MenuItem onClick={handleMenuRunAgain}>
               <ListItemDecorator><FastForwardIcon /></ListItemDecorator>
               Run Again
             </MenuItem>
-          )}
+          )*/}
           <MenuItem onClick={props.onMessageDelete} disabled={false /*fromSystem*/}>
             <ListItemDecorator><ClearIcon /></ListItemDecorator>
             Delete

@@ -22,7 +22,13 @@ const modelSchema = z.object({
   id: z.string(),
   temperature: z.number().min(0).max(1).optional(),
   maxTokens: z.number().min(1).max(100000).optional(),
-  systemPurpose: z.string().optional()
+  systemPurpose: z.string().optional(),
+  messageId: z.string().optional(),
+  conversationId: z.string().optional(),
+  llmRouter: z.string().optional(),
+  convoCount: z.number().min(0).max(100000).optional(),
+  appFingerPrint: z.string().optional(),
+  restricted: z.boolean().optional()
 });
 
 const historySchema = z.array(z.object({
@@ -212,7 +218,12 @@ export function openAICompletionRequest(model: ModelSchema, history: HistorySche
     // ...(functions && { functions: functions, function_call: 'auto', }),
     ...(model.temperature && { temperature: model.temperature }),
     ...(model.maxTokens && { max_tokens: model.maxTokens }),
+    ...(model.conversationId && { conversationId: model.conversationId }),
+    ...(model.messageId && { messageId: model.messageId }),
     ...(model.systemPurpose && { system_purpose: model.systemPurpose }),
+    ...(model.llmRouter && { llm_router: model.llmRouter }),
+    ...(model.convoCount && { convo_count: model.convoCount }),
+    ...(model.appFingerPrint && { app_fingerprint: model.appFingerPrint }),
     stream,
     n: 1,
   };

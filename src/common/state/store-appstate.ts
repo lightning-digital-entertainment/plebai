@@ -45,6 +45,7 @@ export const useAppStateStore = create<AppStateData & AppStateActions>()(
     }),
     {
       name: 'app-state',
+      version: 3,
     },
   ),
 );

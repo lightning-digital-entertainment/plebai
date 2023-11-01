@@ -1,5 +1,5 @@
 import { DLLMId } from '~/modules/llms/llm.types';
-import { SystemPurposeId, SystemPurposes } from '../../../data';
+import { SystemPurposeId, SystemPurposes } from '../components/composer/Composer';
 
 import { createDMessage, DMessage, useChatStore } from '~/common/state/store-chats';
 

@@ -1,14 +1,16 @@
 import * as React from 'react';
 
-import { Box, Button, ListItem, SvgIcon, useTheme } from '@mui/joy';
+import { Box, Button, ListItem, SvgIcon, useTheme, Divider } from '@mui/joy';
 import { SxProps } from '@mui/joy/styles/types';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import HomeIcon from '@mui/icons-material/TempleBuddhist';
-
+import ShareIcon from '@mui/icons-material/Share';
 import { Brand } from '../../brand';
 import { Link } from '../../components/Link';
 import { cssRainbowColorKeyframes } from '../../theme';
+
+import { EmailIcon, EmailShareButton, LinkedinIcon, LinkedinShareButton, TwitterIcon, TwitterShareButton, WhatsappIcon, WhatsappShareButton } from "react-share";
 
 
 // missing from MUI, using Tabler for Discord
@@ -48,13 +50,50 @@ export function SupportMenuItem() {
         mb: -1, // absorb the bottom margin of the list
         mt: 1,
         // background: theme.palette.neutral.solidActiveBg,
-        display: 'flex', flexDirection: 'row', gap: 1,
+        display: 'flex', flexDirection: 'column', gap: 1,
         justifyContent: 'space-between',
       }}>
+
+    <BringTheLove text='Share' icon={<ShareIcon sx={{ color: iconColor }} />} link={'https://chat.plebai.com/'} />
+    <Box sx={{ display: 'flex' , justifyContent: 'center',gap: 2, }}>
+  
+      <EmailShareButton
+            url={Brand.URIs.Home}
+            subject={Brand.Meta.Title}
+            body={Brand.Meta.Description}
+            className="Demo__some-network__share-button"
+          >
+            <EmailIcon size={32} round />
+      </EmailShareButton>
+      <LinkedinShareButton url={Brand.URIs.Home} summary= {Brand.Meta.Description} className="Demo__some-network__share-button">
+            <LinkedinIcon size={32} round />
+      </LinkedinShareButton>
+      <TwitterShareButton
+            url={Brand.URIs.Home}
+            title={Brand.Meta.Description}
+            className="Demo__some-network__share-button"
+          >
+            <TwitterIcon size={32} round />
+      </TwitterShareButton>
+      <WhatsappShareButton
+            url={Brand.URIs.Home}
+            title={Brand.Meta.Description}
+            separator=":: "
+            className="Demo__some-network__share-button"
+          >
+            <WhatsappIcon size={32} round />
+      </WhatsappShareButton>
+      </Box>
+      <Divider />
+
+      <Box sx={{ display: 'flex'   }}>
       
-      <BringTheLove text='PlebAI' icon={<HomeIcon sx={{ color: iconColor }} />} link={'https://plebai.com'} />
-      <BringTheLove text='Telegram' icon={<TelegramIcon sx={{ color: iconColor }} />} link={Brand.URIs.SupportInvite} />
-      <BringTheLove text='GitHub' icon={<GitHubIcon sx={{ color: iconColor }} />} link={Brand.URIs.OpenRepo} />
+          <BringTheLove text='PlebAI' icon={<HomeIcon sx={{ color: iconColor }} />} link={'https://plebai.com'} />
+          <BringTheLove text='Discord' icon={<DiscordIcon sx={{ color: iconColor }} />} link={Brand.URIs.SupportInvite} />
+          <BringTheLove text='GitHub' icon={<GitHubIcon sx={{ color: iconColor }} />} link={Brand.URIs.OpenRepo} />
+      </Box>
     </ListItem>
+
+    
   );
 }

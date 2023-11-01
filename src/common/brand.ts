@@ -15,7 +15,7 @@ export const Brand = {
   Meta: {
     SiteName: 'PlebAI',
     Title: 'PlebAI: Plebs version of chatGPT',
-    Description: "Big techs are pouring billions into building closed source AI models, to keep everyone under lock and key. Yet, the true evolution of AI will come not from walled gardens, but from the open collaboration of plebs worldwide. Plebs will #buildinpublic and beat them at their own game. We built an AI Chatbot that relies solely on open-source large Language Models (LLMs). Check it out.",
+    Description: "Silicon valley elites are pouring billions of dollars in building closed AI systems that can ingest all of our data. Then scare politicians into creating regulations that install them as overlords. They will not win in that game because of millions of Plebs like us band together, build in public (#buildinpublic), democratize AI access for all and beat them in their own game. We call this movement PlebAI.",
     Keywords: 'artificial general intelligence, agi, openai, gpt-4, ai personas, code execution, pdf import, voice i/o, ai chat, artificial intelligence',
     ThemeColor: '#434356',
     TwitterSite: '@getcurrent.io',
@@ -25,6 +25,6 @@ export const Brand = {
     Home: 'https://plebai.com',
     CardImage: 'https://i.current.fyi/current/app/plebai_web.png',
     OpenRepo: 'https://github.com/lightning-digital-entertainment/plebai',
-    SupportInvite: 'https://t.me/+1NhSTfdwv1M2MTky',
+    SupportInvite: 'https://discord.gg/DfSZpqUKYG',
   },
 };

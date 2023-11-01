@@ -14,22 +14,25 @@ import { ApplicationBar } from './appbar/ApplicationBar';
 import { NoSSR } from '../components/NoSSR';
 
 
+
+
+
+
 export function AppLayout(props: {
   noAppBar?: boolean, noSettings?: boolean, noModelsSetup?: boolean,
   children: React.ReactNode,
 }) {
   // external state
   const theme = useTheme();
-  const { centerMode } = useUIPreferencesStore(state => ({ centerMode: isPwa() ? 'full' : state.centerMode }), shallow);
+  const { centerMode, agentUpdate} = useUIPreferencesStore(state => ({ centerMode: isPwa() ? 'full' : state.centerMode, agentUpdate: state.agentUpdate, }), shallow);
 
-  // usage counter, for progressive disclosure of features
-  // noinspection JSUnusedLocalSymbols
+
   const usageCount = useAppStateStore(state => state.usageCount);
-
+  
   return (
     // Global NoSSR wrapper: the overall Container could have hydration issues when using localStorage and non-default maxWidth
     <NoSSR>
-
+     
       <Container
         disableGutters
         maxWidth={centerMode === 'full' ? false : centerMode === 'narrow' ? 'md' : 'xl'}

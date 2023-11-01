@@ -116,7 +116,7 @@ export default function SharePage() {
         <LogoProgress showProgress={isDownloading} />
 
         {/* Title */}
-        <Typography level='h5' sx={{ mt: 2, mb: 1 }}>
+        <Typography level='h4' sx={{ mt: 2, mb: 1 }}>
           {isDownloading ? 'Loading...' : errorMessage ? '' : intentURL ? 'Done' : 'Receiving...'}
         </Typography>
 
@@ -136,7 +136,7 @@ export default function SharePage() {
         </>}
 
         {/* URL under analysis */}
-        <Typography level='body3'>
+        <Typography level='body-sm'>
           {intentURL}
         </Typography>
       </Box>

@@ -29,6 +29,10 @@ export type ResponsePromptData = {
 
 }
 
+export type Image = {
+  imageFile: Blob;
+}; 
+
 export const requestOutputSchema = z.object({
   SystemPurposes: z.string()
 });
@@ -75,3 +79,49 @@ export const requestOutputSchema = z.object({
       url: host + apiPath,
     };
   }
+
+  export const uploadImage = async ({ imageFile }: Image):Promise<string> => {
+    console.log(imageFile)
+    if (imageFile.type === 'image/png' || imageFile.type === 'image/jpg' || imageFile.type === 'image/jpeg') {
+
+      let input:any;
+      
+      const reader = new FileReader()
+      
+      reader.onabort = () => console.log('file reading was aborted')
+      reader.onerror = () => console.log('file reading has failed')
+      reader.onload = async () => {
+        input = {input: reader.result,
+                 type: imageFile.name.split(".").pop()
+                
+                }
+        console.log(imageFile.name.split(".").pop())
+        const response = await fetch(`/api/data/upload`, {
+          method: 'POST',
+          body: JSON.stringify(input),
+          headers: {
+            'content-type' : 'application/json'
+        },
+      });
+
+        
+
+        if (response) {
+          const responseBody = await response.json()
+          return responseBody.url;
+
+        }
+
+      
+        
+
+      } 
+      
+
+      reader.readAsDataURL(imageFile)
+      console.log(input);
+      
+    }
+
+    return '';
+};

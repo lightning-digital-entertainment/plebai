@@ -8,7 +8,7 @@ import Image from "next/image";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 type Image = {
-    imageFile: Blob;
+  imageFile: Blob;
 }; 
 
 
@@ -67,64 +67,64 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
     },[loadAgentData, props.agentId])
 
     const uploadImage = async ({ imageFile }: Image) => {
-        console.log(imageFile)
-        setImageProgress(true);
-        if (imageFile.type === 'image/png' || imageFile.type === 'image/jpg' || imageFile.type === 'image/jpeg') {
-    
-          let input:any;
+      console.log(imageFile)
+      setImageProgress(true);
+      if (imageFile.type === 'image/png' || imageFile.type === 'image/jpg' || imageFile.type === 'image/jpeg') {
+  
+        let input:any;
+        
+        const reader = new FileReader()
+        
+        reader.onabort = () => console.log('file reading was aborted')
+        reader.onerror = () => console.log('file reading has failed')
+        reader.onload = async () => {
+          input = {input: reader.result,
+                   type: imageFile.name.split(".").pop()
+                  
+                  }
+          console.log(imageFile.name.split(".").pop())
+          const response = await fetch(`/api/data/upload`, {
+            method: 'POST',
+            body: JSON.stringify(input),
+            headers: {
+              'content-type' : 'application/json'
+          },
+        });
+  
           
-          const reader = new FileReader()
+  
+          if (response) {
+            const responseBody = await response.json()
+            setAddImageUrl(responseBody.url);
+            setImageProgress(false);
+  
+          }
+  
+  
           
-          reader.onabort = () => console.log('file reading was aborted')
-          reader.onerror = () => console.log('file reading has failed')
-          reader.onload = async () => {
-            input = {input: reader.result,
-                     type: imageFile.name.split(".").pop()
-                    
-                    }
-            console.log(imageFile.name.split(".").pop())
-            const response = await fetch(`/api/data/upload`, {
-              method: 'POST',
-              body: JSON.stringify(input),
-              headers: {
-                'content-type' : 'application/json'
-            },
-          });
-    
-            
-    
-            if (response) {
-              const responseBody = await response.json()
-              setAddImageUrl(responseBody.url);
-              setImageProgress(false);
-    
-            }
-    
-    
-            
-    
-          } 
-          
-            reader.readAsDataURL(imageFile)
-            console.log(input);
-        }
-    
-    
-    };
-    
+  
+        } 
+        
+          reader.readAsDataURL(imageFile)
+          console.log(input);
+      }
+  
+  
+  };
+  
 
-    const onDrop = useCallback((acceptedFiles: any[]) => {
-        // Upload files to storage
-        const file = acceptedFiles[0];
-        uploadImage({ imageFile: file });
-      }, []);
+  const onDrop = useCallback((acceptedFiles: any[]) => {
+      // Upload files to storage
+      const file = acceptedFiles[0];
+      uploadImage({ imageFile: file });
+    }, []);
     
 
     const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     
         //accept: "image/*",
         maxFiles: 1,
-        noClick: true,
+        noClick: false,
         noKeyboard: true,
         onDrop,
       });

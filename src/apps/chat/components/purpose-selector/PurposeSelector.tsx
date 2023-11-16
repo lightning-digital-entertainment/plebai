@@ -17,7 +17,7 @@ import { WelcomeModal } from '~/common/components/WelcomeModal';
 import { useUIStateStore } from '~/common/state/store-ui';
 import { DetailModal } from '~/common/components/DetailModal';
 import AddIcon from '@mui/icons-material/Add';
-
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import { useCallback } from 'react';
 import { useComposerStore } from '../composer/store-composer';
@@ -30,6 +30,7 @@ import MenuButton from '@mui/joy/MenuButton';
 import MenuItem from '@mui/joy/MenuItem';
 import Dropdown from '@mui/joy/Dropdown';
 import EditIcon from '@mui/icons-material/Edit';
+import { copyToClipboard } from '~/common/util/copyToClipboard';
 
 
 
@@ -191,7 +192,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   };
 
   
-
+  const handleIdCopy = (text:string) => {copyToClipboard(text); }
 
   const toggleEditMode = () => setEditMode(!editMode);
 
@@ -325,9 +326,12 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
               mt: 0, ml:10, mr:10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, justifyContent: 'center',
             }} >
        
+       {selectedPurpose?  <div style={{ fontSize: '1rem' }}>  ID: {systemPurposeId.substring(0,8) + '...'}      
+            <IconButton variant='plain' color='neutral' onClick={() => handleIdCopy(systemPurposeId)}  sx={{}}><ContentCopyIcon /> </IconButton> </div> : ''}
+        
         {selectedPurpose? <div style={{ fontSize: '1rem' }}>  Price: {selectedPurpose.paid?selectedPurpose.satsPay + ' SATS':  selectedPurpose.convoCount + ' conversations are FREE. Then ' + selectedPurpose.satsPay +  ' SATS' } </div> : ''}
         {selectedPurpose? <Link href={'https://plebai.com/nostr/' + selectedPurpose.nip05} > {'Nostr profile: ' + selectedPurpose.nip05}  </Link> : ''}
-        {selectedPurpose? <div style={{ fontSize: '1rem' }}>  {selectedPurpose.placeHolder}   </div> : ''}
+               {selectedPurpose? <div style={{ fontSize: '1rem' }}>  {selectedPurpose.placeHolder}   </div> : ''}
         </Typography>
 
          <Button onClick={handlePromptView} sx={{position: 'center'}} variant="soft"  color='neutral' >  {selectedPurpose?.paid?'View  Sample Images':'View Sample Prompts'}</Button>

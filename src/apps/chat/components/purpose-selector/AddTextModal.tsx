@@ -1,15 +1,27 @@
-import { Avatar, Button, CircularProgress, Divider, Select, Switch, Option, Textarea, Typography, Box } from "@mui/joy"
+import { Avatar, Button, CircularProgress, Divider, Select, Switch, Option, Textarea, Typography, Box, IconButton,} from "@mui/joy"
+import DeleteIcon from '@mui/icons-material/Delete';
 import React from "react";
 import { useCallback } from "react";
 import { DetailModal } from "~/common/components/DetailModal"
 import { theme } from "~/common/theme"
 import { useDropzone } from "react-dropzone";
-import Image from "next/image";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import AddIcon from '@mui/icons-material/Add';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import Table from '@mui/joy/Table';
 
-type Image = {
-  imageFile: Blob;
+
+type UploadFile = {
+  uploadFile: Blob;
 }; 
+
+interface Row {
+  id: number;
+  type: string;
+  data: string;
+  status:boolean;
+  // other properties for your row can go here
+}
 
 
 const detailAvatarSx = { xs: 62, md: 122, xl: 130 };
@@ -29,6 +41,11 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
     const [addPrice, setAddPrice] = React.useState<string>('50');
     const [addConvoCount, setAddConvoCount] = React.useState<string>('3');
     const [addllmRouter, setAddLlmRouter] = React.useState('meta-llama/llama-2-13b-chat');
+    const [addRows, setAddRows] = React.useState<Row[]>([]);
+    const [currentRow, setCurrentRow] = React.useState<number>(0);
+    const [addReqType, setAddReqType] =React.useState('opensource');
+    const [addResearch, setAddResearch] = React.useState<boolean>(false);
+ 
 
     const [addAgentCommissionAddress, setaddAgentCommissionAddress] =React.useState('');
     const [errorAlert, setErrorAlert] = React.useState(false);
@@ -55,6 +72,11 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
         setAddConvoCount(agentData.convoCount+'')
         setAddLlmRouter(agentData.llmRouter)
         setaddAgentCommissionAddress(agentData.commissionAddress)
+        setAddResearch(agentData.iresearch)
+        setAddReqType(agentData.reqType)
+        setAddRows(agentData.datasource.datasource)
+        
+
 
     }, [props.agentId]);
 
@@ -66,10 +88,10 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
 
     },[loadAgentData, props.agentId])
 
-    const uploadImage = async ({ imageFile }: Image) => {
-      console.log(imageFile)
+    const uploadImage = async ({ uploadFile }: UploadFile) => {
+      console.log(uploadFile)
       setImageProgress(true);
-      if (imageFile.type === 'image/png' || imageFile.type === 'image/jpg' || imageFile.type === 'image/jpeg') {
+      if (uploadFile.type) {
   
         let input:any;
         
@@ -79,10 +101,10 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
         reader.onerror = () => console.log('file reading has failed')
         reader.onload = async () => {
           input = {input: reader.result,
-                   type: imageFile.name.split(".").pop()
+                   type: uploadFile.name.split(".").pop()
                   
                   }
-          console.log(imageFile.name.split(".").pop())
+          console.log(uploadFile.name.split(".").pop())
           const response = await fetch(`/api/data/upload`, {
             method: 'POST',
             body: JSON.stringify(input),
@@ -105,29 +127,153 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
   
         } 
         
-          reader.readAsDataURL(imageFile)
+          reader.readAsDataURL(uploadFile)
+          console.log(input);
+      }
+  
+  
+  };
+
+    const uploadFileAsync = async ({ uploadFile }: UploadFile) => {
+      console.log(uploadFile)
+      if (uploadFile.type) {
+  
+        let input:any;
+        
+        const reader = new FileReader()
+        
+        reader.onabort = () => console.log('file reading was aborted')
+        reader.onerror = () => console.log('file reading has failed')
+        reader.onload = async () => {
+          input = {input: reader.result,
+                   type: uploadFile.name.split(".").pop()
+                  
+                  }
+          console.log(uploadFile.name.split(".").pop())
+          const response = await fetch(`/api/data/upload`, {
+            method: 'POST',
+            body: JSON.stringify(input),
+            headers: {
+              'content-type' : 'application/json'
+          },
+        });
+  
+          
+  
+          if (response) {
+            const responseBody = await response.json()
+            console.log(responseBody.url);
+
+            if (currentRow !== addRows.length-1) setCurrentRow(addRows.length-1);
+
+            setAddRows(prevRows =>
+              prevRows.map(row => 
+                  row.data==='' ? { ...row, data:responseBody.url?responseBody.url:'' } : row
+              )
+            );
+  
+          }
+  
+  
+          
+  
+        } 
+        
+          reader.readAsDataURL(uploadFile)
           console.log(input);
       }
   
   
   };
   
+  const handleAddRow = () => {
 
-  const onDrop = useCallback((acceptedFiles: any[]) => {
+    let id = 0;
+
+    if (addRows.length > 0) {
+
+      const dataArr = addRows[addRows.length - 1];
+      console.log(dataArr);
+      
+      if (dataArr.data.length === 0) return;
+      id = dataArr.id + 1;
+
+    }
+    const newRow: Row = {
+      
+      id, 
+      type: 'url',
+      data: '',
+      status: false
+      // Initialize other properties here
+    };
+
+    setAddRows([...addRows, newRow]);
+    setCurrentRow(addRows.length-1);
+
+
+
+  }
+
+  const handleRemoveRow = (id: number) => {
+    setAddRows(prevRows => prevRows.filter(row => row.id !== id));
+  };
+
+  // Function to update the 'type' of a row
+  const handleChangeType = (id: number, event: React.SyntheticEvent | null, newValue: string | null) => {
+    
+    setAddRows(prevRows =>
+      prevRows.map(row => 
+        row.id === id ? { ...row, type: newValue?newValue:'' } : row
+      )
+    );
+    
+  };
+
+    // Function to update the 'type' of a row
+    const handleChangeData = (id: number, newValue: string | null) => {
+      setAddRows(prevRows =>
+        prevRows.map(row => 
+          row.id === id ? { ...row, data: newValue?newValue:'' } : row
+        )
+      );
+      
+    };
+
+  
+ 
+  const onDrop1 = useCallback((acceptedFiles: any[]) => {
       // Upload files to storage
       const file = acceptedFiles[0];
-      uploadImage({ imageFile: file });
+      uploadImage({ uploadFile: file });
     }, []);
     
+  const onDrop2 = useCallback((acceptedFiles: any[]) => {
+      // Upload files to storage
+      const file= acceptedFiles[0];
 
-    const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
+      uploadFileAsync({ uploadFile: file });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  
+
+    const { getRootProps: getRootProps1, getInputProps: getInputProps1, isDragActive, open } = useDropzone({
     
         //accept: "image/*",
         maxFiles: 1,
         noClick: false,
         noKeyboard: true,
-        onDrop,
-      });
+        onDrop:onDrop1,
+    });
+
+    const { getRootProps: getRootProps2, getInputProps: getInputProps2 } = useDropzone({
+    
+      maxFiles: 1,
+      noClick: false,
+      noKeyboard: true,
+      onDrop:onDrop2,
+  });
 
       const handleCategory = (
         
@@ -143,6 +289,15 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
         console.log(addCategory);
         console.log('llmrouter: ', addllmRouter);
       };
+
+      const handleReqType = (
+        
+        event: React.SyntheticEvent | null,
+        newValue: string | null,
+      ) => {
+        setAddReqType(newValue?newValue:'');
+      };
+
 
       const handlePrice = (
         event: React.SyntheticEvent | null,
@@ -215,7 +370,12 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
               satspay: parseInt(addPrice),
               category: addCategory,
               llmrouter:addllmRouter,
-              id:props.agentId
+              id:props.agentId,
+              req_type: addReqType,
+              iresearch: addResearch,
+              datasource: {
+                "datasource": addRows
+              }
     
             }
         
@@ -264,7 +424,12 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
                     convoCount: addConvoCount,
                     satsPay: addPrice,
                     category: addCategory,
-                    llmRouter:addllmRouter
+                    llmRouter:addllmRouter,
+                    reqType: addReqType,
+                    iresearch: addResearch,
+                    datasource: {
+                      "datasource": addRows
+                    }
           
                   }
                 
@@ -315,8 +480,8 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
           <div className="dropzone">
                
 
-              <div {...getRootProps()} className="drag_drop_wrapper">
-                <input hidden {...getInputProps()} />
+              <div {...getRootProps1()} className="drag_drop_wrapper">
+                <input hidden {...getInputProps1()} />
 
                 {imageProgress? <CircularProgress variant="solid" />:
     
@@ -444,6 +609,143 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
                           lineHeight: 1.75,
                         }} >
                 </Textarea>
+
+               
+
+                <Select indicator={<KeyboardArrowDownIcon />} value={addReqType} onChange={handleReqType}>
+                      <Option value="opensource">
+                              Default
+                      </Option>
+                      <Option value="perplexity">
+                              Llama2-70B
+                      </Option>
+                      <Option value="gputopia">
+                              GPUtopia
+                      </Option>
+
+                </Select>
+
+                <Switch
+                    checked={addResearch}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                      setAddResearch(event.target.checked)
+                    }
+                    color={addResearch ? 'success' : 'neutral'}
+                    variant={addResearch ? 'solid' : 'outlined'}
+                    endDecorator={addResearch ? 'Web Browsing enabled ' : 'Web Browsing disabled'}
+                    slotProps={{
+                      endDecorator: {
+                        sx: {
+                          minWidth: 24,
+                        },
+                      },
+                    }}
+                />
+
+                <Box sx={{
+                    mb: 0, // absorb the bottom margin of the list
+                    mt: 1,
+                    border: 0,
+                 
+                    display: 'flex', flexDirection: 'row', gap: 1,
+                    justifyContent: 'left',alignItems: 'left'
+                  }}>
+                <Typography sx={{
+                    mb: 0, // absorb the bottom margin of the list
+                    mt: 1,}}>
+
+                  Add DataSource : 
+                </Typography>
+
+                <IconButton
+                  variant='outlined' color='neutral'
+                  
+                  onClick={handleAddRow}>
+                  <AddIcon />
+                </IconButton>
+
+                </Box>
+
+                <Table  size='md' sx={{ '& thead th:nth-child(1)': { width: '20%' }, display: 'flex',  justifyContent: 'center',alignItems: 'center'}}>
+                
+                <tbody>
+                  {addRows.map((row) => (
+                    <tr key={row.id}  >
+                      
+                      <td>
+                          <Select indicator={<KeyboardArrowDownIcon />} value={row.type} disabled= {row.data?true:false} onChange={(e, newValue) => handleChangeType(row.id, e, newValue)}>
+                            <Option value="url">
+                                    Site url
+                            </Option>
+                            <Option value="gitbook">
+                                    Gitbook
+                            </Option>
+                            <Option value="docs">
+                                    Docs
+                            </Option>
+                            <Option value="pdf">
+                                    PDF
+                            </Option>
+                            <Option value="json">
+                                    JSON
+                            </Option>
+
+                          </Select>
+                      </td>
+                      <td>  
+
+                        {(row.type === 'pdf'|| row.type === 'docs' || row.type === 'json')? 
+                        <div className="dropzone">
+                            
+                    
+                        <div  {...getRootProps2()} className="drag_drop_wrapper">
+                          <input disabled= {row.status} hidden {...getInputProps2()} />
+                          {row.data?<Typography sx={{
+                                }}>
+
+                              {row.data.substring(row.data.lastIndexOf(`.`)+1) + ' file uploaded'} 
+                            </Typography>: 
+                          <Button  sx={{position: 'center'}} variant="solid"  color='neutral' > {'attach a file'} </Button>}
+
+                            </div>
+                          </div>
+                        :
+                        
+                      
+                        <Textarea variant='outlined' color={'neutral'}
+                          autoFocus
+                          minRows={1} maxRows={1}
+                          placeholder={row.type==='gitbook'?"Enter gitbook URL": "Enter website URL" }
+                          value={row.data}
+                          onChange={(e) => {handleChangeData(row.id, e.target.value)}}
+                          sx={{
+                            '&::before': {
+                              outline: '0.5px solid var(--Textarea-focusedHighlight)',
+                            },
+        
+                            minWidth : addModalWidthSx,
+                            background: theme.vars.palette.background.level2,
+                            fontSize: '16px',
+                            lineHeight: 1.75,
+                          }} />}
+
+                      </td>
+                      <td>
+                          {row.status? <CheckCircleIcon color='success' />: 
+                          <IconButton
+                            variant='outlined' color='neutral'
+                            
+                            onClick={() => handleRemoveRow(row.id)}>
+                            <DeleteIcon />
+                          </IconButton>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+
+
+              
                         
 
               <Box sx={{
@@ -536,4 +838,12 @@ function countWordsInString(content: string): number {
     const words = content.split(/\s+/).filter(word => /\S/.test(word));
   
     return words.length;
-  }
+}
+
+function createData(
+  name: string,
+  calories: number,
+
+) {
+  return { name, calories};
+}

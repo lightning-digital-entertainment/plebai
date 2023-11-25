@@ -9,6 +9,10 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import AddIcon from '@mui/icons-material/Add';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Table from '@mui/joy/Table';
+import Accordion from '@mui/joy/Accordion';
+import AccordionDetails from '@mui/joy/AccordionDetails';
+import AccordionGroup from '@mui/joy/AccordionGroup';
+import AccordionSummary from '@mui/joy/AccordionSummary';
 
 
 type UploadFile = {
@@ -74,7 +78,7 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
         setaddAgentCommissionAddress(agentData.commissionAddress)
         setAddResearch(agentData.iresearch)
         setAddReqType(agentData.reqType)
-        setAddRows(agentData.datasource.datasource)
+        setAddRows(agentData?.datasource?.datasource)
         
 
 
@@ -188,17 +192,8 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
   
   const handleAddRow = () => {
 
-    let id = 0;
+    let id = currentRow+1;
 
-    if (addRows.length > 0) {
-
-      const dataArr = addRows[addRows.length - 1];
-      console.log(dataArr);
-      
-      if (dataArr.data.length === 0) return;
-      id = dataArr.id + 1;
-
-    }
     const newRow: Row = {
       
       id, 
@@ -208,10 +203,18 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
       // Initialize other properties here
     };
 
+    if (addRows?.length > 0) {
+
+      const dataArr = addRows[addRows.length - 1];
+      console.log(dataArr);
+      
+      if (dataArr.data.length === 0) return;
+      id = dataArr.id + 1;
+
+    } 
+
     setAddRows([...addRows, newRow]);
     setCurrentRow(addRows.length-1);
-
-
 
   }
 
@@ -610,9 +613,32 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
                         }} >
                 </Textarea>
 
-               
+                <AccordionGroup ><Accordion>
 
-                <Select indicator={<KeyboardArrowDownIcon />} value={addReqType} onChange={handleReqType}>
+                <Box sx={{
+                    mb: 0, // absorb the bottom margin of the list
+                    mt: 1,
+                    border: 0,
+                 
+                    display: 'flex', flexDirection: 'column', gap: 1,
+                    justifyContent: 'center',alignItems: 'center'
+                  }}>     
+                  <AccordionSummary sx={{mb: 3, mt:1, maxWidth: 200}}>        
+                        Agent Knowledge
+                  </AccordionSummary>
+                </Box>
+                <AccordionDetails>
+
+                 <Box sx={{
+                    mb: 0, // absorb the bottom margin of the list
+                    mt: 1,
+                    border: 0,
+                 
+                    display: 'flex', flexDirection: 'column', gap: 1,
+                    justifyContent: 'center',alignItems: 'center'
+                  }}>      
+
+                <Select sx={{mb: 3, mt:1, maxWidth: 200}} indicator={<KeyboardArrowDownIcon />} value={addReqType} onChange={handleReqType}>
                       <Option value="opensource">
                               Default
                       </Option>
@@ -626,6 +652,7 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
                 </Select>
 
                 <Switch
+                    sx={{mb: 3, mt:1, border:0}}
                     checked={addResearch}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                       setAddResearch(event.target.checked)
@@ -641,26 +668,18 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
                       },
                     }}
                 />
-
-                <Box sx={{
-                    mb: 0, // absorb the bottom margin of the list
-                    mt: 1,
-                    border: 0,
-                 
-                    display: 'flex', flexDirection: 'row', gap: 1,
-                    justifyContent: 'left',alignItems: 'left'
-                  }}>
                 <Typography sx={{
                     mb: 0, // absorb the bottom margin of the list
                     mt: 1,}}>
 
-                  Add DataSource : 
+                  DataSource  
                 </Typography>
 
                 <IconButton
                   variant='outlined' color='neutral'
                   
                   onClick={handleAddRow}>
+                    Add
                   <AddIcon />
                 </IconButton>
 
@@ -669,7 +688,7 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
                 <Table  size='md' sx={{ '& thead th:nth-child(1)': { width: '20%' }, display: 'flex',  justifyContent: 'center',alignItems: 'center'}}>
                 
                 <tbody>
-                  {addRows.map((row) => (
+                  {addRows?.map((row) => (
                     <tr key={row.id}  >
                       
                       <td>
@@ -744,7 +763,9 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
                 </tbody>
               </Table>
 
-
+              </AccordionDetails>
+                    </Accordion>
+                </AccordionGroup>
               
                         
 

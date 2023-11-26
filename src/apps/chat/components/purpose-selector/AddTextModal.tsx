@@ -192,7 +192,7 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
   
   const handleAddRow = () => {
 
-    let id = currentRow+1;
+    let id = addRows.length;
 
     const newRow: Row = {
       
@@ -200,7 +200,7 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
       type: 'url',
       data: '',
       status: false
-      // Initialize other properties here
+      
     };
 
     if (addRows?.length > 0) {
@@ -209,7 +209,6 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
       console.log(dataArr);
       
       if (dataArr.data.length === 0) return;
-      id = dataArr.id + 1;
 
     } 
 
@@ -375,6 +374,7 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
               llmrouter:addllmRouter,
               id:props.agentId,
               req_type: addReqType,
+              modelid: addReqType==='perplexity'?'llama-2-70b-chat':'',
               iresearch: addResearch,
               datasource: {
                 "datasource": addRows
@@ -429,6 +429,7 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
                     category: addCategory,
                     llmRouter:addllmRouter,
                     reqType: addReqType,
+                    modelid: addReqType==='perplexity'?'llama-2-70b-chat':'',
                     iresearch: addResearch,
                     datasource: {
                       "datasource": addRows
@@ -638,9 +639,16 @@ export function AddTextmodal(props: { agentId: string, open: boolean,  onClose: 
                     justifyContent: 'center',alignItems: 'center'
                   }}>      
 
+                  <Typography sx={{
+                    mb: 0, // absorb the bottom margin of the list
+                    mt: 1,}}>
+
+                    LLM Provider
+                  </Typography>
+
                 <Select sx={{mb: 3, mt:1, maxWidth: 200}} indicator={<KeyboardArrowDownIcon />} value={addReqType} onChange={handleReqType}>
                       <Option value="opensource">
-                              Default
+                              PlebAI
                       </Option>
                       <Option value="perplexity">
                               Llama2-70B

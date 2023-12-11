@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 let nextConfig = {
   reactStrictMode: true,
+  output: 'standalone',
   env: {
     // defaults to TRUE, unless API Keys are set at build time; this flag is used by the UI
     HAS_SERVER_KEY_OPENAI: !!process.env.OPENAI_API_KEY,
@@ -23,7 +24,6 @@ let nextConfig = {
 };
 
 // conditionally enable the nextjs bundle analyzer
-if (process.env.ANALYZE_BUNDLE)
-  nextConfig = require('@next/bundle-analyzer')()(nextConfig);
+if (process.env.ANALYZE_BUNDLE) nextConfig = require('@next/bundle-analyzer')()(nextConfig);
 
 module.exports = nextConfig;

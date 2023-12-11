@@ -1,42 +1,49 @@
-# Test
-FROM node:18-alpine as test-target
-ENV NODE_ENV=development
-ENV PATH $PATH:/usr/src/app/node_modules/.bin
+FROM node:18-alpine AS base
 
-WORKDIR /usr/src/app
+# Check and install deps with npm ci
+FROM base AS deps
 
-COPY package*.json ./
+RUN apk add --no-cache libc6-compat python3 make g++
 
-# CI and release builds should use npm ci to fully respect the lockfile.
-# Local development may use npm install for opportunistic package updates.
-ARG npm_install_command=ci
-RUN npm $npm_install_command
+WORKDIR /app
 
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Build app
+FROM base AS builder
+
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Build
-FROM test-target as build-target
-ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED 1
 
-# Use build tools, installed as development packages, to produce a release build.
 RUN npm run build
 
-# Reduce installed packages to production-only.
-RUN npm prune --production
+# Production container
+FROM base AS runner
+WORKDIR /app
 
-# Archive
-FROM node:18-alpine as archive-target
-ENV NODE_ENV=production
-ENV PATH $PATH:/usr/src/app/node_modules/.bin
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED 1
 
-WORKDIR /usr/src/app
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 next
 
-# Include only the release build and production packages.
-COPY --from=build-target /usr/src/app/node_modules node_modules
-COPY --from=build-target /usr/src/app/.next .next
-COPY --from=build-target /usr/src/app/public public
+COPY --from=builder /app/public ./public
 
-# Expose port 3000 for the application to listen on
+RUN mkdir .next
+RUN chown next:nodejs .next
+
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER node
+
 EXPOSE 3000
 
-CMD ["next", "start"]
+ENV PORT 3000
+ENV HOSTNAME "0.0.0.0"
+
+CMD ["node", "server.js"]

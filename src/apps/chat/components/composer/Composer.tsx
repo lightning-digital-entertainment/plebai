@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { shallow } from 'zustand/shallow';
 
-import { Box, Button, Card, Grid, IconButton, ListDivider, ListItemDecorator, Menu, MenuItem, ModalProps, Stack, Textarea, Tooltip, Typography, useTheme } from '@mui/joy';
+import { Avatar, Box, Button, Card, CircularProgress, Grid, IconButton, ListDivider, ListItemDecorator, Menu, MenuItem, ModalProps, Stack, Textarea, Tooltip, Typography, useTheme } from '@mui/joy';
 import { ColorPaletteProp, SxProps, VariantProp } from '@mui/joy/styles/types';
 import ContentPasteGoIcon from '@mui/icons-material/ContentPasteGo';
 import DataArrayIcon from '@mui/icons-material/DataArray';
@@ -15,6 +15,7 @@ import PsychologyIcon from '@mui/icons-material/Psychology';
 import StopOutlinedIcon from '@mui/icons-material/StopOutlined';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 
 import { ContentReducer } from '~/modules/aifn/summarize/ContentReducer';
 import { useChatLLM } from '~/modules/llms/store-llms';
@@ -42,10 +43,14 @@ import { NoWebLnModal } from '~/common/components/NoWebLnModal';
 import { Invoice } from "alby-tools";
 import { SystemPurposeData } from '~/modules/data/request.router';
 import { staticGenerationAsyncStorage } from 'next/dist/client/components/static-generation-async-storage';
+import { useDropzone } from 'react-dropzone';
 
 
+type Image = {
+  imageFile: Blob;
+}; 
 
-/// Text template helpers
+const detailAvatarSx = { xs: 20, md: 42, xl: 60 };
 
 const PromptTemplates = {
   Concatenate: '{{input}}\n\n{{text}}',
@@ -201,6 +206,8 @@ export function Composer(props: {
   const [openNoWebLnModal, setOpenNoWebLnModal] = React.useState(false);
   const attachmentFileInputRef = React.useRef<HTMLInputElement>(null);
   const [qrCodeText, setQrCodeText] = React.useState('');
+  const [addImageUrl, setAddImageUrl] =React.useState('');
+  const [imageProgress, setImageProgress] = React.useState(false);
 
   const appFingerPrint = localStorage.getItem('appFingerPrint');
 
@@ -249,7 +256,67 @@ export function Composer(props: {
 
   }, [appFingerPrint, setAgentUpdate]);
 
+  const uploadImage = async ({ imageFile }: Image) => {
+    console.log(imageFile)
+    setImageProgress(true);
+    if (imageFile.type === 'image/png' || imageFile.type === 'image/jpg' || imageFile.type === 'image/jpeg') {
+
+      let input:any;
+      
+      const reader = new FileReader()
+      
+      reader.onabort = () => console.log('file reading was aborted')
+      reader.onerror = () => console.log('file reading has failed')
+      reader.onload = async () => {
+        input = {input: reader.result,
+                 type: imageFile.name.split(".").pop()
+                
+                }
+        console.log(imageFile.name.split(".").pop())
+        const response = await fetch(`/api/data/upload`, {
+          method: 'POST',
+          body: JSON.stringify(input),
+          headers: {
+            'content-type' : 'application/json'
+        },
+      });
+
+        
+
+        if (response) {
+          const responseBody = await response.json()
+          setAddImageUrl(responseBody.url);
+          setImageProgress(false);
+
+        }
+
+
+        
+
+      } 
+      
+        reader.readAsDataURL(imageFile)
+        console.log(input);
+    }
+
+
+};
+
+
+const onDrop = React.useCallback((acceptedFiles: any[]) => {
+    // Upload files to storage
+    const file = acceptedFiles[0];
+    uploadImage({ imageFile: file });
+  }, []);
+
+const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     
+    //accept: "image/*",
+    maxFiles: 1,
+    noClick: false,
+    noKeyboard: true,
+    onDrop,
+  });   
   
     
   
@@ -285,11 +352,18 @@ export function Composer(props: {
   const purposeModel: string = SystemPurposes[props.systemPurpose as SystemPurposeId]?.chatLLM?SystemPurposes[props.systemPurpose as SystemPurposeId].chatLLM:'';
 
   const handleSendClicked = () => {
-    const text = (composeText || '').trim();
+    let text = (composeText || '').trim();
     console.log('inside handle clicked')
     console.log('Sats to be paid: %o', paySats);
     console.log('purpose Model: %o', purposeModel)
     console.log('conversationTokenCount: %o',conversationTokenCount)
+
+    if (addImageUrl !== '') {
+      
+      text = text + ' ' + addImageUrl;
+      setAddImageUrl('');
+      
+    }
     if ( conversationCount <  SystemPurposes[props.systemPurpose as SystemPurposeId].convoCount && !SystemPurposes[props.systemPurpose as SystemPurposeId].paid ) {
       if (text.length && props.conversationId) {
         setComposeText('');
@@ -624,11 +698,11 @@ export function Composer(props: {
           <Box sx={{ display: 'flex', flexDirection: 'row', gap: { xs: 0, md: 0 } }}>
 
             {/*<Typography level='body3' sx={{mb: 2}}>Context</Typography>*/}
-
+             {/* 
             {isSpeechEnabled && <Box sx={hideOnDesktop}>
-              <MicButton variant={micVariant} color={micColor} onClick={handleMicClicked} />
+              <MicButton variant={micVariant} color={micColor} onClick={handleMicClicked} /> 
             </Box>}
-            {/* 
+           
             <IconButton variant='soft' color='neutral' onClick={handleShowFilePicker} sx={{ ...hideOnDesktop }}>
               <UploadFileIcon />
             </IconButton>
@@ -660,28 +734,59 @@ export function Composer(props: {
           <Grid xs={1} md={2}>
           <Stack spacing={2}>
 
-            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right' }}>
 
               {/* [mobile-only] Sent messages arrow */}
               {sentMessages.length > 0 && (
                 <IconButton disabled={!!sentMessagesAnchor} variant='plain' color='neutral' onClick={showSentMessages} sx={{ ...hideOnDesktop, mr: { xs: 1, md: 2 } }}>
                   <HistoryIcon />
+                  <Button variant='plain' color='neutral' startDecorator={<AttachFileIcon />}  > </Button>
                 </IconButton>
+                
+                
               )}
 
               {/* Send / Stop */}
              
                             {/* [desktop-only] row with Sent Messages button */}
-                <Stack direction='row' spacing={1} sx={{ ...hideOnMobile, flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'flex-end' }}>
+                <Stack direction='row' spacing={1} sx={{ ...hideOnMobile, flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'right' }}>
                   {sentMessages.length > 0 && (
                     <Button disabled={!!sentMessagesAnchor} variant='plain' color='neutral' startDecorator={<HistoryIcon />} onClick={showSentMessages}>
                       
                     </Button>
                   )}
+
+                        <div className="dropzone">
+                            
+
+                            <div {...getRootProps()} className="drag_drop_wrapper">
+                              <input hidden {...getInputProps()} />
+              
+                              {imageProgress? <CircularProgress variant="solid" />:
+
+                              <Box>
+
+                                {addImageUrl? 
+                                
+                                <Avatar  alt=""src={addImageUrl} sx={{ width: detailAvatarSx, height: detailAvatarSx }}></Avatar>
+                                :                    
+                                <Button variant='plain' color='neutral' startDecorator={<AttachFileIcon />}  > </Button>}
+
+                              </Box> }
+                              
+                  
+                                         
+                              
+                            </div>
+                        </div>     
+
+                  
                 </Stack>
+
+                
             </Box>
 
-
+            
 
           </Stack>
         </Grid>

@@ -164,7 +164,7 @@ export function AddImagemodal(props: { agentId: string, open: boolean,  onClose:
     
         //accept: "image/*",
         maxFiles: 1,
-        noClick: true,
+        noClick: false,
         noKeyboard: true,
         onDrop,
       });

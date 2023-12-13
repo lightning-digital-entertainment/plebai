@@ -204,9 +204,10 @@ export function ApplicationBar(props: { sx?: SxProps }) {
 
       console.log(error);
       setUserImage('/icons/user-defult.png');
-      if (userPubkey?.length < 2) {
+      if (!userPubkey) {
           const privateKey = generatePrivateKey();
           pubkey = getPublicKey(privateKey);
+          console.log(pubkey);
           localStorage.setItem('userPubkey', pubkey);
 
       }

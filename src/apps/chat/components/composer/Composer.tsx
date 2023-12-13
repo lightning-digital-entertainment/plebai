@@ -3,18 +3,15 @@ import { shallow } from 'zustand/shallow';
 
 import { Avatar, Box, Button, Card, CircularProgress, Grid, IconButton, ListDivider, ListItemDecorator, Menu, MenuItem, ModalProps, Stack, Textarea, Tooltip, Typography, useTheme } from '@mui/joy';
 import { ColorPaletteProp, SxProps, VariantProp } from '@mui/joy/styles/types';
-import ContentPasteGoIcon from '@mui/icons-material/ContentPasteGo';
 import DataArrayIcon from '@mui/icons-material/DataArray';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import MicIcon from '@mui/icons-material/Mic';
 import PanToolIcon from '@mui/icons-material/PanTool';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import StopOutlinedIcon from '@mui/icons-material/StopOutlined';
-import TelegramIcon from '@mui/icons-material/Telegram';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
+
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 
 import { ContentReducer } from '~/modules/aifn/summarize/ContentReducer';
@@ -33,8 +30,6 @@ import { useUIPreferencesStore, useUIStateStore } from '~/common/state/store-ui'
 
 import { SendModeId } from '../../Chat';
 import { SendModeMenu } from './SendModeMenu';
-import { TokenBadge } from './TokenBadge';
-import { TokenProgressbar } from './TokenProgressbar';
 import { useComposerStore } from './store-composer';
 import Wallet_Service from '~/modules/webln/wallet';
 import { requestOutputSchema } from '~/modules/current/request.router';
@@ -350,7 +345,7 @@ const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
   const purposeTitle: string = SystemPurposes[props.systemPurpose as SystemPurposeId]?.title?SystemPurposes[props.systemPurpose as SystemPurposeId].title:''
   const paySats: number = purposeTitle==='Gen Image AI (Sats) '?100000:purposeTitle==='Youtube Chat (Sats)'?100000:Math.round(Math.floor(chatLLM?.id.startsWith('openai-gpt-4')?(responseTokens+directTokens)*200:(responseTokens+directTokens)*50)/ 1000) * 1000;
   const purposeModel: string = SystemPurposes[props.systemPurpose as SystemPurposeId]?.chatLLM?SystemPurposes[props.systemPurpose as SystemPurposeId].chatLLM:'';
-
+  const subexpiry = localStorage.getItem('subexpiry');
   const handleSendClicked = () => {
     let text = (composeText || '').trim();
     console.log('inside handle clicked')
@@ -364,7 +359,27 @@ const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
       setAddImageUrl('');
       
     }
-    if ( conversationCount <  SystemPurposes[props.systemPurpose as SystemPurposeId].convoCount && !SystemPurposes[props.systemPurpose as SystemPurposeId].paid ) {
+
+    //write a scruipt to print console log 
+  
+    
+    const isTimestampGreaterThanToday = (timestamp: number): boolean => {
+      const dateFromTimestamp = new Date(timestamp * 1000); // Convert seconds to milliseconds
+      const currentDate = new Date();
+    
+      return dateFromTimestamp > currentDate;
+    };
+    if (subexpiry && isTimestampGreaterThanToday(parseInt(subexpiry, 10))) {
+      if (text.length && props.conversationId) {
+        setComposeText('');
+        setConversationCount(props.conversationId, conversationCount + 1);
+        props.onSendMessage(sendModeId, props.conversationId, text);
+
+        appendSentMessage(text);
+      }
+
+    } 
+    else if ( conversationCount <  SystemPurposes[props.systemPurpose as SystemPurposeId].convoCount && !SystemPurposes[props.systemPurpose as SystemPurposeId].paid ) {
       if (text.length && props.conversationId) {
         setComposeText('');
         setConversationCount(props.conversationId, conversationCount + 1);

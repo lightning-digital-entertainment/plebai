@@ -5,17 +5,14 @@ import { Avatar, Badge, Box, Button, IconButton, Link, ListDivider, ListItemDeco
 import { SxProps } from '@mui/joy/styles/types';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import MenuIcon from '@mui/icons-material/Menu';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import { CloseableMenu } from '~/common/components/CloseableMenu';
-import Person from '@mui/icons-material/Person';
 import { useUIStateStore } from '~/common/state/store-ui';
 import { NDKNip07Signer} from "@nostr-dev-kit/ndk";
 import { SupportMenuItem } from './SupportMenuItem';
 import { useApplicationBarStore } from './store-applicationbar';
-import { M_PLUS_1 } from 'next/font/google';
 import { SubscriptionModal } from 'src/apps/chat/components/appbar/SubscriptionModal';
-import { SimplePool } from 'nostr-tools';
+import { SimplePool, generatePrivateKey, getPublicKey } from 'nostr-tools';
 
 function DiscordIcon(props: { sx?: SxProps }) {
   return <SvgIcon viewBox='0 0 24 24' width='24' height='24' stroke='currentColor' fill='none' strokeLinecap='round' strokeLinejoin='round' {...props}>
@@ -29,7 +26,6 @@ const explicitRelayUrls = [
         'wss://nostr1.current.fyi',
         'wss://nostr-pub.wellorder.net',
         'wss://relay.damus.io',
-        'wss://nostr-relay.wlvs.space',
         'wss://nos.lol',
         'wss://relay.primal.net',
         "wss://relay.nostr.band",
@@ -94,12 +90,13 @@ export function ApplicationBar(props: { sx?: SxProps }) {
   }), shallow);
 
   const closeApplicationMenu = () => setApplicationMenuAnchor(null);
+  const userPubkey:any = localStorage.getItem('userPubkey');
 
   const closeContextMenu = React.useCallback(() => setContextMenuAnchor(null), [setContextMenuAnchor]);
 
   const [subscribeModal, setSubscribeModal] = React.useState(false);
+  const [subscribed, setSubscribed] = React.useState(false);
   const [userImage, setUserImage] = React.useState('');
-
 
   const commonContextItems = React.useMemo(() =>
       <CommonContextItems onClose={closeContextMenu} />
@@ -109,6 +106,42 @@ export function ApplicationBar(props: { sx?: SxProps }) {
       setSubscribeModal(false);
       
   }
+
+  const verifySubscription = async (userPubkey:string) => {
+
+    if (userPubkey==='') return;
+
+    const url =  '/subscribers/' + userPubkey;
+
+    const verifyResponse = await fetch('/api/current/subcheck', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({url})
+    });
+    try {
+
+        const result = await verifyResponse?.json();
+
+        if (result?.active) {
+            localStorage.setItem('subexpiry', result.expires);
+            setSubscribed(true);
+        } else {
+
+          localStorage.setItem('subexpiry', '');
+          setSubscribed(false);
+        }
+        
+    } catch (error) {
+        console.log(error);
+        localStorage.setItem('subexpiry', '');
+        setSubscribed(false);
+    }
+    
+
+
+}
+
+
 
   const getProfile = (pubkey:string) => {
     return new Promise((resolve, reject) => {
@@ -136,6 +169,8 @@ export function ApplicationBar(props: { sx?: SxProps }) {
 
     const nip07signer = new NDKNip07Signer();
 
+    let pubkey = userPubkey;
+
     try {
 
       const nipok =  await nip07signer?.blockUntilReady();
@@ -148,11 +183,17 @@ export function ApplicationBar(props: { sx?: SxProps }) {
           console.log(user);
           if (!!user.npub) {
               console.log("Permission granted to read their public key:", user.npub);
-       
-              const profile:any = await (getProfile(user.pubkey));
-              const data = JSON.parse(profile);
-              console.log(data.picture);
-              setUserImage(data.picture);
+
+              
+
+            const profile:any = await (getProfile(user.pubkey));
+            localStorage.setItem('userPubkey', user.pubkey);
+            const data = JSON.parse(profile);
+            console.log(data.picture);
+            setUserImage(data.picture);
+
+              
+              
           }
         });
        
@@ -162,10 +203,23 @@ export function ApplicationBar(props: { sx?: SxProps }) {
     } catch (error) {
 
       console.log(error);
-      
+      setUserImage('/icons/user-defult.png');
+      if (userPubkey?.length < 2) {
+          const privateKey = generatePrivateKey();
+          pubkey = getPublicKey(privateKey);
+          localStorage.setItem('userPubkey', pubkey);
+
+      }
+
     }
 
-  }, []);
+    verifySubscription(pubkey);
+
+    
+
+  }, [userPubkey]);
+
+
 
   React.useEffect(() => {
 
@@ -204,7 +258,11 @@ export function ApplicationBar(props: { sx?: SxProps }) {
             <Typography level='body-sm' color='primary' sx={{
                             flexDirection: 'row', flexWrap: 'wrap'
                             }} >
-                            <Button  sx={{position: 'center'}} variant="solid"  onClick={() => setSubscribeModal(true)} color='neutral' > Subscribe </Button>
+                            {subscribed? 
+                            
+                            'You are subscribed '
+                            :
+                            <Button  sx={{position: 'center'}} variant="solid"  onClick={() => setSubscribeModal(true)} color='neutral' > Subscribe </Button>}
 
                              {' for unlimited text and image AI. Join our' }
                             <Link color='primary' sx={{ml:1}} href='https://discord.gg/DfSZpqUKYG'> Discord <DiscordIcon sx={{ ml: 1, color: '' }} /> </Link> 
@@ -217,7 +275,7 @@ export function ApplicationBar(props: { sx?: SxProps }) {
       {/* Context-Menu Button */}
       <IconButton disabled={!!contextMenuAnchor || !contextMenuItems} variant='plain' onClick={event => setContextMenuAnchor(event.currentTarget)}>
        {<Avatar  alt="User profile."
-      src={userImage!==''?userImage:'/icons/user-defult.png'}/> } 
+      src={userImage}/> } 
       </IconButton>
     </Sheet>
 

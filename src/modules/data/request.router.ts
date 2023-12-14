@@ -58,7 +58,8 @@ export const requestOutputSchema = z.object({
     category:string;
     createdBy:string;
     commissionAddress:string;
-    restricted:boolean
+    restricted:boolean;
+    private:boolean;
   }
 
   export type requestInputSchema = z.infer<typeof requestInputSchema>;  

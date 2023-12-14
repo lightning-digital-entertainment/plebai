@@ -80,6 +80,8 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   const [showCreateSelect, setShowCreateSelect] = React.useState(false);
   const [agentId, setAgentId] = React.useState<string>('new');
   const [restricted, setRestricted] = React.useState(localStorage.getItem('restricted')==='true'?true:false)
+  const [privateAgent, setPrivateAgent] = React.useState(localStorage.getItem('private')==='true'?true:false)
+  const [agentPubKey, setAgentPubKey] = React.useState('')
   
   const {  startupText, setStartupText } = useComposerStore();
 
@@ -92,6 +94,37 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   const appFingerPrint = localStorage.getItem('appFingerPrint');
   const {agentUpdate, setAgentUpdate} = useUIPreferencesStore(state => ({agentUpdate: state.agentUpdate, setAgentUpdate: state.setAgentUpdate,}));
   
+  const getNostrPubkey = React.useCallback(async (nip05:string) => {
+    
+        
+    try {
+
+      const [user, domain] = nip05.split('@');
+      const input = {user, domain}
+
+      const response = await fetch(`/api/current/pubkey`, {
+        method: 'POST',
+        body: JSON.stringify(input),
+        headers: {
+          'content-type' : 'application/json'
+        }
+  
+      });
+  
+      const result = await response?.json();
+      
+  
+      setAgentPubKey(result?.names[user]);
+      
+    } catch (error) {
+      console.log(error);
+    }
+
+   
+
+
+  },[]);
+
 
   React.useEffect(() => {
     if (updateRefresh || Object.keys(SystemPurposes).length<2) {
@@ -142,7 +175,20 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
           localStorage.setItem('restricted', "false")
         } 
         executeFilter('');
-      };
+  };
+
+  const handlePrivateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    
+    console.log(event.target.checked);
+    if (event.target.checked) {
+      setPrivateAgent(true);
+      localStorage.setItem('private', "true")
+    } else {
+      setPrivateAgent(false);
+      localStorage.setItem('private', "false")
+    } 
+    executeFilter('');
+};
   
 
   const executeFilter = (data:string) => {
@@ -156,13 +202,13 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
       .filter(key => SystemPurposes.hasOwnProperty(key))
       .filter(key => {
         const purpose = SystemPurposes[key as SystemPurposeId];
-        return  ( purpose.restricted === null || purpose.restricted === restricted) && (purpose.title.toLowerCase().includes(query.toLowerCase())
+        return  (purpose.private === privateAgent) && ( purpose.restricted === null || purpose.restricted === restricted) && (purpose.title.toLowerCase().includes(query.toLowerCase())
           || (typeof purpose.placeHolder === 'string' && purpose.placeHolder.toLowerCase().includes(query.toLowerCase()))
           || (typeof purpose.category === 'string' && purpose.category.toLowerCase().includes(query.toLowerCase())));
       });
     setFilteredIDs(ids as SystemPurposeId[]);
 
-    console.log("fileter: ", filteredIDs)
+    //console.log("fileter: ", filteredIDs)
 
 
 
@@ -202,9 +248,11 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
       console.log(SystemPurposes[purposeId as SystemPurposeId].chatLLM)
       setChatLLMId(SystemPurposes[purposeId as SystemPurposeId].chatLLM)
       setDetailModal(true);
-
+      getNostrPubkey(SystemPurposes[purposeId as SystemPurposeId].nip05);
     }  
   };
+
+  
 
   const onSetExample = (messageText: string) => {
 
@@ -299,7 +347,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   const unfilteredPurposeIDs = (filteredIDs && showPurposeFinder) ? filteredIDs : Object.keys(SystemPurposes);
   const purposeIDs = editMode ? unfilteredPurposeIDs : unfilteredPurposeIDs.filter(id => !hiddenPurposeIDs.includes(id)).filter(key => {
     const purpose = SystemPurposes[key as SystemPurposeId];
-    return  ( purpose.restricted === null || purpose.restricted === restricted)});
+    return  ( purpose.restricted === null || purpose.restricted === restricted) && (purpose.private === privateAgent)});
 
   const selectedPurpose = purposeIDs.length ? (SystemPurposes[systemPurposeId] ?? null) : null;
   const selectedExample = selectedPurpose?.examples && getRandomElement(selectedPurpose.examples) || null;
@@ -326,8 +374,8 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
               mt: 0, ml:10, mr:10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, justifyContent: 'center',
             }} >
        
-       {selectedPurpose?  <div style={{ fontSize: '1rem' }}>  ID: {systemPurposeId.substring(0,8) + '...'}      
-            <IconButton variant='plain' color='neutral' onClick={() => handleIdCopy(systemPurposeId)}  sx={{}}><ContentCopyIcon /> </IconButton> </div> : ''}
+       {selectedPurpose?  <div style={{ fontSize: '1rem' }}>  ID: {agentPubKey.substring(0,8) + '...'}      
+            <IconButton variant='plain' color='neutral' onClick={() => handleIdCopy(agentPubKey)}  sx={{}}><ContentCopyIcon /> </IconButton> </div> : ''}
         
         {selectedPurpose? <div style={{ fontSize: '1rem' }}>  Price: {selectedPurpose.paid?selectedPurpose.satsPay + ' SATS':  selectedPurpose.convoCount + ' conversations are FREE. Then ' + selectedPurpose.satsPay +  ' SATS' } </div> : ''}
         {selectedPurpose? <Link href={'https://plebai.com/nostr/' + selectedPurpose.nip05} > {'Nostr profile: ' + selectedPurpose.nip05}  </Link> : ''}
@@ -403,7 +451,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
             </Menu>
           </Dropdown>
           <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', justifyContent: 'right', gap: 2, mb: 1, mt:4 }}>
-
+          <Checkbox sx={{ justifyContent: 'right'}} checked={privateAgent} onChange = {handlePrivateChange} label="Private" size="sm" />
           <Checkbox sx={{ justifyContent: 'right'}} checked={restricted} onChange = {handleRestrictChange} label="Over 18+" size="sm" />
           <Button sx={{ justifyContent: 'right'}} variant="outlined" color='neutral' size='sm' onClick={toggleEditMode}>
             {editMode ? 'Done' : 'Hide'}

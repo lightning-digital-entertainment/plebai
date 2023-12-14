@@ -39,6 +39,7 @@ import { Invoice } from "alby-tools";
 import { SystemPurposeData } from '~/modules/data/request.router';
 import { staticGenerationAsyncStorage } from 'next/dist/client/components/static-generation-async-storage';
 import { useDropzone } from 'react-dropzone';
+import { CloseableMenu } from '~/common/components/CloseableMenu';
 
 
 type Image = {
@@ -86,7 +87,8 @@ export let SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
     category:'',
     createdBy:'',
     commissionAddress:'',
-    restricted:false
+    restricted:false,
+    private:false
   },
 
 };
@@ -144,8 +146,8 @@ const SentMessagesMenu = (props: {
   onPaste: (text: string) => void,
   onClear: () => void,
 }) =>
-  <Menu
-    variant='plain' color='neutral' size='md' placement='top-end' sx={{ minWidth: 320, maxWidth: '100dvw', maxHeight: 'calc(100dvh - 56px)', overflowY: 'auto' }}
+  <CloseableMenu
+    variant='plain' placement='top-end' sx={{ minWidth: 320, maxWidth: '100dvw', maxHeight: 'calc(100dvh - 56px)', overflowY: 'auto' }}
     open={!!props.anchorEl} anchorEl={props.anchorEl} onClose={props.onClose}>
 
     <MenuItem color='neutral' selected>Reuse messages 💬</MenuItem>
@@ -168,7 +170,7 @@ const SentMessagesMenu = (props: {
       Clear sent messages history
     </MenuItem>
 
-  </Menu>;
+  </CloseableMenu>;
 
 
 /**

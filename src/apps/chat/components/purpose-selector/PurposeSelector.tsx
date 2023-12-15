@@ -552,7 +552,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
             '&:hover > button': { opacity: 1 },
             }} >
 
-{"NOTE: PlebAI exclusively utilizes open-source large language models and does not favor any particular ideology. We do not use closed-source models from OpenAI or Anthropic. You can engage in unbiased conversations without filters. However, prompts are visible to other users. DO NOT input any private or personally identifiable information. There are no terms and conditions to accept. Remain civil and abide by the law. "}
+{"NOTE: PlebAI exclusively utilizes open-source large language models and does not favor any particular ideology. You can engage in unbiased conversations without filters. However, prompts are visible to other users. DO NOT input any private or personally identifiable information. There are no terms and conditions to accept. Remain civil and abide by the law. "}
             </Typography>
 
         

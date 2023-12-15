@@ -12,6 +12,7 @@ import { apiQuery } from '~/modules/trpc/trpc.client';
 import '~/common/styles/GithubMarkdown.css';
 import { Brand } from '~/common/brand';
 import { createEmotionCache, theme } from '~/common/theme';
+import { generatePrivateKey, getPublicKey } from 'nostr-tools';
 
 
 // Client-side cache, shared for the whole session of the user in the browser.
@@ -32,9 +33,12 @@ function MyApp({ Component, emotionCache = clientSideEmotionCache, pageProps }: 
     const setFp = async () => {
       const fp = await FingerprintJS.load();
 
-      const { visitorId } = await fp.get();
-      localStorage.setItem('appFingerPrint', visitorId);
-      
+      //const { visitorId } = await fp.get();
+      const appFingerPrint = localStorage.getItem('appFingerPrint');
+      if (!appFingerPrint) {
+        const privateKey = generatePrivateKey();
+        localStorage.setItem('appFingerPrint', getPublicKey(privateKey));
+      }
     };
   
     const storedVersion = localStorage.getItem('appVersion');

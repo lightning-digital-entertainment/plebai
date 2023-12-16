@@ -304,6 +304,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   
     setaddImageModal(false);
     setAgentId('new');
+    setPrivateAgent(true);
     
   }
 
@@ -313,6 +314,7 @@ export function PurposeSelector(props: { conversationId: string, runExample: (ex
   
     setaddTextModal(false);
     setAgentId('new');
+    setPrivateAgent(true);
     
   }
 

@@ -14,13 +14,14 @@ import 'prismjs/components/prism-typescript';
 import 'prismjs/themes/prism.css';
 
 
-export type Block = TextBlock | CodeBlock | ImageBlock | VideoBlock | HtmlBlock | QuestionBlock;
+export type Block = TextBlock | CodeBlock | ImageBlock | VideoBlock | HtmlBlock | QuestionBlock | RenderMarkdownBlock;
 export type TextBlock = { type: 'text'; content: string; };
 export type CodeBlock = { type: 'code'; content: string; language: string | null; complete: boolean; code: string; };
 export type ImageBlock = { type: 'image'; url: string; };
 export type VideoBlock = { type: 'video'; url: string; };
 export type HtmlBlock = { type: 'html'; html: string; };
 export type QuestionBlock = { type: 'question'; question: string; };
+export type RenderMarkdownBlock = { type: 'markdown', content:string};
 
 
 /**
@@ -44,6 +45,9 @@ export const parseBlocks = (forceText: boolean, text: string): Block[] => {
 
   if (text.startsWith('<!DOCTYPE html'))
     return [{ type: 'html', html: text }];
+
+  if (text.startsWith('/ '))
+    return [{type: 'markdown', content:text }];
 
   const codeBlockRegex = /`{3,}([\w\\.+-_]+)?\n([\s\S]*?)(`{3,}|$)/g;
   const result: Block[] = [];

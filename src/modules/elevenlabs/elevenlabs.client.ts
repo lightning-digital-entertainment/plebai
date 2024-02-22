@@ -19,6 +19,8 @@ export async function speakText(text: string) {
   const { elevenLabsApiKey, elevenLabsVoiceId } = useElevenlabsStore.getState();
   if (!isElevenLabsEnabled(elevenLabsApiKey)) return;
 
+  if (!elevenLabsVoiceId) useElevenlabsStore.setState({ elevenLabsVoiceId: 'Mz8ep4BmdyqyRT5FwH6G'});
+
   const { preferredLanguage } = useUIPreferencesStore.getState();
   const nonEnglish = !(preferredLanguage?.toLowerCase()?.startsWith('en'));
 

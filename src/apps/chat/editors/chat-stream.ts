@@ -70,7 +70,7 @@ async function streamAssistantMessage(
     model: {
       id: llmRef,
       temperature: llmTemperature,
-      maxTokens: SystemPurposes[systemPurpose as SystemPurposeId].maxToken,
+      maxTokens: SystemPurposes[systemPurpose as SystemPurposeId]?.maxToken?SystemPurposes[systemPurpose as SystemPurposeId]?.maxToken:1024,
       conversationId: conversationId?conversationId:'',
       messageId: assistantMessageId? assistantMessageId:'',
       llmRouter: SystemPurposes[systemPurpose as SystemPurposeId].llmRouter,

@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Box, useTheme } from '@mui/joy';
 
 import { TextBlock } from './Block';
+import {RenderMarkdownBlock} from './Block';
 
 
 // Dynamically import ReactMarkdown using React.lazy
@@ -21,7 +22,7 @@ const ReactMarkdown = React.lazy(async () => {
 });
 
 
-export const RenderMarkdown = ({ textBlock }: { textBlock: TextBlock }) => {
+export const RenderMarkdown = ({ textBlock }: { textBlock: RenderMarkdownBlock }) => {
   const theme = useTheme();
   return (
     <Box

@@ -21,7 +21,8 @@ import ThumbsUpFilledIcon from '@mui/icons-material/ThumbUpSharp';
 
 import ThumbsDownOutlinedIcon from '@mui/icons-material/ThumbDownAltOutlined';
 import ThumbsDownFilledIcon from '@mui/icons-material/ThumbDownSharp';
-
+import RecordVoiceOverOutlinedIcon from '@mui/icons-material/RecordVoiceOverOutlined';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { canUseElevenLabs, speakText } from '~/modules/elevenlabs/elevenlabs.client';
 import { canUseProdia } from '~/modules/prodia/prodia.client';
 
@@ -358,15 +359,14 @@ export function ChatMessage(props: { message: DMessage, isBottom: boolean, onMes
               ? <RenderHtml key={'html-' + index} htmlBlock={block} sx={cssCode} />
               : block.type === 'code'
                 ? <RenderCode key={'code-' + index} codeBlock={block} sx={cssCode} />
-                
+              : block.type === 'markdown'
+                ? <RenderMarkdown key={'text-md-' + index} textBlock={block} />
   
               : block.type === 'video'
                 ? <RenderVideo key={'video-' + index} videoBlock={block} allowRunAgain={props.isBottom} onRunAgain={handleMenuRunAgain} />
             
                 : block.type === 'image'
                   ? <RenderImage key={'image-' + index} imageBlock={block} allowRunAgain={props.isBottom} onRunAgain={handleMenuRunAgain} />   
-                  : renderMarkdown
-                    ? <RenderMarkdown key={'text-md-' + index} textBlock={block} />
                     : <RenderText key={'text-' + index} textBlock={block} />,
                     
                     
@@ -377,9 +377,7 @@ export function ChatMessage(props: { message: DMessage, isBottom: boolean, onMes
                   <Box  sx={{
                     display: 'flex', mt: 4, mb:2, mx: 1, alignItems: 'right', justifyContent: 'flex-end', flexDirection: 'row'
                   }} >
-                        <Typography level='body-sm' color='neutral'  sx={{mt: 1, mx: 0.5 }}>
-                        Do you like the response? 
-                        </Typography>
+
                         <IconButton variant='plain' color='neutral'  onClick={toggleThumbsUp} sx={{}}>
                           {isThumbsUpToggled? <ThumbsUpFilledIcon />: <ThumbsUpOutlinedIcon />}
                         </IconButton>
@@ -387,6 +385,16 @@ export function ChatMessage(props: { message: DMessage, isBottom: boolean, onMes
                         <IconButton variant='plain' color='neutral' onClick={toggleThumbsDown} sx={{}}>
                         {isThumbsDownToggled? <ThumbsDownFilledIcon />: <ThumbsDownOutlinedIcon />}
                         </IconButton>
+                        <IconButton variant='plain' color='neutral' onClick={handleMenuSpeak} sx={{}}>
+                        {isSpeaking? <CircularProgress/>: <RecordVoiceOverIcon />}
+                        </IconButton>
+                        <IconButton variant='plain' color='neutral' onClick={handleMenuRunAgain} sx={{}}>
+                              {<RefreshIcon/>}
+                        </IconButton>
+
+
+                        
+                        
                     
                   </Box> 
           )}

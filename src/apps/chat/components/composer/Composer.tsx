@@ -381,7 +381,7 @@ const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
       }
 
     } 
-    else if ( conversationCount <  SystemPurposes[props.systemPurpose as SystemPurposeId].convoCount && !SystemPurposes[props.systemPurpose as SystemPurposeId].paid ) {
+    else if ( conversationCount <  SystemPurposes[props.systemPurpose as SystemPurposeId]?.convoCount?SystemPurposes[props.systemPurpose as SystemPurposeId]?.convoCount:5 && !SystemPurposes[props.systemPurpose as SystemPurposeId]?.paid?!SystemPurposes[props.systemPurpose as SystemPurposeId]?.paid:false ) {
       if (text.length && props.conversationId) {
         setComposeText('');
         setConversationCount(props.conversationId, conversationCount + 1);

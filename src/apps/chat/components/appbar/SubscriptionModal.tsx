@@ -105,7 +105,7 @@ export function SubscriptionModal(props: { open: boolean,  onClose: () => void, 
                 const response = await fetch('/api/current/request', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({'amtinsats': 9000*1000,'nip05':'plebai@getcurrent.io' })
+                  body: JSON.stringify({'amtinsats': 7500*1000,'nip05':'plebai@getcurrent.io' })
                 });
                 const payResponse  = await response.json();
                 const { pr, verify } = requestOutputSchema.parse(payResponse);
@@ -227,7 +227,7 @@ export function SubscriptionModal(props: { open: boolean,  onClose: () => void, 
                     </Typography>
                     
                     <Typography level='body-md' color='primary' sx={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 2 }}>
-                        Our price:  <span style={{ textDecoration: 'line-through' }}>12,000 Sats</span>{" Limited Time Offer: 9,000 Sats!"}
+                        Our price:  <span style={{ textDecoration: 'line-through' }}>12,000 Sats</span>{" Limited Time Offer: 7,500 Sats!"}
                     </Typography>
                     
                     <Button variant="solid" color="primary" onClick={handleSubscription} sx={{ marginTop: 3 }}>
